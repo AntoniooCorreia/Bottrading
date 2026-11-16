@@ -26,6 +26,7 @@ def main():
     ap.add_argument("--ideas", required=True)
     ap.add_argument("--markets", default=",".join(CARTEIRA))
     ap.add_argument("--period", default="tudo", choices=[p for p in PERIODS if p != "holdout"])
+    ap.add_argument("--only", default="", help="lista indice:ideia a usar (ex.: nq:rsi2-dip-d,es:ibs-dip-d)")
     ap.add_argument("--max-open", type=int, default=3,
                     help="maximo de trades abertas ao mesmo tempo (risco total maximo = max_open %%)")
     a = ap.parse_args()
@@ -36,6 +37,8 @@ def main():
             print(f"  {key}: sem dados (python download.py 2012 2026 {key})")
             continue
         for name in ideas:
+            if a.only and f"{key}:{name}" not in a.only.split(","):
+                continue
             fn, tf, st, tp, mh = IDEAS[name]
             b = load_tf(key, tf, a.period)
             tr = run_positions(b, fn(b), st, SPEC[key]["cost_pts"], FUT_COST[key], tp, mh)
@@ -63,8 +66,13 @@ def main():
     dropped = len(allt) - len(keep)
     allt = allt.loc[keep].sort_values("t")
     per = pd.DataFrame(rows)
-    real = allt.groupby(["mk", "idea"]).size()
-    per["trades"] = [int(real.get((r.indice, r.ideia), 0)) for r in per.itertuples()]
+    # numeros por indice/ideia DEPOIS do limite de risco (so as trades que a carteira fez mesmo)
+    nyears = max((allt["t"].max() - allt["t"].min()).days / 365.25, 0.1)
+    g = allt.groupby(["mk", "idea"])["R"]
+    per = pd.DataFrame({"indice": [k[0] for k in g.groups], "ideia": [k[1] for k in g.groups],
+                        "trades": g.size().to_numpy(), "R/trade": g.mean().round(3).to_numpy(),
+                        "%/ano": (g.sum() / nyears).round(2).to_numpy()})
+    per = per.sort_values("%/ano", ascending=False)
     yearly = allt.groupby(allt["t"].dt.year)["R"].sum()          # 1% por trade -> R = % da conta
     eq = allt["R"].cumsum().to_numpy()
     dd = float((eq - np.maximum.accumulate(np.maximum(eq, 0))).min())

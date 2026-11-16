@@ -224,8 +224,8 @@ function portfolioDetail(P){
     <div class="grid2"><div style="overflow-x:auto"><table class="runs"><thead><tr><th>Ano</th><th class="num">Resultado</th><th class="num">€ (conta ${eurFmt(ACC)})</th></tr></thead><tbody>
       ${yrs.map(([y,x])=>`<tr><td>${y}</td><td class="num"><b>${x>0?"+":""}${(+x).toFixed(1).replace(".",",")}%</b>${x>=14?" ✓":""}</td><td class="num">${eurFmt(x/100*ACC)}</td></tr>`).join("")}
     </tbody></table></div>
-    <div style="overflow-x:auto"><table class="runs"><thead><tr><th>Índice</th><th class="num">Trades</th><th class="num">Por trade</th><th class="num">% / ano</th></tr></thead><tbody>
-      ${idx.map(r=>`<tr><td>${NM[r.indice]||r.indice}</td><td class="num">${r.trades}</td><td class="num">${fmt(r["R/trade"],3)}R</td><td class="num">${r["%/ano"]>0?"+":""}${(+r["%/ano"]).toFixed(2).replace(".",",")}%</td></tr>`).join("")}
+    <div style="overflow-x:auto"><table class="runs"><thead><tr><th>Índice</th><th>Estratégia</th><th class="num">Trades</th><th class="num">Por trade</th><th class="num">% / ano</th></tr></thead><tbody>
+      ${idx.map(r=>`<tr><td>${NM[r.indice]||r.indice}</td><td><code>${esc(r.ideia)}</code></td><td class="num">${r.trades}</td><td class="num">${fmt(r["R/trade"],3)}R</td><td class="num">${r["%/ano"]>0?"+":""}${(+r["%/ano"]).toFixed(2).replace(".",",")}%</td></tr>`).join("")}
     </tbody></table></div></div>`;
   el.scrollIntoView({behavior:"smooth",block:"start"});
 }
