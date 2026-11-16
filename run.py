@@ -88,8 +88,8 @@ def verdict(per: dict, pooled_t: float, min_t: float = 2.5) -> str:
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--play", default="bounce", choices=["bounce", "break", "fake", "gapfill"])
-    ap.add_argument("--levels", default="pdhl", choices=["pdhl", "pwhl", "swing1h", "round", "pdc", "onhl", "nr4"])
+    ap.add_argument("--play", default="bounce", choices=["bounce", "break", "fake", "gapfill", "gapgo"])
+    ap.add_argument("--levels", default="pdhl", choices=["pdhl", "pwhl", "swing1h", "round", "pdc", "onhl", "nr4", "lunchhl", "monhl"])
     ap.add_argument("--tp", type=float, default=2.0)
     ap.add_argument("--stop-atr", type=float, default=0.5)
     ap.add_argument("--fake-atr", type=float, default=0.3)
@@ -103,8 +103,8 @@ def main():
     if a.period == "holdout" and not a.unlock_holdout:
         raise SystemExit("O holdout esta FECHADO. Ver regras em CLAUDE.md antes de usar --unlock-holdout.")
 
-    if (a.play == "gapfill") != (a.levels == "pdc"):
-        raise SystemExit("gapfill so funciona com --levels pdc (e pdc so com gapfill).")
+    if (a.play in ("gapfill", "gapgo")) != (a.levels == "pdc"):
+        raise SystemExit("gapfill/gapgo so funcionam com --levels pdc (e pdc so com gapfill/gapgo).")
     v = Variant(play=a.play, levels=a.levels, tp_r=a.tp, stop_atr=a.stop_atr, fake_atr=a.fake_atr, session=a.session)
     per, all_tr, yearly, curves, periods = {}, [], {}, {}, {}
     for key in a.markets.split(","):

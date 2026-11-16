@@ -24,6 +24,12 @@ VARIANTS = [Variant(play=p, levels=lv) for p in ("bounce", "break", "fake") for 
 # ideias do agente (2026-11-16)
 VARIANTS += [Variant(play="gapfill", levels="pdc"), Variant(play="fake", levels="onhl"),
              Variant(play="break", levels="nr4")]
+VARIANTS += [Variant(play="break", levels="lunchhl"), Variant(play="gapgo", levels="pdc"),
+             Variant(play="break", levels="monhl")]
+
+
+# gapgo so dispara com gaps > 0.6%: no passeio aleatorio usa-se mais volatilidade para ter trades suficientes
+VOL = {"gapgo": 8.0}
 
 
 @pytest.mark.parametrize("v", VARIANTS, ids=lambda v: v.name())
@@ -31,7 +37,7 @@ def test_random_walk_has_no_edge(v):
     """Num passeio aleatorio, sem custos, nao pode haver edge (senao ha batota/bug)."""
     rs = []
     for seed in range(3):
-        tr = backtest(synth(seed=seed), v, cost_pts=0.0, round_step=50.0)
+        tr = backtest(synth(seed=seed, vol=VOL.get(v.play, 3.0)), v, cost_pts=0.0, round_step=50.0)
         if len(tr):
             rs.append(tr["gross_R"].to_numpy())
     r = np.concatenate(rs)
@@ -43,7 +49,7 @@ def test_random_walk_has_no_edge(v):
 @pytest.mark.parametrize("v", VARIANTS, ids=lambda v: v.name())
 def test_no_lookahead(v):
     """Trades que fecham antes do corte nao podem mudar quando se apagam os dados depois do corte."""
-    df = synth(days=120, seed=7)
+    df = synth(days=120, seed=7, vol=VOL.get(v.play, 3.0))
     cut = df.index[len(df) // 2]
     full = backtest(df, v, 0.0, 50.0)
     part = backtest(df[df.index <= cut], v, 0.0, 50.0)

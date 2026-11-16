@@ -117,5 +117,41 @@ def nr4_day_hl(m5: pd.DataFrame):
     return out
 
 
+def _rth(m5: pd.DataFrame) -> pd.DataFrame:
+    mins = m5.index.hour * 60 + m5.index.minute
+    return m5[(mins >= 9 * 60 + 30) & (mins < 16 * 60)]
+
+
+def lunch_hl(m5: pd.DataFrame):
+    """Maxima/minima das velas 12:00-13:25 NY, activas das 13:30 as 16:00 do mesmo dia."""
+    mins = m5.index.hour * 60 + m5.index.minute
+    sub = m5[(mins >= 12 * 60) & (mins < 13 * 60 + 30)]
+    g = sub.groupby(sub.index.normalize())
+    hi, lo = g["high"].max(), g["low"].min()
+    out = []
+    for d in hi.index:
+        if hi[d] > lo[d]:
+            out.append((d + pd.Timedelta(hours=13, minutes=30),
+                        [(f"lnh:{d.date()}", float(hi[d])), (f"lnl:{d.date()}", float(lo[d]))]))
+        out.append((d + pd.Timedelta(hours=16), []))
+    return out
+
+
+def monday_hl(m5: pd.DataFrame):
+    """Maxima/minima RTH de segunda-feira, activas de terca 09:30 ate ao fim da semana."""
+    rth = _rth(m5)
+    g = rth.groupby(rth.index.normalize())
+    hi, lo = g["high"].max(), g["low"].min()
+    out = []
+    for d in hi.index:
+        if d.dayofweek == 0:
+            out.append((d, []))                      # limpa os niveis da semana anterior
+            if hi[d] > lo[d]:
+                avail = d + pd.Timedelta(days=1, hours=9, minutes=30)
+                out.append((avail, [(f"mnh:{d.date()}", float(hi[d])), (f"mnl:{d.date()}", float(lo[d]))]))
+    return out
+
+
 LEVELS = {"pdhl": prior_day_hl, "pwhl": prior_week_hl, "swing1h": swing_1h,
-          "pdc": prior_rth_close, "onhl": overnight_hl, "nr4": nr4_day_hl}
+          "pdc": prior_rth_close, "onhl": overnight_hl, "nr4": nr4_day_hl,
+          "lunchhl": lunch_hl, "monhl": monday_hl}

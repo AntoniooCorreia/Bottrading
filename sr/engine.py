@@ -7,6 +7,8 @@ Jogadas:
   fake   : preco passa o nivel em >= fake_atr*ATR mas a vela fecha de volta -> entra contra, stop no extremo da vela
   gapfill: (so com niveis pdc) na abertura da vela das 09:30, se GAP_MIN <= |abertura - pdc|/pdc <= GAP_MAX,
            entra contra o gap; alvo = pdc, stop = mesma distancia do outro lado (1R). Ignora tp_r e stop_atr.
+  gapgo  : (so com niveis pdc) na abertura da vela das 09:30, se |abertura - pdc|/pdc > GAPGO_MIN, entra A FAVOR
+           do gap; stop = 0.5 x gap para tras, alvo tp_r. Ignora stop_atr.
 
 Regras comuns (conservadoras):
   * cada nivel so dispara uma vez (1o toque); numeros redondos: 1 vez por dia
@@ -45,6 +47,7 @@ class Variant:
 
 
 GAP_MIN, GAP_MAX = 0.001, 0.006     # gapfill: gap entre 0.10% e 0.60% do pdc (fixo, pre-registado)
+GAPGO_MIN, GAPGO_STOP = 0.006, 0.5  # gapgo: gap > 0.60%, stop a 0.5 x gap (fixo, pre-registado)
 
 
 def atr14(m5: pd.DataFrame) -> np.ndarray:
@@ -132,6 +135,29 @@ def backtest(m5: pd.DataFrame, v: Variant, cost_pts: float, round_step: float) -
         else:
             lv = active
         a = atr[i]
+        if v.play == "gapgo":
+            if idx[i].hour != 9 or idx[i].minute != 30:
+                continue
+            for lid, L in lv:
+                if lid in used or L <= 0:
+                    continue
+                used.add(lid)
+                gap = o[i] - L
+                if abs(gap) / L <= GAPGO_MIN:
+                    break
+                d = 1 if gap > 0 else -1
+                entry, risk = o[i], GAPGO_STOP * abs(gap)
+                if risk < v.min_risk_cost * cost_pts:
+                    break
+                pos = {"d": d, "entry": entry, "stop": entry - d * risk, "tp": entry + d * v.tp_r * risk,
+                       "risk": risk, "t": idx[i], "play": "gapgo", "lvl": lid, "fresh": False}
+                # na vela de entrada (entrada a mercado na abertura) so o stop conta
+                if (d == 1 and l[i] <= pos["stop"]) or (d == -1 and h[i] >= pos["stop"]):
+                    trades.append({"time": idx[i], "exit": idx[i], "dir": d, "R": -1.0 - cost_pts / risk,
+                                   "gross_R": -1.0, "risk_pts": risk, "play": "gapgo", "level": lid})
+                    pos = None
+                break
+            continue
         if v.play == "gapfill":
             if idx[i].hour != 9 or idx[i].minute != 30:
                 continue
