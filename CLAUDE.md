@@ -5,6 +5,10 @@ nos indices americanos (NQ, S&P 500, Dow) em CFDs, DEPOIS de custos. So backtest
 nada de broker, nada de chaves. O MT5 (conta demo STARTRADER) so entra no PC do Antonio e so
 para uma variante que tenha passado o holdout.
 
+O Antonio so opera o US100 (NQ). O S&P e o Dow ficam nos testes APENAS como confirmacao (detetor de sorte):
+um edge real tem de aparecer nos tres. Em relatorios, diario e Telegram mostra sempre o NQ primeiro e com mais
+detalhe (R por trade, win rate, R por mes); S&P e Dow numa linha curta como confirmacao.
+
 Escreve tudo (commits, relatorios, notas) em portugues de Portugal, sem acentos nos ficheiros .py.
 
 ## Historico (ja testado noutro chat, NAO repetir)
