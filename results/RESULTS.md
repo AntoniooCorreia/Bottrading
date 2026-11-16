@@ -17,3 +17,6 @@
 | 2026-11-16 20:24 | `gapfill-pdc-tp2-sl0.5-rth` | dev | 770 / -0.082 / -2.32 | 880 / +0.009 / +0.29 | 904 / -0.011 / -0.35 | -1.34 | -0.88 | REPROVADA (negativa em pelo menos 1 indice) |
 | 2026-11-16 20:24 | `fake-onhl-tp2-sl0.5-fk0.3-rth` | dev | 970 / -0.191 / -4.37 | 824 / -0.121 / -2.50 | 1040 / -0.054 / -1.24 | -4.62 | -2.58 | REPROVADA (negativa em pelo menos 1 indice) |
 | 2026-11-16 20:24 | `break-nr4-tp2-sl0.5-rth` | dev | 285 / +0.072 / +0.83 | 237 / -0.114 / -1.25 | 307 / -0.128 / -1.62 | -1.12 | 0.28 | REPROVADA (negativa em pelo menos 1 indice) |
+| 2026-11-16 20:27 | `break-lunchhl-tp2-sl0.5-rth` | dev | 1159 / -0.082 / -2.01 | 1017 / -0.090 / -2.07 | 1332 / -0.071 / -1.85 | -3.41 | -1.32 | REPROVADA (negativa em pelo menos 1 indice) |
+| 2026-11-16 20:27 | `gapgo-pdc-tp2-sl0.5-rth` | dev | 545 / +0.046 / +0.81 | 384 / +0.133 / +2.04 | 330 / +0.095 / +1.37 | +2.34 | 0.35 | REPROVADA (t < 3) |
+| 2026-11-16 20:27 | `break-monhl-tp2-sl0.5-rth` | dev | 351 / +0.041 / +0.54 | 298 / +0.039 / +0.47 | 375 / -0.051 / -0.70 | +0.15 | 0.2 | REPROVADA (negativa em pelo menos 1 indice) |

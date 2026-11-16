@@ -3,12 +3,11 @@
 | variante | t junto | veredicto |
 |---|---|---|
 | plano original: 12 combinacoes bounce/break/fake x pdhl/pwhl/swing1h/round | -15.79 a +1.34 | 12/12 REPROVADAS |
-| ideia `gapfill-pdc` (fade do gap 0.1-0.6% ate ao fecho anterior) | -1.34 | REPROVADA |
-| ideia `fake-onhl` (falso rompimento max/min overnight) | -4.62 | REPROVADA |
-| ideia `break-nr4` (rompimento do dia anterior apos dia NR4) | -1.12 | REPROVADA |
+| ideias 1-3: `gapfill-pdc` / `fake-onhl` / `break-nr4` | -1.34 / -4.62 / -1.12 | REPROVADAS |
+| ideias 4-6: `break-lunchhl` / `gapgo-pdc` / `break-monhl` | -3.41 / **+2.34** / +0.15 | REPROVADAS |
 
-Leitura honesta: 15/15 testes reprovados (12 do plano + 3 ideias do agente; total de ideias do agente: 3). O gap fill
-fecha ~50% das vezes com alvo 1:1, ou seja moeda ao ar antes de custos e ligeiramente negativo depois. O sweep da
-max/min overnight e claramente perdedor (os rompimentos "falsos" continuam mais vezes do que voltam). O NR4 so ajuda
-no NQ (+0.07R) e piora ES/Dow. Nada chega perto de t 3.0; o unico t positivo continua a ser break-pwhl (+1.34).
-Confirma o historico: regras mecanicas intraday nos indices EUA com custos de CFD nao mostram edge. Holdout intocado.
+Leitura honesta: 18/18 reprovados (12 do plano + 6 ideias do agente; hoje 6 de 8). O unico resultado interessante e
+o `gapgo-pdc` (seguir gaps > 0.6%): positivo nos 3 indices (+0.05 a +0.13R, 1259 trades), mas t 2.34 fica abaixo da
+fasquia de 3.0 e 2023 foi negativo nos 3. Depois de 18 testes, um t de 2.3 e o que se espera encontrar por sorte;
+nao vai ao holdout nem se afina. O rompimento do intervalo de almoco e claramente perdedor; o de segunda-feira e ruido.
+Continua sem edge mecanico intraday nos indices EUA com custos de CFD. Holdout intocado.

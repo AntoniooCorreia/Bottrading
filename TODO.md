@@ -28,6 +28,6 @@ Registadas em IDEAS.md antes de correr. Fasquia t >= 3.0.
 - [x] `python run.py --play gapfill --levels pdc` -> REPROVADA, t junto -1.34 (NQ -0.08R, ES +0.01R, Dow -0.01R)
 - [x] `python run.py --play fake --levels onhl` -> REPROVADA, t junto -4.62 (negativa nos 3)
 - [x] `python run.py --play break --levels nr4` -> REPROVADA, t junto -1.12 (so NQ positivo, +0.07R)
-- [ ] `python run.py --play break --levels lunchhl`
-- [ ] `python run.py --play gapgo --levels pdc`
-- [ ] `python run.py --play break --levels monhl`
+- [x] `python run.py --play break --levels lunchhl` -> REPROVADA, t junto -3.41 (negativa nos 3)
+- [x] `python run.py --play gapgo --levels pdc` -> REPROVADA (t < 3), t junto +2.34 (positiva nos 3: NQ +0.05R, ES +0.13R, Dow +0.10R)
+- [x] `python run.py --play break --levels monhl` -> REPROVADA, t junto +0.15 (Dow negativo)
