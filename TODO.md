@@ -27,6 +27,6 @@ So variantes com PASSA no dev e vizinhanca positiva. Uma vez cada. Ver CLAUDE.md
 Regras em sr/antonio.py (niveis S/R de 15m/30m/1h + dia/semana/Asia/Londres, displacement + IFVG de 1m,
 stop no extremo do sweep, Asia+Londres+NY, max 3 trades/dia). Precisa de data/m1gz (se faltar, regista erro
 "faltam velas de 1m" e salta estes itens). Fasquia t >= 2.5 (pre-registado por humano). Foco do relatorio: NQ.
-- [ ] `python run.py --play antonio --levels all --tp 1`
-- [ ] `python run.py --play antonio --levels all --tp 2`
-- [ ] `python run.py --play antonio --levels all --tp 3`
+- [x] `python run.py --play antonio --levels all --tp 1` -> REPROVADA (NQ -0.18R/trade, t junto -17.5)
+- [x] `python run.py --play antonio --levels all --tp 2` -> REPROVADA (NQ -0.17R/trade, t junto -13.0)
+- [x] `python run.py --play antonio --levels all --tp 3` -> REPROVADA (NQ -0.18R/trade, t junto -10.7)
