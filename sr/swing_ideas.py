@@ -55,9 +55,55 @@ def donchian20(b: pd.DataFrame) -> pd.Series:
     return pd.Series(pos, index=b.index)
 
 
+def _rsi(c: pd.Series, n: int) -> pd.Series:
+    d = c.diff()
+    up = d.clip(lower=0).ewm(alpha=1 / n, adjust=False).mean()
+    dn = (-d.clip(upper=0)).ewm(alpha=1 / n, adjust=False).mean()
+    return 100 - 100 / (1 + up / dn.replace(0, np.nan))
+
+
+def _enter_exit(enter: pd.Series, exit_: pd.Series) -> pd.Series:
+    pos, cur = [], 0
+    for e, x in zip(enter.to_numpy(), exit_.to_numpy()):
+        if cur == 0 and e:
+            cur = 1
+        elif cur == 1 and x:
+            cur = 0
+        pos.append(cur)
+    return pd.Series(pos, index=enter.index)
+
+
+def rsi2_dip_4h(b: pd.DataFrame) -> pd.Series:
+    """4h. A mesma ideia do rsi2-dip-d em velas de 4h: long quando RSI(2) < 10 e fecho acima da media de 200 velas
+    (~6 semanas); sai quando fecha acima da media de 5 velas. Mais trades que o diario."""
+    c = b["close"]
+    r, sma200, sma5 = _rsi(c, 2), c.rolling(200).mean(), c.rolling(5).mean()
+    return _enter_exit((r < 10) & (c > sma200), c > sma5)
+
+
+def ibs_dip_d(b: pd.DataFrame) -> pd.Series:
+    """Diario. IBS (onde fecha dentro da vela: (fecho-minimo)/(maximo-minimo)). Long quando IBS < 0.2 e fecho acima
+    da media de 200 dias; sai quando IBS > 0.7. Efeito de reversao de curto prazo documentado em indices."""
+    rng = (b["high"] - b["low"]).replace(0, np.nan)
+    ibs = (b["close"] - b["low"]) / rng
+    sma200 = b["close"].rolling(200).mean()
+    return _enter_exit((ibs < 0.2) & (b["close"] > sma200), ibs > 0.7)
+
+
+def down3_d(b: pd.DataFrame) -> pd.Series:
+    """Diario. Tres fechos seguidos em queda acima da media de 200 dias -> long; sai no primeiro fecho acima do maximo
+    do dia anterior. Variante simples de comprar quedas em tendencia."""
+    c = b["close"]
+    dn3 = (c < c.shift(1)) & (c.shift(1) < c.shift(2)) & (c.shift(2) < c.shift(3))
+    return _enter_exit(dn3 & (c > c.rolling(200).mean()), c > b["high"].shift(1))
+
+
 # nome -> (funcao, timeframe, stop_atr, tp_r, max_hold)
 IDEAS = {
     "trend-sma100-d": (trend_sma100, "1d", 3.0, 0.0, 0),
     "rsi2-dip-d": (rsi2_dip, "1d", 3.0, 0.0, 10),
     "donchian20-d": (donchian20, "1d", 3.0, 0.0, 0),
+    "rsi2-dip-4h": (rsi2_dip_4h, "4h", 3.0, 0.0, 30),
+    "ibs-dip-d": (ibs_dip_d, "1d", 3.0, 0.0, 10),
+    "down3-d": (down3_d, "1d", 3.0, 0.0, 10),
 }
