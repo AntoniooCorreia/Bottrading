@@ -22,3 +22,9 @@ parametros tambem for positiva (nao um pico isolado).
 
 ## Fase 3 - holdout
 So variantes com PASSA no dev e vizinhanca positiva. Uma vez cada. Ver CLAUDE.md.
+
+## Ideias do agente (2026-11-16)
+Registadas em IDEAS.md antes de correr. Fasquia t >= 3.0.
+- [ ] `python run.py --play gapfill --levels pdc`
+- [ ] `python run.py --play fake --levels onhl`
+- [ ] `python run.py --play break --levels nr4`

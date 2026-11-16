@@ -5,6 +5,8 @@ Jogadas:
   bounce : ordem limite NO nivel (compra no suporte / vende na resistencia), stop a stop_atr*ATR para la do nivel
   break  : vela de 5m fecha para la do nivel -> entra na abertura seguinte a favor da rutura, stop do outro lado do nivel
   fake   : preco passa o nivel em >= fake_atr*ATR mas a vela fecha de volta -> entra contra, stop no extremo da vela
+  gapfill: (so com niveis pdc) na abertura da vela das 09:30, se GAP_MIN <= |abertura - pdc|/pdc <= GAP_MAX,
+           entra contra o gap; alvo = pdc, stop = mesma distancia do outro lado (1R). Ignora tp_r e stop_atr.
 
 Regras comuns (conservadoras):
   * cada nivel so dispara uma vez (1o toque); numeros redondos: 1 vez por dia
@@ -26,8 +28,8 @@ from .levels import LEVELS
 
 @dataclass
 class Variant:
-    play: str = "bounce"          # bounce | break | fake
-    levels: str = "pdhl"          # pdhl | pwhl | swing1h | round
+    play: str = "bounce"          # bounce | break | fake | gapfill
+    levels: str = "pdhl"          # pdhl | pwhl | swing1h | round | pdc | onhl | nr4
     tp_r: float = 2.0
     stop_atr: float = 0.5
     fake_atr: float = 0.3
@@ -40,6 +42,9 @@ class Variant:
 
     def to_dict(self) -> dict:
         return asdict(self)
+
+
+GAP_MIN, GAP_MAX = 0.001, 0.006     # gapfill: gap entre 0.10% e 0.60% do pdc (fixo, pre-registado)
 
 
 def atr14(m5: pd.DataFrame) -> np.ndarray:
@@ -108,7 +113,7 @@ def backtest(m5: pd.DataFrame, v: Variant, cost_pts: float, round_step: float) -
             if (d == 1 and l[i] <= pos["stop"]) or (d == -1 and h[i] >= pos["stop"]):
                 r = -1.0
             elif not pos["fresh"] and ((d == 1 and h[i] >= pos["tp"]) or (d == -1 and l[i] <= pos["tp"])):
-                r = v.tp_r
+                r = pos.get("tp_r", v.tp_r)
             elif last_in_sess[i] or not in_sess[i]:
                 r = (c[i] - pos["entry"]) * d / pos["risk"]
             pos["fresh"] = False
@@ -127,6 +132,32 @@ def backtest(m5: pd.DataFrame, v: Variant, cost_pts: float, round_step: float) -
         else:
             lv = active
         a = atr[i]
+        if v.play == "gapfill":
+            if idx[i].hour != 9 or idx[i].minute != 30:
+                continue
+            for lid, L in lv:
+                if lid in used or L <= 0:
+                    continue
+                used.add(lid)
+                gap = o[i] - L
+                if not (GAP_MIN <= abs(gap) / L <= GAP_MAX):
+                    break
+                d = -1 if gap > 0 else 1
+                entry, risk = o[i], abs(gap)
+                if risk < v.min_risk_cost * cost_pts:
+                    break
+                pos = {"d": d, "entry": entry, "stop": entry - d * risk, "tp": L, "risk": risk,
+                       "t": idx[i], "play": "gapfill", "lvl": lid, "fresh": False, "tp_r": 1.0}
+                # na vela de entrada: stop e alvo na mesma vela conta como stop
+                hit_s = (d == 1 and l[i] <= pos["stop"]) or (d == -1 and h[i] >= pos["stop"])
+                hit_t = (d == 1 and h[i] >= L) or (d == -1 and l[i] <= L)
+                if hit_s or hit_t:
+                    rr = -1.0 if hit_s else 1.0
+                    trades.append({"time": idx[i], "exit": idx[i], "dir": d, "R": rr - cost_pts / risk,
+                                   "gross_R": rr, "risk_pts": risk, "play": "gapfill", "level": lid})
+                    pos = None
+                break
+            continue
         for lid, L in lv:
             if lid in used:
                 continue

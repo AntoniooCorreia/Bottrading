@@ -21,6 +21,9 @@ def synth(days=260, seed=0, vol=3.0):
 
 
 VARIANTS = [Variant(play=p, levels=lv) for p in ("bounce", "break", "fake") for lv in ("pdhl", "swing1h", "round")]
+# ideias do agente (2026-11-16)
+VARIANTS += [Variant(play="gapfill", levels="pdc"), Variant(play="fake", levels="onhl"),
+             Variant(play="break", levels="nr4")]
 
 
 @pytest.mark.parametrize("v", VARIANTS, ids=lambda v: v.name())
@@ -57,3 +60,17 @@ def test_costs_reduce_r():
     b = backtest(df, v, 0.2, 50.0)
     assert len(a) > 20 and len(b) > 20
     assert b["R"].mean() < a["R"].mean()
+
+
+def test_gapfill_fills_gap_up():
+    """Gap para cima de 0.3% que fecha durante a manha -> short com +1R bruto."""
+    idx = pd.date_range("2021-01-04 09:30", "2021-01-05 16:00", freq="5min", tz=TZ)
+    df = pd.DataFrame({"open": 1000.0, "high": 1000.5, "low": 999.5, "close": 1000.0}, index=idx)
+    d2 = idx >= pd.Timestamp("2021-01-04 16:00", tz=TZ)
+    df.loc[d2, ["open", "high", "low", "close"]] = [1003.0, 1003.5, 1002.5, 1003.0]
+    t = pd.Timestamp("2021-01-05 10:30", tz=TZ)
+    df.loc[t, "low"] = 999.0
+    tr = backtest(df, Variant(play="gapfill", levels="pdc"), 0.0, 50.0)
+    assert len(tr) == 1
+    assert tr.iloc[0]["dir"] == -1 and tr.iloc[0]["gross_R"] == 1.0
+    assert tr.iloc[0]["exit"] == t

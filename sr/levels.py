@@ -65,4 +65,57 @@ def swing_1h(m5: pd.DataFrame, k: int = 5, keep: int = 3):
     return out
 
 
-LEVELS = {"pdhl": prior_day_hl, "pwhl": prior_week_hl, "swing1h": swing_1h}
+def prior_rth_close(m5: pd.DataFrame):
+    """Fecho RTH do dia anterior (fecho da ultima vela antes das 16:00 NY), activo a partir das 16:00."""
+    mins = m5.index.hour * 60 + m5.index.minute
+    rth = m5[(mins >= 9 * 60 + 30) & (mins < 16 * 60)]
+    if len(rth) == 0:
+        return []
+    last = rth.groupby(rth.index.normalize()).tail(1)
+    out = []
+    for t, row in last.iterrows():
+        out.append((t + pd.Timedelta(minutes=5), [(f"pdc:{t.date()}", float(row["close"]))]))
+    return out
+
+
+def overnight_hl(m5: pd.DataFrame):
+    """Maxima/minima overnight (18:00 do dia anterior ate a vela das 09:25), activas a partir das 09:30."""
+    idx = m5.index
+    mins = idx.hour * 60 + idx.minute
+    on = (mins >= 18 * 60) | (mins < 9 * 60 + 30)
+    sub = m5[on]
+    tday = _trading_day(sub.index)
+    g = sub.groupby(tday)
+    hi, lo = g["high"].max(), g["low"].min()
+    out = []
+    for d in hi.index:
+        if hi[d] <= lo[d]:
+            continue          # feriado / sem dados reais
+        avail = d + pd.Timedelta(hours=9, minutes=30)
+        out.append((avail, [(f"onh:{d.date()}", float(hi[d])), (f"onl:{d.date()}", float(lo[d]))]))
+    return out
+
+
+def nr4_day_hl(m5: pd.DataFrame):
+    """Maxima/minima do dia anterior so se esse dia teve a menor amplitude dos ultimos 4 (NR4).
+    Dias com amplitude 0 (feriados) ignorados. Nos outros dias o conjunto de niveis fica vazio."""
+    day = _trading_day(m5.index)
+    g = m5.groupby(day)
+    hi, lo = g["high"].max(), g["low"].min()
+    first = pd.Series(m5.index, index=m5.index).groupby(day).first()
+    rng = hi - lo
+    valid = [d for d in hi.index if rng[d] > 0]
+    out = []
+    for k in range(1, len(valid)):
+        p = valid[k - 1]
+        lv = []
+        if k - 1 >= 3:
+            last4 = [rng[valid[j]] for j in range(k - 4, k)]
+            if rng[p] <= min(last4):
+                lv = [(f"nr4h:{p.date()}", float(hi[p])), (f"nr4l:{p.date()}", float(lo[p]))]
+        out.append((first[valid[k]], lv))
+    return out
+
+
+LEVELS = {"pdhl": prior_day_hl, "pwhl": prior_week_hl, "swing1h": swing_1h,
+          "pdc": prior_rth_close, "onhl": overnight_hl, "nr4": nr4_day_hl}
