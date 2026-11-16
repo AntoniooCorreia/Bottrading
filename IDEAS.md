@@ -33,3 +33,30 @@ Registo de ideias criadas pelo agente no modo ideias (ver CLAUDE.md). Cada ideia
   menor amplitude dos ultimos 4 dias (dias com amplitude 0, feriados, ignorados). Nos outros dias nao ha niveis.
 - Entrada/stop/alvo: jogada `break` existente com parametros por defeito (tp 2R, stop 0.5 ATR), sessao rth.
 - Comando: `python run.py --play break --levels nr4`
+
+## 2026-11-16 - sessao 2 (3 ideias; total de ideias do agente ate agora: 6; hoje: 6 de 8)
+
+### Ideia 4 - `break-lunchhl`: rompimento do intervalo da hora de almoco
+- Hipotese: entre as 12:00 e as 13:30 NY a liquidez cai e o preco comprime-se num intervalo. A tarde volta o fluxo
+  institucional (e os desequilibrios do fecho), e a saida desse intervalo comprimido tende a ter seguimento
+  (compressao -> expansao). Diferente do opening range (ja testado): e um intervalo do meio do dia.
+- Nivel `lunchhl`: maxima e minima das velas das 12:00 ate a vela das 13:25 (RTH), activas a partir das 13:30.
+- Entrada/stop/alvo: jogada `break` existente, parametros por defeito (tp 2R, stop 0.5 ATR), sessao rth.
+- Comando: `python run.py --play break --levels lunchhl`
+
+### Ideia 5 - `gapgo-pdc`: seguir os gaps de abertura GRANDES
+- Hipotese (ja escrita na ideia 1, antes de qualquer resultado): gaps grandes vem de noticias/reavaliacao e tendem
+  a continuar em vez de fechar; o mercado a vista confirma a reavaliacao overnight.
+- Nivel `pdc` (fecho RTH anterior). Entrada na abertura da vela das 09:30 se |abertura - pdc| / pdc > 0.60%,
+  A FAVOR do gap. Stop: metade do gap para tras da entrada (risco = 0.5 x gap). Alvo 2R. Saida no fim da sessao RTH.
+  Uma trade por dia. Parametros fixos (0.60%, 0.5 x gap, 2R).
+- Comando: `python run.py --play gapgo --levels pdc`
+
+### Ideia 6 - `break-monhl`: rompimento do intervalo de segunda-feira
+- Hipotese: a segunda-feira define o "balanco inicial" da semana (posicionamento depois do fim de semana); um
+  rompimento desse intervalo mais tarde na semana sinaliza que um lado ganhou e tende a ter seguimento.
+  Diferente de pwhl (semana anterior) e pdhl (dia anterior).
+- Nivel `monhl`: maxima e minima RTH (09:30-16:00) da segunda-feira, activas de terca as 09:30 ate sexta.
+  Se segunda for feriado (sem amplitude), nao ha niveis nessa semana.
+- Entrada/stop/alvo: jogada `break` existente, parametros por defeito (tp 2R, stop 0.5 ATR), sessao rth.
+- Comando: `python run.py --play break --levels monhl`
