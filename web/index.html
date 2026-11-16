@@ -185,6 +185,16 @@ function whyShort(run){
   return "lucro nos 3, mas fraco (t "+fmt(run.pooled.t)+")";
 }
 
+function goalTile(d){
+  // estrategias com lucro nos 3 indices; melhor % ao ano no NQ (1% de risco => R/ano = %/ano)
+  const ok=d.runs.filter(r=>["nq","es","dow"].every(k=>r.markets[k]&&r.markets[k].meanR>0));
+  const best=ok.sort((a,b)=>b.markets.nq["R/ano"]-a.markets.nq["R/ano"])[0];
+  const v=best?best.markets.nq["R/ano"]:0, pc=Math.max(0,Math.min(100,v/14*100));
+  return `<div class="tile" style="grid-column:1/-1"><div class="k">Objetivo: +14% ao ano (1% de risco por trade)</div>
+    <div style="display:flex;align-items:baseline;gap:8px"><div class="v">${v.toFixed(1).replace(".",",")}%</div><div class="s">melhor estratégia com lucro nos 3 índices${best?` · ${esc(best.variant)} (${best.period==="pre"?"2012–18":"2019–24"})`:""}</div></div>
+    <div style="height:8px;background:var(--grid);border-radius:4px;margin-top:6px;overflow:hidden"><div style="height:100%;width:${pc}%;background:var(--series-1);border-radius:4px"></div></div>
+    <div class="s" style="margin-top:4px">${pc.toFixed(0)}% do caminho · o objetivo vai ser atingido juntando várias estratégias validadas, nunca subindo o risco</div></div>`;
+}
 function tiles(d){
   const dev = d.runs.filter(r=>r.period==="dev"), hold = d.runs.filter(r=>r.period==="holdout");
   const pass = dev.filter(r=>r.verdict.startsWith("PASSA")).length;
@@ -195,7 +205,8 @@ function tiles(d){
     T("Variantes testadas (dev)", dev.length, `de ${d.todo.length} no plano`) +
     T("Passaram no dev", pass, pass ? "candidatas ao holdout" : "nenhuma até agora") +
     T("Holdout aberto", hold.length, hold.filter(r=>r.verdict.startsWith("PASSA")).length + " passaram") +
-    T("Melhor t conjunto", best ? fmt(best.pooled.t) : "—", best ? esc(best.variant) : "ainda sem testes");
+    T("Melhor t conjunto", best ? fmt(best.pooled.t) : "—", best ? esc(best.variant) : "ainda sem testes") +
+    goalTile(d);
 }
 
 function runsTable(d){

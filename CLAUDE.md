@@ -12,6 +12,12 @@ detalhe (R por trade, win rate, R por mes); S&P e Dow numa linha curta como conf
 O Antonio arrisca SEMPRE 1% da conta por trade (1R = 1%). No diario e no Telegram traduz resultados para
 % da conta (ex.: +0.1R por trade = +0.1% por trade; 12R por ano = +12% ao ano).
 
+OBJETIVO DO ANTONIO (2026-11-16): pelo menos +14% ao ano com 1% de risco por trade, ou seja >= 14R por ano no total
+da carteira de estrategias, com queda maxima pequena. Nenhuma estrategia sozinha chega la (a melhor ate agora,
+rsi2-dip-d, da ~1.2R/ano no NQ): o caminho e juntar VARIAS estrategias validadas e pouco correlacionadas
+(mais trades por ano com a mesma vantagem: 4h/1h, outras formas de comprar quedas, outros sinais). Em cada
+SUMMARY.md diz quanto falta para os 14R/ano e o que poderia juntar-se. Nunca chegar la aumentando o risco por trade.
+
 Escreve tudo (commits, relatorios, notas) em portugues de Portugal, sem acentos nos ficheiros .py.
 
 ## Historico (ja testado noutro chat, NAO repetir)
