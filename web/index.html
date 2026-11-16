@@ -69,6 +69,22 @@ code{font:12px ui-monospace,SFMono-Regular,Menlo,monospace}
 li.done .box{background:var(--text-muted);color:var(--surface-1);border-color:var(--text-muted)}
 .empty{padding:22px 4px;text-align:center;color:var(--text-secondary)}
 .small{font-size:12px}
+.seg{display:inline-flex;background:var(--grid);border-radius:8px;padding:2px;gap:2px;flex-wrap:wrap}
+.seg button{border:0;background:transparent;color:var(--text-secondary);font:inherit;font-size:13px;padding:5px 10px;border-radius:6px;cursor:pointer}
+.seg button.on{background:var(--surface-1);color:var(--text-primary);font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.ctrls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0 10px}
+.ctrls label{font-size:12px;color:var(--text-secondary);display:inline-flex;align-items:center;gap:6px}
+.ctrls input{width:72px;font:inherit;font-size:13px;padding:4px 6px;border:1px solid var(--border);border-radius:6px;background:var(--surface-1);color:var(--text-primary)}
+.ptiles{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px}
+@media(min-width:720px){.ptiles{grid-template-columns:repeat(6,1fr)}}
+.ptiles .tile{padding:8px 10px}.ptiles .tile .v{font-size:19px}
+.pos{color:var(--text-primary)} .more{margin-top:8px;border:1px solid var(--border);background:var(--surface-1);color:var(--text-secondary);border-radius:8px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer}
+.now{display:flex;align-items:center;gap:10px;background:var(--surface-1);border:1px solid var(--border);border-radius:12px;padding:10px 14px;margin-top:14px;font-size:14px}
+.dot{width:10px;height:10px;border-radius:50%;flex:none;background:var(--text-muted)}
+.dot.live{background:var(--good);box-shadow:0 0 0 0 rgba(12,163,12,.6);animation:pulse 1.6s infinite}
+.dot.err{background:var(--critical)}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(12,163,12,.55)}70%{box-shadow:0 0 0 9px rgba(12,163,12,0)}100%{box-shadow:0 0 0 0 rgba(12,163,12,0)}}
+.now .rt{margin-left:auto;font-size:11px;color:var(--text-muted);white-space:nowrap}
 details summary{cursor:pointer;color:var(--text-secondary);font-size:13px}
 </style>
 </head>
@@ -78,6 +94,7 @@ details summary{cursor:pointer;color:var(--text-secondary);font-size:13px}
     <h1>Bottrading · Suporte e resistência</h1>
     <p id="sub">A carregar…</p>
   </header>
+  <div class="now" id="now"><span class="dot" id="nowDot"></span><span id="nowTxt">A verificar o estado do agente…</span><span class="rt" id="rt"></span></div>
   <div class="tiles" id="tiles"></div>
   <section id="sumSec" hidden><h2>Leitura do agente</h2><div class="summary" id="summary"></div></section>
   <section>
@@ -222,8 +239,11 @@ function detail(run){
       ${years.map(yy=>`<tr><td>${yy}</td>${mk.map(k=>{const v=(run.yearly[k]||{})[yy];return `<td class="num">${v==null?"—":fmt(v,1)+"R"}</td>`}).join("")}</tr>`).join("")}
       </tbody></table></div>
     </div>
+    <h2 style="margin-top:18px">Resultados por período</h2>
+    <div id="pview"></div>
     <div class="small muted" style="margin-top:8px">Parâmetros: ${esc(Object.entries(run.params).map(([k,v])=>k+"="+v).join(" · "))}</div>`;
   hookHover();
+  PV.run=run; renderPeriods();
   el.scrollIntoView({behavior:"smooth",block:"start"});
 }
 
@@ -234,13 +254,88 @@ function todoList(d){
   document.getElementById("todo").innerHTML = html || `<li class="muted">Sem itens.</li>`;
 }
 
+
+const PV={run:null,gran:"month",mk:"all",eur:100,shown:40};
+const GRAN={day:"Dia",week:"Semana",month:"Mês",year:"Ano"};
+const MKSEL={all:"Todos",nq:"NQ",es:"S&P",dow:"Dow"};
+const eurFmt=x=>(x<0?"−":"")+Math.abs(x).toLocaleString("pt-PT",{maximumFractionDigits:0})+" €";
+function plabel(g,k){ if(g==="week"){const d=new Date(k+"T00:00:00");const e=new Date(d.getTime()+4*864e5);return `${k.slice(8,10)}/${k.slice(5,7)} – ${String(e.getDate()).padStart(2,"0")}/${String(e.getMonth()+1).padStart(2,"0")}/${k.slice(0,4)}`;}
+  if(g==="month"){const m=["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];return m[+k.slice(5,7)-1]+" "+k.slice(0,4);}
+  if(g==="day") return k.slice(8,10)+"/"+k.slice(5,7)+"/"+k.slice(0,4); return k;}
+function renderPeriods(){
+  const box=document.getElementById("pview"); if(!box) return;
+  const P=(PV.run.periods||{})[PV.mk]; const rows=P&&P[PV.gran]||[];
+  const seg=(obj,cur,fn)=>`<div class="seg">${Object.entries(obj).map(([k,v])=>`<button class="${k===cur?"on":""}" onclick="${fn}('${k}')">${v}</button>`).join("")}</div>`;
+  let h=`<div class="ctrls">${seg(GRAN,PV.gran,"setGran")}${seg(MKSEL,PV.mk,"setMk")}
+    <label>€ por 1R <input type="number" min="1" step="10" value="${PV.eur}" onchange="setEur(this.value)"></label></div>`;
+  if(!rows.length){ box.innerHTML=h+`<div class="empty small">Sem dados por período para este teste${PV.run.periods&&Object.keys(PV.run.periods).length?"":" (foi corrido antes desta funcionalidade; volta a aparecer na próxima corrida)"}.</div>`; return; }
+  const totR=rows.reduce((a,r)=>a+r[1],0), n=rows.reduce((a,r)=>a+r[2],0), w=rows.reduce((a,r)=>a+r[3],0);
+  const posP=rows.filter(r=>r[1]>0).length, best=rows.reduce((a,r)=>r[1]>a[1]?r:a), worst=rows.reduce((a,r)=>r[1]<a[1]?r:a);
+  const T=(k,v,s="")=>`<div class="tile"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${s}</div></div>`;
+  h+=`<div class="ptiles">
+    ${T("Total",fmt(totR,1)+"R",eurFmt(totR*PV.eur))}
+    ${T("Win rate",(n?w/n*100:0).toFixed(1).replace(".",",")+"%",`${w} de ${n} trades`)}
+    ${T("Média / "+GRAN[PV.gran].toLowerCase(),fmt(totR/rows.length,2)+"R",eurFmt(totR/rows.length*PV.eur))}
+    ${T(GRAN[PV.gran]+"s positivos",Math.round(posP/rows.length*100)+"%",`${posP} de ${rows.length}`)}
+    ${T("Melhor",fmt(best[1],1)+"R",plabel(PV.gran,best[0]))}
+    ${T("Pior",fmt(worst[1],1)+"R",plabel(PV.gran,worst[0]))}</div>`;
+  h+=barChart(rows);
+  const rev=rows.slice().reverse(), vis=rev.slice(0,PV.shown);
+  h+=`<div style="overflow-x:auto"><table class="runs"><thead><tr><th>${GRAN[PV.gran]}</th><th class="num">Trades</th><th class="num">Win rate</th><th class="num">R</th><th class="num">€</th></tr></thead><tbody>
+    ${vis.map(r=>`<tr><td>${plabel(PV.gran,r[0])}</td><td class="num">${r[2]}</td><td class="num">${(r[3]/r[2]*100).toFixed(0)}%</td><td class="num">${fmt(r[1],2)}</td><td class="num">${eurFmt(r[1]*PV.eur)}</td></tr>`).join("")}
+    </tbody></table></div>${rev.length>vis.length?`<button class="more" onclick="PV.shown+=60;renderPeriods()">Mostrar mais (${rev.length-vis.length} restantes)</button>`:""}`;
+  box.innerHTML=h; hookBars(rows);
+}
+function setGran(g){PV.gran=g;PV.shown=40;renderPeriods();}
+function setMk(m){PV.mk=m;PV.shown=40;renderPeriods();}
+function setEur(v){PV.eur=Math.max(1,+v||100);renderPeriods();}
+function barChart(rows){
+  const W=Math.max(340,Math.min(760,(document.getElementById("detail").clientWidth||760)-32)),H=200,L=40,R=8,T=8,B=20;
+  const vals=rows.map(r=>r[1]); let v0=Math.min(0,...vals), v1=Math.max(0,...vals); const pad=(v1-v0)*0.06||1; v0-=pad; v1+=pad;
+  const y=v=>T+(v1-v)/(v1-v0)*(H-T-B), bw=(W-L-R)/rows.length, gap=bw>4?2:0;
+  let s=`<svg viewBox="0 0 ${W} ${H}" id="bars">`;
+  const step=niceStep((v1-v0)/4); for(let v=Math.ceil(v0/step)*step; v<=v1; v+=step) s+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--grid)"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end" font-size="10" fill="var(--text-muted)">${Math.round(v*10)/10}R</text>`;
+  rows.forEach((r,i)=>{const x=L+i*bw, y0=y(0), y1=y(r[1]); s+=`<rect x="${(x+gap/2).toFixed(1)}" y="${Math.min(y0,y1).toFixed(1)}" width="${Math.max(bw-gap,0.6).toFixed(1)}" height="${Math.max(Math.abs(y1-y0),0.6).toFixed(1)}" rx="${bw>8?2:0}" fill="${r[1]>=0?"var(--series-1)":"var(--series-2)"}"/>`;});
+  s+=`<line x1="${L}" x2="${W-R}" y1="${y(0)}" y2="${y(0)}" stroke="var(--text-muted)"/>`;
+  const yrs=[...new Set(rows.map(r=>r[0].slice(0,4)))]; if(PV.gran!=="year") yrs.forEach(yy=>{const i=rows.findIndex(r=>r[0].startsWith(yy)); s+=`<text x="${L+i*bw+2}" y="${H-5}" font-size="10" fill="var(--text-muted)">${yy}</text>`;});
+  else rows.forEach((r,i)=>{s+=`<text x="${L+i*bw+bw/2}" y="${H-5}" font-size="10" text-anchor="middle" fill="var(--text-muted)">${r[0]}</text>`;});
+  s+=`<rect id="bhit" x="${L}" y="${T}" width="${W-L-R}" height="${H-T-B}" fill="transparent"/></svg>`;
+  barChart._c={W,L,R,bw};
+  return `<div class="small muted" style="margin:2px 0">R por ${GRAN[PV.gran].toLowerCase()} · <span style="color:var(--series-1)">■</span> positivo <span style="color:var(--series-2)">■</span> negativo</div><div class="chart" id="barBox">${s}<div class="tip" id="btip"></div></div>`;
+}
+function hookBars(rows){
+  const c=barChart._c, box=document.getElementById("barBox"); if(!box) return; const svg=box.querySelector("svg"), tip=document.getElementById("btip");
+  const mv=ev=>{const r=svg.getBoundingClientRect(); const sx=((ev.touches?ev.touches[0].clientX:ev.clientX)-r.left)/r.width*c.W;
+    const i=Math.min(rows.length-1,Math.max(0,Math.floor((sx-c.L)/c.bw))); const p=rows[i];
+    tip.innerHTML=`<div class="muted">${plabel(PV.gran,p[0])}</div><b>${fmt(p[1],2)}R</b> · ${eurFmt(p[1]*PV.eur)}<div class="muted">${p[2]} trades · WR ${(p[3]/p[2]*100).toFixed(0)}%</div>`;
+    tip.style.display="block"; const px=(c.L+(i+.5)*c.bw)/c.W*r.width; tip.style.left=Math.min(Math.max(px+8,0),r.width-tip.offsetWidth)+"px"; tip.style.top="4px";};
+  const hit=svg.querySelector("#bhit"); hit.addEventListener("mousemove",mv); hit.addEventListener("touchstart",mv,{passive:true}); hit.addEventListener("touchmove",mv,{passive:true});
+  hit.addEventListener("mouseleave",()=>tip.style.display="none"); hit.addEventListener("touchend",()=>tip.style.display="none");
+}
+
+
+function nextRun(){ // corridas de hora a hora das 19h as 3h (hora de Lisboa)
+  const now=new Date(); const lis=new Date(now.toLocaleString("en-US",{timeZone:"Europe/Lisbon"}));
+  for(let k=1;k<=24;k++){const t=new Date(lis.getTime()+k*36e5); const h=t.getHours(); if(h>=19||h<=3) return String(h).padStart(2,"0")+":00";}
+  return "19:00";
+}
+function nowStatus(log){
+  const dot=document.getElementById("nowDot"), txt=document.getElementById("nowTxt");
+  const last=log[0]; const ago=last?(Date.now()-Date.parse(last.at))/6e4:1e9;
+  const started=log.find(e=>e.kind==="inicio"), ended=log.find(e=>e.kind==="fim"||e.kind==="erro");
+  const running=started && (!ended || Date.parse(started.at)>Date.parse(ended.at)) && ago<45;
+  if(running){ dot.className="dot live"; txt.innerHTML=`<b>A trabalhar agora</b> · ${esc(last.kind==="estado"?last.message:(last.kind==="teste"?"último: "+last.message:last.message))}`; }
+  else if(last && last.kind==="erro" && ago<720){ dot.className="dot err"; txt.innerHTML=`<b>Parou com erro</b> · ${esc(last.message)} · próxima corrida às ${nextRun()}`; }
+  else { dot.className="dot"; txt.innerHTML=`<b>Em pausa</b> · próxima corrida às ${nextRun()}`+(last?` · última atividade ${new Date(last.at).toLocaleString("pt-PT",{dateStyle:"short",timeStyle:"short"})}`:""); }
+}
+
 const SB="https://ctyndeyumrvcwlxzdgnz.supabase.co/rest/v1/", KEY="sb_publishable_hMd_xtAGBa1zcJY30QRNIA_LupFPdfp";
 const q=p=>fetch(SB+p,{headers:{apikey:KEY,Authorization:"Bearer "+KEY},cache:"no-store"}).then(r=>{if(!r.ok)throw new Error(r.status);return r.json();});
 
 function activity(log){
   const el=document.getElementById("log");
   if(!log.length){el.innerHTML='<li class="muted">Sem atividade.</li>';return;}
-  const ICON={inicio:"▶",teste:"•",fim:"■",erro:"!"};
+  const ICON={inicio:"▶",teste:"•",fim:"■",erro:"!",estado:"⋯"};
   el.innerHTML=log.map(e=>`<li><span class="box" style="border:0">${ICON[e.kind]||"•"}</span><span><span class="muted small">${new Date(e.at).toLocaleString("pt-PT",{dateStyle:"short",timeStyle:"short"})}</span><br>${esc(e.message)}</span></li>`).join("");
 }
 
@@ -254,12 +349,23 @@ function load(){
     const d={runs:runs.map(r=>({...r,date:r.created_at.slice(0,16)})),todo:st.todo||[],summary:st.summary||"",holdoutLog:st.holdout_log||""};
     const last=log[0]?new Date(log[0].at):null;
     document.getElementById("sub").textContent="Backtests NQ · S&P 500 · Dow em 5m, com custos de CFD"+(last?` · última atividade ${last.toLocaleString("pt-PT",{dateStyle:"short",timeStyle:"short"})}`:"");
-    tiles(d); runsTable(d); todoList(d); activity(log);
+    tiles(d); runsTable(d); todoList(d); activity(log); nowStatus(log); if(PV.run){const u=d.runs.find(r=>r.id===PV.run.id); if(u){PV.run=u; renderPeriods();}}
     if(d.summary.trim()){document.getElementById("sumSec").hidden=false; document.getElementById("summary").textContent=d.summary.trim();}
     if(d.holdoutLog.trim()){document.getElementById("holdBox").hidden=false; document.getElementById("hold").textContent=d.holdoutLog.trim();}
   }).catch(e=>{document.getElementById("sub").textContent="Erro a carregar dados: "+e;});
 }
-load(); setInterval(load, 120000);
+load(); setInterval(load, 60000);
+window.load=load;
+</script>
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+const sb=createClient("https://ctyndeyumrvcwlxzdgnz.supabase.co","sb_publishable_hMd_xtAGBa1zcJY30QRNIA_LupFPdfp");
+let t=null; const kick=()=>{clearTimeout(t); t=setTimeout(()=>window.load(),400);};
+const rt=document.getElementById("rt");
+sb.channel("bottrading").on("postgres_changes",{event:"*",schema:"public",table:"agent_log"},kick)
+  .on("postgres_changes",{event:"*",schema:"public",table:"runs"},kick)
+  .on("postgres_changes",{event:"*",schema:"public",table:"state"},kick)
+  .subscribe(s=>{rt.textContent = s==="SUBSCRIBED" ? "● tempo real" : (s==="CHANNEL_ERROR"||s==="TIMED_OUT" ? "atualiza a cada minuto" : "");});
 </script>
 </body>
 </html>

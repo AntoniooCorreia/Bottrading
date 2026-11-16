@@ -38,6 +38,7 @@ o trabalho e confirmar ou desmentir com honestidade, nao "encontrar" algo.
 1. `git pull`; trabalha no branch `research` (cria-o a partir do main se nao existir).
 2. Se nao houver nenhum `[ ]` em TODO.md: escreve no maximo 3 linhas em NOTES.md e termina. Nao gastes mais.
 3. Garante dados em data/m5 (download.py so se faltarem) e testes a passar.
-4. Pega nos itens `[ ]` por ordem, corre-os, marca `[x]` com o veredicto numa linha.
+4. Pega nos itens `[ ]` por ordem. ANTES de cada um: `python sync.py --log estado "A correr <variante>"` (o dashboard mostra
+   isto em tempo real); depois corre-o, marca `[x]` com o veredicto e `python sync.py --log teste "<variante>: <veredicto>, t junto <t>"`.
 5. Atualiza `SUMMARY.md`: tabela curta do que passou/reprovou e a tua leitura honesta, em 10 linhas.
 6. Commit + push para `research`; se nao houver PR aberto de research -> main, abre um.

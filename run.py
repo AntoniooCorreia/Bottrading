@@ -44,6 +44,28 @@ def equity_curve(tr: pd.DataFrame, max_pts: int = 400) -> list:
     return [[t[i].strftime("%Y-%m-%d"), round(float(eq[i]), 2)] for i in keep]
 
 
+def period_tables(tr: pd.DataFrame) -> dict:
+    """R e win rate por dia, semana, mes e ano: {"day": [[rotulo, R, trades, ganhas], ...], ...}."""
+    if tr is None or len(tr) == 0:
+        return {}
+    t = pd.DatetimeIndex(tr["time"])
+    if t.tz is not None:
+        t = t.tz_localize(None)
+    keys = {
+        "day": t.strftime("%Y-%m-%d"),
+        "week": (t - pd.to_timedelta(t.dayofweek, unit="D")).strftime("%Y-%m-%d"),   # 2a feira da semana
+        "month": t.strftime("%Y-%m"),
+        "year": t.strftime("%Y"),
+    }
+    r = tr["R"].to_numpy()
+    out = {}
+    for name, k in keys.items():
+        g = pd.DataFrame({"k": k, "R": r, "w": (r > 0).astype(int)}).groupby("k").agg(
+            R=("R", "sum"), n=("R", "size"), w=("w", "sum"))
+        out[name] = [[idx, round(float(row.R), 2), int(row.n), int(row.w)] for idx, row in g.iterrows()]
+    return out
+
+
 def verdict(per: dict, pooled_t: float) -> str:
     if any(s["n"] < 100 for s in per.values()):
         return "REPROVADA (poucas trades)"
@@ -72,7 +94,7 @@ def main():
         raise SystemExit("O holdout esta FECHADO. Ver regras em CLAUDE.md antes de usar --unlock-holdout.")
 
     v = Variant(play=a.play, levels=a.levels, tp_r=a.tp, stop_atr=a.stop_atr, fake_atr=a.fake_atr, session=a.session)
-    per, all_tr, yearly, curves = {}, [], {}, {}
+    per, all_tr, yearly, curves, periods = {}, [], {}, {}, {}
     for key in a.markets.split(","):
         m5 = load_m5(key, a.period)
         yrs = max((m5.index[-1] - m5.index[0]).days / 365.25, 0.1)
@@ -80,9 +102,11 @@ def main():
         per[key] = summarize(tr, yrs)
         yearly[key] = by_year(tr)
         curves[key] = equity_curve(tr)
+        periods[key] = period_tables(tr)
         if len(tr):
             all_tr.append(tr.assign(market=key))
     pooled = summarize(pd.concat(all_tr) if all_tr else None, 1.0)
+    periods["all"] = period_tables(pd.concat(all_tr) if all_tr else None)
     vd = verdict(per, pooled["t"])
 
     print(f"Variante: {v.name()}  |  periodo: {a.period}")
@@ -107,7 +131,7 @@ def main():
                    "date": datetime.now().astimezone().isoformat(timespec="minutes"), "verdict": vd,
                    "pooled": pooled, "markets": per,
                    "yearly": {k: {str(y): float(r) for y, r in s.items()} for k, s in yearly.items()},
-                   "equity": curves}
+                   "equity": curves, "periods": periods}
     with open(os.path.join(RUNS_DIR, f"{v.name()}__{a.period}.json"), "w") as f:
         json.dump(run_doc, f)
     if supa.report_run(run_doc):
