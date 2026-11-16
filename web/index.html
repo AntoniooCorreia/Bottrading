@@ -185,6 +185,15 @@ function whyShort(run){
   return "lucro nos 3, mas fraco (t "+fmt(run.pooled.t)+")";
 }
 
+function goalTile(d){
+  const P=d.portfolio; const v=P?P.media:0, pc=Math.max(0,Math.min(100,v/14*100));
+  const yrs=P?Object.entries(P.por_ano).filter(([y])=>+y>=2013&&+y<=2024):[];
+  const bars=yrs.map(([y,x])=>`<div title="${y}: ${x>0?"+":""}${x}%" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="height:46px;width:100%;display:flex;align-items:flex-end;justify-content:center"><div style="width:70%;height:${Math.min(46,Math.abs(x)/14*46)}px;min-height:2px;border-radius:2px;background:${x>=14?"var(--good)":x>=0?"var(--series-1)":"var(--series-2)"}"></div></div><span style="font-size:9px;color:var(--text-muted)">${y.slice(2)}</span></div>`).join("");
+  return `<div class="tile" style="grid-column:1/-1"><div class="k">Objetivo: +14% ao ano · carteira com 1% de risco por trade</div>
+    <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap"><div class="v">${v>0?"+":""}${v.toFixed(1).replace(".",",")}%</div><div class="s">${P?`média por ano · ${P.anos_ok} de ${P.anos} anos acima de 14% · pior queda ${P.dd.toFixed(1).replace(".",",")}% · ${Math.round(P.trades_ano)} trades/ano · ${esc(P.ideas.join(", "))}`:"ainda sem carteira"}</div></div>
+    <div style="height:8px;background:var(--grid);border-radius:4px;margin-top:6px;overflow:hidden"><div style="height:100%;width:${pc}%;background:var(--series-1);border-radius:4px"></div></div>
+    ${bars?`<div style="display:flex;gap:2px;margin-top:8px">${bars}</div><div class="s">% por ano (verde = acima de 14%)</div>`:""}</div>`;
+}
 function tiles(d){
   const dev = d.runs.filter(r=>r.period==="dev"), hold = d.runs.filter(r=>r.period==="holdout");
   const pass = dev.filter(r=>r.verdict.startsWith("PASSA")).length;
@@ -195,7 +204,8 @@ function tiles(d){
     T("Variantes testadas (dev)", dev.length, `de ${d.todo.length} no plano`) +
     T("Passaram no dev", pass, pass ? "candidatas ao holdout" : "nenhuma até agora") +
     T("Holdout aberto", hold.length, hold.filter(r=>r.verdict.startsWith("PASSA")).length + " passaram") +
-    T("Melhor t conjunto", best ? fmt(best.pooled.t) : "—", best ? esc(best.variant) : "ainda sem testes");
+    T("Melhor t conjunto", best ? fmt(best.pooled.t) : "—", best ? esc(best.variant) : "ainda sem testes") +
+    goalTile(d);
 }
 
 function runsTable(d){
@@ -209,7 +219,7 @@ function runsTable(d){
   box.innerHTML = `<div style="overflow-x:auto"><table class="runs"><thead><tr>
     <th>Variante</th><th>Veredicto</th><th class="num">t junto</th>
     <th class="num hide-sm">NQ (o teu)</th><th class="num hide-sm">S&amp;P</th><th class="num hide-sm">Dow</th></tr></thead><tbody>
-    ${runs.map((r,i)=>`<tr class="row" data-i="${i}"><td><code>${esc(r.variant)}</code><div class="small muted">${r.period==="dev"?"dev 2019–24":"HOLDOUT 2025–26"} · ${esc(r.date.replace("T"," "))}</div></td>
+    ${runs.map((r,i)=>`<tr class="row" data-i="${i}"><td><code>${esc(r.variant)}</code><div class="small muted">${r.period==="dev"?"dev 2019–24":r.period==="pre"?"às cegas 2012–18":"HOLDOUT 2025–26"} · ${esc(r.date.replace("T"," "))}</div></td>
       <td>${badge(r.verdict).replace(/<div class="small muted">.*<\/div>/,"")}<div class="small muted">${esc(whyShort(r))}</div></td><td class="num">${fmt(r.pooled.t)}</td>
       <td class="num hide-sm">${cell(r.markets.nq)}</td><td class="num hide-sm">${cell(r.markets.es)}</td><td class="num hide-sm">${cell(r.markets.dow)}</td></tr>`).join("")}
     </tbody></table></div>`;
@@ -281,7 +291,7 @@ function detail(run){
   const el=document.getElementById("detail"); el.hidden=false;
   const mk=Object.keys(run.markets);
   const years=[...new Set(mk.flatMap(k=>Object.keys(run.yearly[k]||{})))].sort();
-  el.innerHTML=`<h2><code>${esc(run.variant)}</code> <span class="muted small">· ${run.period==="dev"?"dev 2019–2024":"holdout 2025–2026"}</span></h2>
+  el.innerHTML=`<h2><code>${esc(run.variant)}</code> <span class="muted small">· ${run.period==="dev"?"dev 2019–2024":run.period==="pre"?"teste às cegas 2012–2018":"holdout 2025–2026"}</span></h2>
     <div style="margin-bottom:6px">${badge(run.verdict).replace(/<div class="small muted">.*<\/div>/,"")}</div>
     ${why(run)}
     <div class="small muted" style="margin:6px 0 2px">R acumulado por índice (depois de custos)</div>
@@ -311,7 +321,9 @@ function todoList(d){
 }
 
 
-const PV={run:null,gran:"month",mk:"nq",eur:100,shown:40};
+let ACC=10000, RISK=1; try{ACC=+localStorage.getItem("bt_acc")||10000;}catch(e){}
+const PV={run:null,gran:"month",mk:"nq",get eur(){return ACC*RISK/100;},shown:40};
+const pct=x=>(x>0?"+":x<0?"−":"")+Math.abs(x*RISK).toFixed(1).replace(".",",")+"%";
 const GRAN={day:"Dia",week:"Semana",month:"Mês",year:"Ano"};
 const GRANP={day:"Dias",week:"Semanas",month:"Meses",year:"Anos"};
 function md(t){ // markdown simples: titulos, tabelas, negrito
@@ -335,28 +347,29 @@ function renderPeriods(){
   const P=(PV.run.periods||{})[PV.mk]; const rows=P&&P[PV.gran]||[];
   const seg=(obj,cur,fn)=>`<div class="seg">${Object.entries(obj).map(([k,v])=>`<button class="${k===cur?"on":""}" onclick="${fn}('${k}')">${v}</button>`).join("")}</div>`;
   let h=`<div class="ctrls">${seg(GRAN,PV.gran,"setGran")}${seg(MKSEL,PV.mk,"setMk")}
-    <label>€ por 1R <input type="number" min="1" step="10" value="${PV.eur}" onchange="setEur(this.value)"></label></div>`;
+    <label>Conta € <input type="number" min="100" step="500" value="${ACC}" onchange="setAcc(this.value)" style="width:86px"></label>
+    <span class="small muted">risco 1% por trade = ${eurFmt(PV.eur)}</span></div>`;
   if(!rows.length){ box.innerHTML=h+`<div class="empty small">Sem dados por período para este teste${PV.run.periods&&Object.keys(PV.run.periods).length?"":" (foi corrido antes desta funcionalidade; volta a aparecer na próxima corrida)"}.</div>`; return; }
   const totR=rows.reduce((a,r)=>a+r[1],0), n=rows.reduce((a,r)=>a+r[2],0), w=rows.reduce((a,r)=>a+r[3],0);
   const posP=rows.filter(r=>r[1]>0).length, best=rows.reduce((a,r)=>r[1]>a[1]?r:a), worst=rows.reduce((a,r)=>r[1]<a[1]?r:a);
   const T=(k,v,s="")=>`<div class="tile"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${s}</div></div>`;
   h+=`<div class="ptiles">
-    ${T("Total",fmt(totR,1)+"R",eurFmt(totR*PV.eur))}
+    ${T("Total",pct(totR),fmt(totR,1)+"R · "+eurFmt(totR*PV.eur))}
     ${T("Win rate",(n?w/n*100:0).toFixed(1).replace(".",",")+"%",`${w} de ${n} trades`)}
-    ${T("Média / "+GRAN[PV.gran].toLowerCase(),fmt(totR/rows.length,2)+"R",eurFmt(totR/rows.length*PV.eur))}
+    ${T("Média / "+GRAN[PV.gran].toLowerCase(),pct(totR/rows.length),fmt(totR/rows.length,2)+"R · "+eurFmt(totR/rows.length*PV.eur))}
     ${T(GRANP[PV.gran]+" com lucro",Math.round(posP/rows.length*100)+"%",`${posP} de ${rows.length}`)}
-    ${T("Melhor",fmt(best[1],1)+"R",plabel(PV.gran,best[0]))}
-    ${T("Pior",fmt(worst[1],1)+"R",plabel(PV.gran,worst[0]))}</div>`;
+    ${T("Melhor",pct(best[1]),plabel(PV.gran,best[0]))}
+    ${T("Pior",pct(worst[1]),plabel(PV.gran,worst[0]))}</div>`;
   h+=barChart(rows);
   const rev=rows.slice().reverse(), vis=rev.slice(0,PV.shown);
-  h+=`<div style="overflow-x:auto"><table class="runs"><thead><tr><th>${GRAN[PV.gran]}</th><th class="num">Trades</th><th class="num">Win rate</th><th class="num">R</th><th class="num">€</th></tr></thead><tbody>
-    ${vis.map(r=>`<tr><td>${plabel(PV.gran,r[0])}</td><td class="num">${r[2]}</td><td class="num">${(r[3]/r[2]*100).toFixed(0)}%</td><td class="num">${fmt(r[1],2)}</td><td class="num">${eurFmt(r[1]*PV.eur)}</td></tr>`).join("")}
+  h+=`<div style="overflow-x:auto"><table class="runs"><thead><tr><th>${GRAN[PV.gran]}</th><th class="num">Trades</th><th class="num">Win rate</th><th class="num">Conta</th><th class="num">R</th><th class="num">€</th></tr></thead><tbody>
+    ${vis.map(r=>`<tr><td>${plabel(PV.gran,r[0])}</td><td class="num">${r[2]}</td><td class="num">${(r[3]/r[2]*100).toFixed(0)}%</td><td class="num"><b>${pct(r[1])}</b></td><td class="num">${fmt(r[1],2)}</td><td class="num">${eurFmt(r[1]*PV.eur)}</td></tr>`).join("")}
     </tbody></table></div>${rev.length>vis.length?`<button class="more" onclick="PV.shown+=60;renderPeriods()">Mostrar mais (${rev.length-vis.length} restantes)</button>`:""}`;
   box.innerHTML=h; hookBars(rows);
 }
 function setGran(g){PV.gran=g;PV.shown=40;renderPeriods();}
 function setMk(m){PV.mk=m;PV.shown=40;renderPeriods();}
-function setEur(v){PV.eur=Math.max(1,+v||100);renderPeriods();}
+function setAcc(v){ACC=Math.max(100,+v||10000); try{localStorage.setItem("bt_acc",ACC);}catch(e){} renderPeriods();}
 function barChart(rows){
   const W=Math.max(340,Math.min(760,(document.getElementById("detail").clientWidth||760)-32)),H=200,L=40,R=8,T=8,B=20;
   const vals=rows.map(r=>r[1]); let v0=Math.min(0,...vals), v1=Math.max(0,...vals); const pad=(v1-v0)*0.06||1; v0-=pad; v1+=pad;
@@ -375,7 +388,7 @@ function hookBars(rows){
   const c=barChart._c, box=document.getElementById("barBox"); if(!box) return; const svg=box.querySelector("svg"), tip=document.getElementById("btip");
   const mv=ev=>{const r=svg.getBoundingClientRect(); const sx=((ev.touches?ev.touches[0].clientX:ev.clientX)-r.left)/r.width*c.W;
     const i=Math.min(rows.length-1,Math.max(0,Math.floor((sx-c.L)/c.bw))); const p=rows[i];
-    tip.innerHTML=`<div class="muted">${plabel(PV.gran,p[0])}</div><b>${fmt(p[1],2)}R</b> · ${eurFmt(p[1]*PV.eur)}<div class="muted">${p[2]} trades · WR ${(p[3]/p[2]*100).toFixed(0)}%</div>`;
+    tip.innerHTML=`<div class="muted">${plabel(PV.gran,p[0])}</div><b>${pct(p[1])}</b> da conta · ${fmt(p[1],2)}R · ${eurFmt(p[1]*PV.eur)}<div class="muted">${p[2]} trades · WR ${(p[3]/p[2]*100).toFixed(0)}%</div>`;
     tip.style.display="block"; const px=(c.L+(i+.5)*c.bw)/c.W*r.width; tip.style.left=Math.min(Math.max(px+8,0),r.width-tip.offsetWidth)+"px"; tip.style.top="4px";};
   const hit=svg.querySelector("#bhit"); hit.addEventListener("mousemove",mv); hit.addEventListener("touchstart",mv,{passive:true}); hit.addEventListener("touchmove",mv,{passive:true});
   hit.addEventListener("mouseleave",()=>tip.style.display="none"); hit.addEventListener("touchend",()=>tip.style.display="none");
@@ -431,7 +444,7 @@ function load(){
     q("agent_log?select=*&order=at.desc&limit=200"),
   ]).then(([runs,state,log])=>{
     const st=Object.fromEntries(state.map(r=>[r.key,r.value]));
-    const d={runs:runs.map(r=>({...r,date:r.created_at.slice(0,16)})),todo:st.todo||[],summary:st.summary||"",holdoutLog:st.holdout_log||"",ideas:st.ideas||""};
+    const d={runs:runs.map(r=>({...r,date:r.created_at.slice(0,16)})),todo:st.todo||[],summary:st.summary||"",holdoutLog:st.holdout_log||"",ideas:st.ideas||"",portfolio:st.portfolio||null};
     if(d.ideas.split("\n").filter(l=>l.trim()).length>2){document.getElementById("ideasSec").hidden=false; document.getElementById("ideas").innerHTML=md(d.ideas);}
     const last=log[0]?new Date(log[0].at):null;
     document.getElementById("sub").textContent="Backtests NQ · S&P 500 · Dow em 5m, com custos de CFD"+(last?` · última atividade ${last.toLocaleString("pt-PT",{dateStyle:"short",timeStyle:"short"})}`:"");

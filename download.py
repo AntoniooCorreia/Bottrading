@@ -18,6 +18,9 @@ import pandas as pd
 
 from sr.data import INSTR, M5_DIR, m5_path, resample_m1_to_m5
 
+# python download.py 2012 2026            -> todos os indices
+# python download.py 2012 2026 dax ftse   -> so estes
+
 Y0 = int(sys.argv[1]) if len(sys.argv) > 1 else 2019
 Y1 = int(sys.argv[2]) if len(sys.argv) > 2 else date.today().year
 
@@ -42,6 +45,10 @@ def get_year(inst: str, y: int) -> str | None:
         print(f"  {inst} {y}: FALHOU\n{r.stdout[-500:]}\n{r.stderr[-500:]}")
         shutil.rmtree(tmp, ignore_errors=True)
         return None
+    if os.path.getsize(files[0]) < 1000:      # a Dukascopy nao tem dados para este ano (ficheiro vazio)
+        print(f"  {inst} {y}: sem dados na Dukascopy (ignorado)")
+        shutil.rmtree(tmp, ignore_errors=True)
+        return None
     shutil.move(files[0], out)
     shutil.rmtree(tmp, ignore_errors=True)
     return out
@@ -49,11 +56,14 @@ def get_year(inst: str, y: int) -> str | None:
 
 def main():
     os.makedirs(M5_DIR, exist_ok=True)
+    only = set(sys.argv[3:])
     for key, inst in INSTR.items():
+        if only and key not in only:
+            continue
         parts = []
         for y in range(Y0, Y1 + 1):
             f = get_year(inst, y)
-            if f:
+            if f and os.path.getsize(f) > 1000:
                 df = pd.read_csv(f)
                 df.columns = [c.strip().lower() for c in df.columns]
                 df.index = pd.to_datetime(df["timestamp"].astype("int64"), unit="ms", utc=True)
