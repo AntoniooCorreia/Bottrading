@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Bottrading · Suporte e resistência</title>
+<title>Bottrading · Laboratório</title>
 <style>
 .viz-root{
   color-scheme:light;
@@ -85,17 +85,38 @@ li.done .box{background:var(--text-muted);color:var(--surface-1);border-color:va
 .dot.err{background:var(--critical)}
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(12,163,12,.55)}70%{box-shadow:0 0 0 9px rgba(12,163,12,0)}100%{box-shadow:0 0 0 0 rgba(12,163,12,0)}}
 .now .rt{margin-left:auto;font-size:11px;color:var(--text-muted);white-space:nowrap}
+.journal{list-style:none;margin:0;padding:0}
+.jsess{margin:12px 0 4px;font-size:12px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.04em}
+.jitem{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--grid)}
+.jicon{flex:none;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font-size:15px;background:var(--grid)}
+.jbody{min-width:0;flex:1}
+.jhead{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.jkind{font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.04em}
+.jtime{font-size:11px;color:var(--text-muted);margin-left:auto}
+.jtitle{font-size:14px;color:var(--text-primary);margin-top:1px;overflow-wrap:anywhere}
+.jbody ul{margin:4px 0 0;padding-left:18px;font-size:13px;color:var(--text-secondary)}
+.jbody li{margin:2px 0;overflow-wrap:anywhere}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.chips button{border:1px solid var(--border);background:var(--surface-1);color:var(--text-secondary);border-radius:999px;padding:4px 10px;font:inherit;font-size:12px;cursor:pointer}
+.chips button.on{background:var(--text-primary);color:var(--surface-1);border-color:var(--text-primary)}
+.why{list-style:none;margin:6px 0 4px;padding:0;font-size:13px}
+.why li{display:flex;gap:8px;padding:3px 0;align-items:flex-start}
+.why .ck{flex:none;width:18px;height:18px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:11px;margin-top:1px}
+.why .ok{background:var(--good)} .why .no{background:var(--critical)}
+.whybox{background:var(--grid);border-radius:10px;padding:8px 12px;margin:8px 0}
 details summary{cursor:pointer;color:var(--text-secondary);font-size:13px}
 </style>
 </head>
 <body>
 <div class="viz-root"><div class="wrap">
   <header>
-    <h1>Bottrading · Suporte e resistência</h1>
+    <h1>Bottrading · Laboratório</h1>
     <p id="sub">A carregar…</p>
   </header>
   <div class="now" id="now"><span class="dot" id="nowDot"></span><span id="nowTxt">A verificar o estado do agente…</span><span class="rt" id="rt"></span></div>
   <div class="tiles" id="tiles"></div>
+  <section><h2>Diário do agente <span class="muted small">· o que pensou, testou e mudou</span></h2>
+    <div class="chips" id="jchips"></div><div id="journal" style="max-height:620px;overflow:auto"></div></section>
   <section id="sumSec" hidden><h2>Leitura do agente</h2><div class="summary" id="summary"></div></section>
   <section id="ideasSec" hidden><details><summary style="font-size:15px;font-weight:600;color:var(--text-primary)">Ideias do agente</summary><div class="summary" id="ideas" style="margin-top:8px"></div></details></section>
   <section>
@@ -105,7 +126,6 @@ details summary{cursor:pointer;color:var(--text-secondary);font-size:13px}
   <section id="detail" hidden></section>
   <div class="grid2">
     <section><h2>Plano de testes</h2><ul class="todo" id="todo"></ul></section>
-    <section><h2>Atividade do agente</h2><ul class="todo" id="log" style="max-height:340px;overflow:auto"></ul></section>
     <section>
       <h2>Como ler isto</h2>
       <div class="small" style="color:var(--text-secondary)">
@@ -132,6 +152,39 @@ function badge(v){
     + (why ? `<div class="small muted">${esc(why)}</div>` : "");
 }
 
+
+const ORIG=new Set(["bounce","break","fake"].flatMap(p=>["pdhl","pwhl","swing1h","round"].map(l=>p+"|"+l)).concat(["antonio|all"]));
+function why(run){
+  const minT=ORIG.has(run.params.play+"|"+run.params.levels)||run.params.play==="antonio"?2.5:3.0;
+  const ks=["nq","es","dow"].filter(k=>run.markets[k]);
+  const m=k=>run.markets[k], nm=k=>MK_SHORT[k];
+  const minN=run.params.play==="swing"?60:100;
+  const c1=ks.every(k=>m(k).n>=minN), c2=ks.every(k=>m(k).meanR>0), c3=run.pooled.t>=minT;
+  const items=[
+    [c1, `Trades suficientes (≥${minN} em cada índice): `+ks.map(k=>`${nm(k)} ${m(k).n}`).join(" · ")],
+    [c2, `Ganha dinheiro em todos os índices (média por trade > 0): `+ks.map(k=>`${nm(k)} ${fmt(m(k).meanR,3)}R`).join(" · ")],
+    [c3, `Resultado forte o suficiente para não ser sorte (t junto ${fmt(run.pooled.t)} vs mínimo ${String(minT).replace(".",",")})`],
+  ];
+  let plain;
+  if(c1&&c2&&c3) plain="Passou: dá lucro nos três índices, com trades suficientes e um resultado demasiado forte para ser só sorte.";
+  else { const bad=ks.filter(k=>m(k).meanR<=0).map(nm), good=ks.filter(k=>m(k).meanR>0).map(nm);
+    if(!c2 && !good.length) plain="Reprovou: perde dinheiro em todos os índices depois de custos.";
+    else if(!c2) plain=`Reprovou: dá lucro em ${good.join(" e ")} mas perde em ${bad.join(" e ")}. Um edge real devia aparecer em todos, por isso o lucro onde aparece é provavelmente sorte.`;
+    else if(!c1) plain="Reprovou: não há trades suficientes para tirar conclusões.";
+    else plain=`Reprovou: dá lucro nos três índices, mas o resultado ainda é fraco demais (t ${fmt(run.pooled.t)}) para excluir a sorte.`; }
+  if(run.fut&&run.fut.markets){const f=run.fut.markets; plain+=` Com micro-futuros (sem financiamento, custos mais baixos): `+["nq","es","dow"].filter(k=>f[k]).map(k=>`${MK_SHORT[k]} ${fmt(f[k].meanR,3)}R`).join(" · ")+` → ${run.fut.verdict.startsWith("PASSA")?"passaria":"também não passa"}.`;}
+  return `<div class="whybox"><b>Porquê?</b> ${esc(plain)}<ul class="why">${items.map(([ok,t])=>`<li><span class="ck ${ok?"ok":"no"}">${ok?"✓":"✕"}</span><span>${esc(t)}</span></li>`).join("")}</ul></div>`;
+}
+function whyShort(run){
+  const ks=["nq","es","dow"].filter(k=>run.markets[k]); const m=k=>run.markets[k];
+  if(run.verdict.startsWith("PASSA")) return "lucro nos 3 índices e t forte";
+  const good=ks.filter(k=>m(k).meanR>0).map(k=>MK_SHORT[k]);
+  if(!good.length) return "perde nos 3 índices";
+  if(good.length<ks.length) return "lucro só em "+good.join(" e ");
+  if(ks.some(k=>m(k).n<(run.params.play==="swing"?60:100))) return "poucas trades";
+  return "lucro nos 3, mas fraco (t "+fmt(run.pooled.t)+")";
+}
+
 function tiles(d){
   const dev = d.runs.filter(r=>r.period==="dev"), hold = d.runs.filter(r=>r.period==="holdout");
   const pass = dev.filter(r=>r.verdict.startsWith("PASSA")).length;
@@ -155,9 +208,9 @@ function runsTable(d){
   const cell = m => m && m.n ? `${fmt(m.meanR,3)}R<div class="small muted">n ${m.n} · t ${fmt(m.t)}</div>` : `<span class="muted">—</span>`;
   box.innerHTML = `<div style="overflow-x:auto"><table class="runs"><thead><tr>
     <th>Variante</th><th>Veredicto</th><th class="num">t junto</th>
-    <th class="num hide-sm">NQ</th><th class="num hide-sm">S&amp;P</th><th class="num hide-sm">Dow</th></tr></thead><tbody>
+    <th class="num hide-sm">NQ (o teu)</th><th class="num hide-sm">S&amp;P</th><th class="num hide-sm">Dow</th></tr></thead><tbody>
     ${runs.map((r,i)=>`<tr class="row" data-i="${i}"><td><code>${esc(r.variant)}</code><div class="small muted">${r.period==="dev"?"dev 2019–24":"HOLDOUT 2025–26"} · ${esc(r.date.replace("T"," "))}</div></td>
-      <td>${badge(r.verdict)}</td><td class="num">${fmt(r.pooled.t)}</td>
+      <td>${badge(r.verdict).replace(/<div class="small muted">.*<\/div>/,"")}<div class="small muted">${esc(whyShort(r))}</div></td><td class="num">${fmt(r.pooled.t)}</td>
       <td class="num hide-sm">${cell(r.markets.nq)}</td><td class="num hide-sm">${cell(r.markets.es)}</td><td class="num hide-sm">${cell(r.markets.dow)}</td></tr>`).join("")}
     </tbody></table></div>`;
   box.querySelectorAll("tr.row").forEach(tr=>tr.addEventListener("click",()=>{
@@ -229,7 +282,8 @@ function detail(run){
   const mk=Object.keys(run.markets);
   const years=[...new Set(mk.flatMap(k=>Object.keys(run.yearly[k]||{})))].sort();
   el.innerHTML=`<h2><code>${esc(run.variant)}</code> <span class="muted small">· ${run.period==="dev"?"dev 2019–2024":"holdout 2025–2026"}</span></h2>
-    <div style="margin-bottom:6px">${badge(run.verdict)}</div>
+    <div style="margin-bottom:6px">${badge(run.verdict).replace(/<div class="small muted">.*<\/div>/,"")}</div>
+    ${why(run)}
     <div class="small muted" style="margin:6px 0 2px">R acumulado por índice (depois de custos)</div>
     ${chart(run)}
     <div class="grid2" style="margin-top:10px">
@@ -241,6 +295,7 @@ function detail(run){
       </tbody></table></div>
     </div>
     <h2 style="margin-top:18px">Resultados por período</h2>
+    <div class="small muted" style="margin-top:-6px">Abre no NQ, que é o que operas. O S&amp;P e o Dow servem só para confirmar que não é sorte.</div>
     <div id="pview"></div>
     <div class="small muted" style="margin-top:8px">Parâmetros: ${esc(Object.entries(run.params).map(([k,v])=>k+"="+v).join(" · "))}</div>`;
   hookHover();
@@ -256,7 +311,7 @@ function todoList(d){
 }
 
 
-const PV={run:null,gran:"month",mk:"all",eur:100,shown:40};
+const PV={run:null,gran:"month",mk:"nq",eur:100,shown:40};
 const GRAN={day:"Dia",week:"Semana",month:"Mês",year:"Ano"};
 const GRANP={day:"Dias",week:"Semanas",month:"Meses",year:"Anos"};
 function md(t){ // markdown simples: titulos, tabelas, negrito
@@ -270,7 +325,7 @@ function md(t){ // markdown simples: titulos, tabelas, negrito
     i++; }
   return out.join("");
 }
-const MKSEL={all:"Todos",nq:"NQ",es:"S&P",dow:"Dow"};
+const MKSEL={nq:"NQ (o teu)",es:"S&P",dow:"Dow",all:"Todos"};
 const eurFmt=x=>(x<0?"−":"")+Math.abs(x).toLocaleString("pt-PT",{maximumFractionDigits:0})+" €";
 function plabel(g,k){ if(g==="week"){const d=new Date(k+"T00:00:00");const e=new Date(d.getTime()+4*864e5);return `${k.slice(8,10)}/${k.slice(5,7)} – ${String(e.getDate()).padStart(2,"0")}/${String(e.getMonth()+1).padStart(2,"0")}/${e.getFullYear()}`;}
   if(g==="month"){const m=["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];return m[+k.slice(5,7)-1]+" "+k.slice(0,4);}
@@ -345,18 +400,35 @@ function nowStatus(log){
 const SB="https://ctyndeyumrvcwlxzdgnz.supabase.co/rest/v1/", KEY="sb_publishable_hMd_xtAGBa1zcJY30QRNIA_LupFPdfp";
 const q=p=>fetch(SB+p,{headers:{apikey:KEY,Authorization:"Bearer "+KEY},cache:"no-store"}).then(r=>{if(!r.ok)throw new Error(r.status);return r.json();});
 
+const JK={inicio:["▶","Início"],estado:["⋯","A fazer"],ideia:["💡","Ideia nova"],teste:["🧪","Teste"],mudanca:["🔧","Mudança"],erro:["⚠️","Erro"],fim:["🏁","Fim de sessão"]};
+const JF={all:"Tudo",ideia:"Ideias",teste:"Testes",mudanca:"Mudanças",erro:"Erros"};
+let JSEL="all", JLOG=[];
+function setJ(k){JSEL=k; activity(JLOG);}
 function activity(log){
-  const el=document.getElementById("log");
-  if(!log.length){el.innerHTML='<li class="muted">Sem atividade.</li>';return;}
-  const ICON={inicio:"▶",teste:"•",fim:"■",erro:"!",estado:"⋯"};
-  el.innerHTML=log.map(e=>`<li><span class="box" style="border:0">${ICON[e.kind]||"•"}</span><span><span class="muted small">${new Date(e.at).toLocaleString("pt-PT",{dateStyle:"short",timeStyle:"short"})}</span><br>${esc(e.message)}</span></li>`).join("");
+  JLOG=log;
+  document.getElementById("jchips").innerHTML=Object.entries(JF).map(([k,v])=>{const n=k==="all"?"":` ${log.filter(e=>e.kind===k).length}`;return `<button class="${k===JSEL?"on":""}" onclick="setJ('${k}')">${v}${n}</button>`;}).join("");
+  const el=document.getElementById("journal");
+  // sessoes: do mais recente para o mais antigo; 'estado' antigo esconde-se (so interessa o atual)
+  let items=log.filter(e=>JSEL==="all"?true:e.kind===JSEL);
+  if(JSEL==="all"){ const firstState=items.findIndex(e=>e.kind==="estado"); items=items.filter((e,i)=>e.kind!=="estado"||i===firstState); }
+  if(!items.length){el.innerHTML='<div class="empty small">Nada por aqui ainda.</div>';return;}
+  let html="", lastDay="";
+  items.forEach(e=>{
+    const d=new Date(e.at), day=d.toLocaleDateString("pt-PT",{weekday:"long",day:"numeric",month:"long"});
+    if(day!==lastDay){html+=`<div class="jsess">${day}</div>`; lastDay=day;}
+    const [ic,lab]=JK[e.kind]||["•",e.kind];
+    let msg=e.message, det=Array.isArray(e.details)?e.details:[];
+    if(!det.length && msg.includes(" | ")){const parts=msg.split(" | "); msg=parts.shift(); det=parts;}
+    html+=`<div class="jitem"><div class="jicon">${ic}</div><div class="jbody"><div class="jhead"><span class="jkind">${lab}</span><span class="jtime">${d.toLocaleTimeString("pt-PT",{hour:"2-digit",minute:"2-digit"})}</span></div>
+      <div class="jtitle">${esc(msg)}</div>${det.length?`<ul>${det.map(b=>`<li>${esc(b)}</li>`).join("")}</ul>`:""}</div></div>`;
+  });
+  el.innerHTML=html;
 }
-
 function load(){
   Promise.all([
     q("runs?select=*&order=created_at.desc"),
     q("state?select=key,value,updated_at"),
-    q("agent_log?select=*&order=at.desc&limit=40"),
+    q("agent_log?select=*&order=at.desc&limit=200"),
   ]).then(([runs,state,log])=>{
     const st=Object.fromEntries(state.map(r=>[r.key,r.value]));
     const d={runs:runs.map(r=>({...r,date:r.created_at.slice(0,16)})),todo:st.todo||[],summary:st.summary||"",holdoutLog:st.holdout_log||"",ideas:st.ideas||""};

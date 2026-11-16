@@ -41,3 +41,26 @@ def resample_m1_to_m5(m1: pd.DataFrame) -> pd.DataFrame:
     """m1 com indice UTC -> m5 (indice UTC), rotulo = inicio da vela."""
     agg = {"open": "first", "high": "max", "low": "min", "close": "last"}
     return m1.resample("5min", label="left", closed="left").agg(agg).dropna()
+
+
+M1_DIR = os.path.join("data", "m1gz")
+
+
+def load_m1(key: str, period: str | None = None) -> pd.DataFrame:
+    """Velas de 1m (indice UTC) a partir de data/m1gz/<instrumento>_<ano>.csv.gz (criados por pack_m1.py)."""
+    import glob
+    files = sorted(glob.glob(os.path.join(M1_DIR, f"{INSTR[key]}_*.csv.gz")))
+    if not files:
+        raise SystemExit(f"Faltam velas de 1m em {M1_DIR}. No PC: python pack_m1.py e push de data/m1gz")
+    a, b = PERIODS[period] if period else ("1900-01-01", "2100-01-01")
+    parts = []
+    for f in files:
+        y = int(os.path.basename(f).split("_")[-1][:4])
+        if y < int(a[:4]) or y > int(b[:4]):
+            continue
+        df = pd.read_csv(f)
+        df.index = pd.to_datetime(df["timestamp"].astype("int64"), unit="ms", utc=True)
+        parts.append(df[["open", "high", "low", "close"]].astype(float))
+    m1 = pd.concat(parts).sort_index()
+    m1 = m1[~m1.index.duplicated(keep="last")]
+    return m1[(m1.index >= pd.Timestamp(a, tz=TZ)) & (m1.index <= pd.Timestamp(b, tz=TZ) + pd.Timedelta(days=1))]

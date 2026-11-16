@@ -32,5 +32,9 @@ def set_state(key: str, value) -> bool:
     return _rpc("set_state", {"p_key": key, "p_value": value})
 
 
-def log_event(kind: str, message: str) -> bool:
+def log_event(kind: str, message: str, details: list | None = None) -> bool:
+    if details:
+        if _rpc("log_event2", {"p_kind": kind, "p_message": message, "p_details": details}):
+            return True
+        message = message + " | " + " | ".join(details)   # versao antiga da funcao: junta os pontos na mensagem
     return _rpc("log_event", {"p_kind": kind, "p_message": message})

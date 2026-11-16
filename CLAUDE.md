@@ -5,6 +5,10 @@ nos indices americanos (NQ, S&P 500, Dow) em CFDs, DEPOIS de custos. So backtest
 nada de broker, nada de chaves. O MT5 (conta demo STARTRADER) so entra no PC do Antonio e so
 para uma variante que tenha passado o holdout.
 
+O Antonio so opera o US100 (NQ). O S&P e o Dow ficam nos testes APENAS como confirmacao (detetor de sorte):
+um edge real tem de aparecer nos tres. Em relatorios, diario e Telegram mostra sempre o NQ primeiro e com mais
+detalhe (R por trade, win rate, R por mes); S&P e Dow numa linha curta como confirmacao.
+
 Escreve tudo (commits, relatorios, notas) em portugues de Portugal, sem acentos nos ficheiros .py.
 
 ## Historico (ja testado noutro chat, NAO repetir)
@@ -19,6 +23,9 @@ o trabalho e confirmar ou desmentir com honestidade, nao "encontrar" algo.
 - `python download.py` - descarrega 1m da Dukascopy e cria `data/m5/*.csv.gz` (so se faltarem; os
   .csv.gz de 5m estao no repo, faz commit deles se os criares)
 - `python -m pytest -q` - TEM de passar antes de qualquer commit
+- `python run.py --play antonio --levels all --tp 1|2|3` - setup do Antonio em velas de 1m (sr/antonio.py; precisa de data/m1gz)
+- `python run_swing.py --idea <nome>` - ideias de prazo mais longo (15m/1h/4h/diario), registadas em sr/swing_ideas.py;
+  reporta custos de CFD (veredicto oficial) e de micro-futuros MNQ/MES/MYM
 - `python run.py --play bounce|break|fake --levels pdhl|pwhl|swing1h|round [--tp 2 --stop-atr 0.5 --fake-atr 0.3 --session rth|all]`
   regista sozinho uma linha em `results/RESULTS.md`
 
@@ -42,22 +49,37 @@ O Antonio quer que o agente invente e teste ideias novas durante a noite. Regras
 2. Cada ideia e registada em `IDEAS.md` ANTES de correr, com: data, nome curto, hipotese (porque podera ter edge,
    com base em comportamento de mercado conhecido, nao em olhar para os resultados), regras exatas de entrada,
    stop, alvo e sessao, e os parametros (fixos; nada de grelhas de otimizacao). Faz commit desse registo primeiro.
-3. Ideias de price action / niveis / sessoes nos indices EUA intraday (5m). Proibido: martingale, sem stop,
+3. FOCO (decidido a 2026-11-16 depois de tudo em 1m/5m dar ~0R antes de custos): ideias de PRAZO MAIS LONGO,
+   timeframes 15m, 1h, 4h e diario, trades de horas a dias, stops largos (custos passam de ~0.15-0.25R para ~0.03R).
+   Usa sr/swing.py + sr/swing_ideas.py + run_swing.py (os testes em tests/test_swing.py apanham a ideia sozinhos).
+   Intraday 1m/5m so com uma razao muito forte. Pode ser long-only. Proibido: martingale, sem stop,
    grid, mexer em custos, periodos ou criterios, usar dados do holdout, e repetir o que ja reprovou (ver historico
    e results/RESULTS.md).
-4. Implementa a ideia em sr/ como uma jogada (--play) ou definicao de nivel (--levels) nova, acrescenta-a aos
-   choices do run.py, e acrescenta-a aos testes de tests/test_engine.py (passeio aleatorio sem edge + sem lookahead).
-   pytest tem de passar antes de correr.
+4. Implementa a ideia como funcao em sr/swing_ideas.py e acrescenta-a ao dicionario IDEAS (timeframe, stop_atr,
+   tp_r, max_hold fixos). pytest tem de passar antes de correr (passeio aleatorio sem edge + sem lookahead).
+   Criterio em run_swing.py: >= 60 trades por indice, meanR > 0 em cada indice, t junto >= 3.0, com custos de CFD.
 5. Acrescenta a ideia ao TODO numa seccao "Ideias do agente (AAAA-MM-DD)" e corre-a como qualquer item.
    Ideias novas tem fasquia t >= 3.0 (automatico no run.py).
 6. Uma ideia que PASSE no dev vai uma vez ao holdout. Escreve no SUMMARY.md a leitura honesta, incluindo quantas
    ideias ja foram testadas no total (quanto mais, mais desconfianca num resultado isolado).
 
+## Diario (o que o Antonio ve no dashboard e no Telegram)
+O Antonio acompanha tudo pelo diario. Escreve para ele perceber sem ler codigo: frases curtas, portugues simples,
+numeros concretos. Usa `python sync.py --log <tipo> "titulo" -b "ponto" -b "ponto"`:
+- `estado` "o que estas a fazer agora" (sem pontos; nao vai para o Telegram)
+- `ideia` "<nome>: <hipotese numa frase>" com pontos: Porque pode funcionar / Entrada / Stop e alvo / Sessao / Fasquia (t >= 3.0)
+- `teste` "<variante>: PASSA|REPROVADA" com pontos: resultado por indice (R por trade e trades), win rate, R por mes,
+  e "O que aprendemos: ..." numa frase
+- `mudanca` "<o que mudou>" com pontos: o que mudou, porque, e o efeito (ex.: testes, resultados afetados)
+- `erro` "<o que falhou>" com pontos: causa provavel e o que fizeste
+- `fim` "<resumo numa linha>" com pontos: ideias testadas, o que passou, proximo passo
+
 ## Fluxo de cada sessao autonoma
 1. `git pull`; trabalha no branch `research` (cria-o a partir do main se nao existir).
 2. Se nao houver nenhum `[ ]` em TODO.md: modo ideias (seccao acima), dentro dos limites.
 3. Garante dados em data/m5 (download.py so se faltarem) e testes a passar.
-4. Pega nos itens `[ ]` por ordem. ANTES de cada um: `python sync.py --log estado "A correr <variante>"` (o dashboard mostra
-   isto em tempo real); depois corre-o, marca `[x]` com o veredicto e `python sync.py --log teste "<variante>: <veredicto>, t junto <t>"`.
+4. Pega nos itens `[ ]` por ordem. ANTES de cada um: `--log estado "A correr <variante>"`; depois corre-o, marca `[x]`
+   com o veredicto e regista um `--log teste` com pontos (ver Diario). Ideias novas: `--log ideia` com pontos antes de as testar;
+   mudancas ao motor ou ao projeto: `--log mudanca` com pontos.
 5. Atualiza `SUMMARY.md`: tabela curta do que passou/reprovou e a tua leitura honesta, em 10 linhas.
 6. Commit + push para `research`; se nao houver PR aberto de research -> main, abre um.

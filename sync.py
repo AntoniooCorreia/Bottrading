@@ -1,7 +1,9 @@
 """
 Sincroniza o estado do repo com o dashboard (Supabase).
   python sync.py                         # envia TODO, SUMMARY, NOTES, HOLDOUT_LOG e todos os results/runs/*.json
-  python sync.py --log inicio "texto"    # regista um evento na atividade do agente (inicio|teste|fim|erro)
+  python sync.py --log <tipo> "titulo" [-b "ponto 1" -b "ponto 2" ...]
+      tipos: inicio | estado | ideia | teste | mudanca | erro | fim
+      os pontos (-b) aparecem como bullet points no dashboard e no Telegram
 Precisa de BT_WRITE_TOKEN no ambiente; sem ele nao faz nada.
 """
 from __future__ import annotations
@@ -35,7 +37,16 @@ def main():
         print("BT_WRITE_TOKEN nao definido: nada enviado.")
         return
     if len(sys.argv) >= 4 and sys.argv[1] == "--log":
-        print("log:", supa.log_event(sys.argv[2], " ".join(sys.argv[3:])))
+        kind, rest = sys.argv[2], sys.argv[3:]
+        title, bullets, i = [], [], 0
+        while i < len(rest):
+            if rest[i] in ("-b", "--bullet") and i + 1 < len(rest):
+                bullets.append(rest[i + 1])
+                i += 2
+            else:
+                title.append(rest[i])
+                i += 1
+        print("log:", supa.log_event(kind, " ".join(title), bullets))
         return
     ok = [supa.set_state("todo", parse_todo(read("TODO.md"))),
           supa.set_state("summary", read("SUMMARY.md")),
