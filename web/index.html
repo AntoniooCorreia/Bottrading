@@ -37,7 +37,7 @@ header p{margin:0;color:var(--text-secondary);font-size:13px}
 section{background:var(--surface-1);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:12px 0}
 section h2{font-size:15px;margin:0 0 10px}
 .muted{color:var(--text-muted)}
-.summary{white-space:pre-wrap;font-size:14px;color:var(--text-secondary)}
+.summary{font-size:14px;color:var(--text-secondary)}
 .runs{width:100%;border-collapse:collapse;font-size:13px}
 .runs th{text-align:left;font-weight:500;color:var(--text-secondary);border-bottom:1px solid var(--border);padding:6px 6px}
 .runs td{padding:8px 6px;border-bottom:1px solid var(--grid);vertical-align:top;font-variant-numeric:tabular-nums}
@@ -257,9 +257,21 @@ function todoList(d){
 
 const PV={run:null,gran:"month",mk:"all",eur:100,shown:40};
 const GRAN={day:"Dia",week:"Semana",month:"Mês",year:"Ano"};
+const GRANP={day:"Dias",week:"Semanas",month:"Meses",year:"Anos"};
+function md(t){ // markdown simples: titulos, tabelas, negrito
+  const out=[]; const L=t.split("\n"); let i=0;
+  const inl=x=>esc(x).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/`(.+?)`/g,"<code>$1</code>");
+  while(i<L.length){ const l=L[i];
+    if(/^\s*\|/.test(l)){ const rows=[]; while(i<L.length&&/^\s*\|/.test(L[i])){ if(!/^\s*\|[\s|:-]+\|\s*$/.test(L[i])) rows.push(L[i].trim().replace(/^\||\|$/g,"").split("|").map(c=>c.trim())); i++; }
+      out.push(`<div style="overflow-x:auto"><table class="runs">${rows.map((r,j)=>`<tr>${r.map(c=>j?`<td>${inl(c)}</td>`:`<th>${inl(c)}</th>`).join("")}</tr>`).join("")}</table></div>`); continue; }
+    if(/^#+\s/.test(l)) out.push(`<div style="font-weight:600;color:var(--text-primary);margin:4px 0">${inl(l.replace(/^#+\s/,""))}</div>`);
+    else if(l.trim()) out.push(`<p style="margin:6px 0">${inl(l)}</p>`);
+    i++; }
+  return out.join("");
+}
 const MKSEL={all:"Todos",nq:"NQ",es:"S&P",dow:"Dow"};
 const eurFmt=x=>(x<0?"−":"")+Math.abs(x).toLocaleString("pt-PT",{maximumFractionDigits:0})+" €";
-function plabel(g,k){ if(g==="week"){const d=new Date(k+"T00:00:00");const e=new Date(d.getTime()+4*864e5);return `${k.slice(8,10)}/${k.slice(5,7)} – ${String(e.getDate()).padStart(2,"0")}/${String(e.getMonth()+1).padStart(2,"0")}/${k.slice(0,4)}`;}
+function plabel(g,k){ if(g==="week"){const d=new Date(k+"T00:00:00");const e=new Date(d.getTime()+4*864e5);return `${k.slice(8,10)}/${k.slice(5,7)} – ${String(e.getDate()).padStart(2,"0")}/${String(e.getMonth()+1).padStart(2,"0")}/${e.getFullYear()}`;}
   if(g==="month"){const m=["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];return m[+k.slice(5,7)-1]+" "+k.slice(0,4);}
   if(g==="day") return k.slice(8,10)+"/"+k.slice(5,7)+"/"+k.slice(0,4); return k;}
 function renderPeriods(){
@@ -276,7 +288,7 @@ function renderPeriods(){
     ${T("Total",fmt(totR,1)+"R",eurFmt(totR*PV.eur))}
     ${T("Win rate",(n?w/n*100:0).toFixed(1).replace(".",",")+"%",`${w} de ${n} trades`)}
     ${T("Média / "+GRAN[PV.gran].toLowerCase(),fmt(totR/rows.length,2)+"R",eurFmt(totR/rows.length*PV.eur))}
-    ${T(GRAN[PV.gran]+"s positivos",Math.round(posP/rows.length*100)+"%",`${posP} de ${rows.length}`)}
+    ${T(GRANP[PV.gran]+" com lucro",Math.round(posP/rows.length*100)+"%",`${posP} de ${rows.length}`)}
     ${T("Melhor",fmt(best[1],1)+"R",plabel(PV.gran,best[0]))}
     ${T("Pior",fmt(worst[1],1)+"R",plabel(PV.gran,worst[0]))}</div>`;
   h+=barChart(rows);
@@ -350,7 +362,7 @@ function load(){
     const last=log[0]?new Date(log[0].at):null;
     document.getElementById("sub").textContent="Backtests NQ · S&P 500 · Dow em 5m, com custos de CFD"+(last?` · última atividade ${last.toLocaleString("pt-PT",{dateStyle:"short",timeStyle:"short"})}`:"");
     tiles(d); runsTable(d); todoList(d); activity(log); nowStatus(log); if(PV.run){const u=d.runs.find(r=>r.id===PV.run.id); if(u){PV.run=u; renderPeriods();}}
-    if(d.summary.trim()){document.getElementById("sumSec").hidden=false; document.getElementById("summary").textContent=d.summary.trim();}
+    if(d.summary.trim()){document.getElementById("sumSec").hidden=false; document.getElementById("summary").innerHTML=md(d.summary.trim());}
     if(d.holdoutLog.trim()){document.getElementById("holdBox").hidden=false; document.getElementById("hold").textContent=d.holdoutLog.trim();}
   }).catch(e=>{document.getElementById("sub").textContent="Erro a carregar dados: "+e;});
 }
