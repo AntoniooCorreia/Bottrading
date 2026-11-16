@@ -16,6 +16,7 @@ SPEC = {
 PERIODS = {
     "dev": ("2019-01-01", "2024-12-31"),       # para escolher / afinar
     "holdout": ("2025-01-01", "2030-12-31"),   # FECHADO: so com --unlock-holdout
+    "pre": ("2012-01-01", "2018-12-31"),       # anos antigos: teste "as cegas" para ideias ja vistas no dev
 }
 M5_DIR = os.path.join("data", "m5")
 

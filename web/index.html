@@ -311,7 +311,9 @@ function todoList(d){
 }
 
 
-const PV={run:null,gran:"month",mk:"nq",eur:100,shown:40};
+let ACC=10000, RISK=1; try{ACC=+localStorage.getItem("bt_acc")||10000;}catch(e){}
+const PV={run:null,gran:"month",mk:"nq",get eur(){return ACC*RISK/100;},shown:40};
+const pct=x=>(x>0?"+":x<0?"−":"")+Math.abs(x*RISK).toFixed(1).replace(".",",")+"%";
 const GRAN={day:"Dia",week:"Semana",month:"Mês",year:"Ano"};
 const GRANP={day:"Dias",week:"Semanas",month:"Meses",year:"Anos"};
 function md(t){ // markdown simples: titulos, tabelas, negrito
@@ -335,28 +337,29 @@ function renderPeriods(){
   const P=(PV.run.periods||{})[PV.mk]; const rows=P&&P[PV.gran]||[];
   const seg=(obj,cur,fn)=>`<div class="seg">${Object.entries(obj).map(([k,v])=>`<button class="${k===cur?"on":""}" onclick="${fn}('${k}')">${v}</button>`).join("")}</div>`;
   let h=`<div class="ctrls">${seg(GRAN,PV.gran,"setGran")}${seg(MKSEL,PV.mk,"setMk")}
-    <label>€ por 1R <input type="number" min="1" step="10" value="${PV.eur}" onchange="setEur(this.value)"></label></div>`;
+    <label>Conta € <input type="number" min="100" step="500" value="${ACC}" onchange="setAcc(this.value)" style="width:86px"></label>
+    <span class="small muted">risco 1% por trade = ${eurFmt(PV.eur)}</span></div>`;
   if(!rows.length){ box.innerHTML=h+`<div class="empty small">Sem dados por período para este teste${PV.run.periods&&Object.keys(PV.run.periods).length?"":" (foi corrido antes desta funcionalidade; volta a aparecer na próxima corrida)"}.</div>`; return; }
   const totR=rows.reduce((a,r)=>a+r[1],0), n=rows.reduce((a,r)=>a+r[2],0), w=rows.reduce((a,r)=>a+r[3],0);
   const posP=rows.filter(r=>r[1]>0).length, best=rows.reduce((a,r)=>r[1]>a[1]?r:a), worst=rows.reduce((a,r)=>r[1]<a[1]?r:a);
   const T=(k,v,s="")=>`<div class="tile"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${s}</div></div>`;
   h+=`<div class="ptiles">
-    ${T("Total",fmt(totR,1)+"R",eurFmt(totR*PV.eur))}
+    ${T("Total",pct(totR),fmt(totR,1)+"R · "+eurFmt(totR*PV.eur))}
     ${T("Win rate",(n?w/n*100:0).toFixed(1).replace(".",",")+"%",`${w} de ${n} trades`)}
-    ${T("Média / "+GRAN[PV.gran].toLowerCase(),fmt(totR/rows.length,2)+"R",eurFmt(totR/rows.length*PV.eur))}
+    ${T("Média / "+GRAN[PV.gran].toLowerCase(),pct(totR/rows.length),fmt(totR/rows.length,2)+"R · "+eurFmt(totR/rows.length*PV.eur))}
     ${T(GRANP[PV.gran]+" com lucro",Math.round(posP/rows.length*100)+"%",`${posP} de ${rows.length}`)}
-    ${T("Melhor",fmt(best[1],1)+"R",plabel(PV.gran,best[0]))}
-    ${T("Pior",fmt(worst[1],1)+"R",plabel(PV.gran,worst[0]))}</div>`;
+    ${T("Melhor",pct(best[1]),plabel(PV.gran,best[0]))}
+    ${T("Pior",pct(worst[1]),plabel(PV.gran,worst[0]))}</div>`;
   h+=barChart(rows);
   const rev=rows.slice().reverse(), vis=rev.slice(0,PV.shown);
-  h+=`<div style="overflow-x:auto"><table class="runs"><thead><tr><th>${GRAN[PV.gran]}</th><th class="num">Trades</th><th class="num">Win rate</th><th class="num">R</th><th class="num">€</th></tr></thead><tbody>
-    ${vis.map(r=>`<tr><td>${plabel(PV.gran,r[0])}</td><td class="num">${r[2]}</td><td class="num">${(r[3]/r[2]*100).toFixed(0)}%</td><td class="num">${fmt(r[1],2)}</td><td class="num">${eurFmt(r[1]*PV.eur)}</td></tr>`).join("")}
+  h+=`<div style="overflow-x:auto"><table class="runs"><thead><tr><th>${GRAN[PV.gran]}</th><th class="num">Trades</th><th class="num">Win rate</th><th class="num">Conta</th><th class="num">R</th><th class="num">€</th></tr></thead><tbody>
+    ${vis.map(r=>`<tr><td>${plabel(PV.gran,r[0])}</td><td class="num">${r[2]}</td><td class="num">${(r[3]/r[2]*100).toFixed(0)}%</td><td class="num"><b>${pct(r[1])}</b></td><td class="num">${fmt(r[1],2)}</td><td class="num">${eurFmt(r[1]*PV.eur)}</td></tr>`).join("")}
     </tbody></table></div>${rev.length>vis.length?`<button class="more" onclick="PV.shown+=60;renderPeriods()">Mostrar mais (${rev.length-vis.length} restantes)</button>`:""}`;
   box.innerHTML=h; hookBars(rows);
 }
 function setGran(g){PV.gran=g;PV.shown=40;renderPeriods();}
 function setMk(m){PV.mk=m;PV.shown=40;renderPeriods();}
-function setEur(v){PV.eur=Math.max(1,+v||100);renderPeriods();}
+function setAcc(v){ACC=Math.max(100,+v||10000); try{localStorage.setItem("bt_acc",ACC);}catch(e){} renderPeriods();}
 function barChart(rows){
   const W=Math.max(340,Math.min(760,(document.getElementById("detail").clientWidth||760)-32)),H=200,L=40,R=8,T=8,B=20;
   const vals=rows.map(r=>r[1]); let v0=Math.min(0,...vals), v1=Math.max(0,...vals); const pad=(v1-v0)*0.06||1; v0-=pad; v1+=pad;
@@ -375,7 +378,7 @@ function hookBars(rows){
   const c=barChart._c, box=document.getElementById("barBox"); if(!box) return; const svg=box.querySelector("svg"), tip=document.getElementById("btip");
   const mv=ev=>{const r=svg.getBoundingClientRect(); const sx=((ev.touches?ev.touches[0].clientX:ev.clientX)-r.left)/r.width*c.W;
     const i=Math.min(rows.length-1,Math.max(0,Math.floor((sx-c.L)/c.bw))); const p=rows[i];
-    tip.innerHTML=`<div class="muted">${plabel(PV.gran,p[0])}</div><b>${fmt(p[1],2)}R</b> · ${eurFmt(p[1]*PV.eur)}<div class="muted">${p[2]} trades · WR ${(p[3]/p[2]*100).toFixed(0)}%</div>`;
+    tip.innerHTML=`<div class="muted">${plabel(PV.gran,p[0])}</div><b>${pct(p[1])}</b> da conta · ${fmt(p[1],2)}R · ${eurFmt(p[1]*PV.eur)}<div class="muted">${p[2]} trades · WR ${(p[3]/p[2]*100).toFixed(0)}%</div>`;
     tip.style.display="block"; const px=(c.L+(i+.5)*c.bw)/c.W*r.width; tip.style.left=Math.min(Math.max(px+8,0),r.width-tip.offsetWidth)+"px"; tip.style.top="4px";};
   const hit=svg.querySelector("#bhit"); hit.addEventListener("mousemove",mv); hit.addEventListener("touchstart",mv,{passive:true}); hit.addEventListener("touchmove",mv,{passive:true});
   hit.addEventListener("mouseleave",()=>tip.style.display="none"); hit.addEventListener("touchend",()=>tip.style.display="none");

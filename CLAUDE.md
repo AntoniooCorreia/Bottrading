@@ -9,6 +9,9 @@ O Antonio so opera o US100 (NQ). O S&P e o Dow ficam nos testes APENAS como conf
 um edge real tem de aparecer nos tres. Em relatorios, diario e Telegram mostra sempre o NQ primeiro e com mais
 detalhe (R por trade, win rate, R por mes); S&P e Dow numa linha curta como confirmacao.
 
+O Antonio arrisca SEMPRE 1% da conta por trade (1R = 1%). No diario e no Telegram traduz resultados para
+% da conta (ex.: +0.1R por trade = +0.1% por trade; 12R por ano = +12% ao ano).
+
 Escreve tudo (commits, relatorios, notas) em portugues de Portugal, sem acentos nos ficheiros .py.
 
 ## Historico (ja testado noutro chat, NAO repetir)
