@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Bottrading · Suporte e resistência</title>
+<title>Bottrading · Laboratório</title>
 <style>
 .viz-root{
   color-scheme:light;
@@ -85,17 +85,33 @@ li.done .box{background:var(--text-muted);color:var(--surface-1);border-color:va
 .dot.err{background:var(--critical)}
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(12,163,12,.55)}70%{box-shadow:0 0 0 9px rgba(12,163,12,0)}100%{box-shadow:0 0 0 0 rgba(12,163,12,0)}}
 .now .rt{margin-left:auto;font-size:11px;color:var(--text-muted);white-space:nowrap}
+.journal{list-style:none;margin:0;padding:0}
+.jsess{margin:12px 0 4px;font-size:12px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.04em}
+.jitem{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--grid)}
+.jicon{flex:none;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font-size:15px;background:var(--grid)}
+.jbody{min-width:0;flex:1}
+.jhead{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.jkind{font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.04em}
+.jtime{font-size:11px;color:var(--text-muted);margin-left:auto}
+.jtitle{font-size:14px;color:var(--text-primary);margin-top:1px;overflow-wrap:anywhere}
+.jbody ul{margin:4px 0 0;padding-left:18px;font-size:13px;color:var(--text-secondary)}
+.jbody li{margin:2px 0;overflow-wrap:anywhere}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.chips button{border:1px solid var(--border);background:var(--surface-1);color:var(--text-secondary);border-radius:999px;padding:4px 10px;font:inherit;font-size:12px;cursor:pointer}
+.chips button.on{background:var(--text-primary);color:var(--surface-1);border-color:var(--text-primary)}
 details summary{cursor:pointer;color:var(--text-secondary);font-size:13px}
 </style>
 </head>
 <body>
 <div class="viz-root"><div class="wrap">
   <header>
-    <h1>Bottrading · Suporte e resistência</h1>
+    <h1>Bottrading · Laboratório</h1>
     <p id="sub">A carregar…</p>
   </header>
   <div class="now" id="now"><span class="dot" id="nowDot"></span><span id="nowTxt">A verificar o estado do agente…</span><span class="rt" id="rt"></span></div>
   <div class="tiles" id="tiles"></div>
+  <section><h2>Diário do agente <span class="muted small">· o que pensou, testou e mudou</span></h2>
+    <div class="chips" id="jchips"></div><div id="journal" style="max-height:620px;overflow:auto"></div></section>
   <section id="sumSec" hidden><h2>Leitura do agente</h2><div class="summary" id="summary"></div></section>
   <section id="ideasSec" hidden><details><summary style="font-size:15px;font-weight:600;color:var(--text-primary)">Ideias do agente</summary><div class="summary" id="ideas" style="margin-top:8px"></div></details></section>
   <section>
@@ -105,7 +121,6 @@ details summary{cursor:pointer;color:var(--text-secondary);font-size:13px}
   <section id="detail" hidden></section>
   <div class="grid2">
     <section><h2>Plano de testes</h2><ul class="todo" id="todo"></ul></section>
-    <section><h2>Atividade do agente</h2><ul class="todo" id="log" style="max-height:340px;overflow:auto"></ul></section>
     <section>
       <h2>Como ler isto</h2>
       <div class="small" style="color:var(--text-secondary)">
@@ -345,18 +360,35 @@ function nowStatus(log){
 const SB="https://ctyndeyumrvcwlxzdgnz.supabase.co/rest/v1/", KEY="sb_publishable_hMd_xtAGBa1zcJY30QRNIA_LupFPdfp";
 const q=p=>fetch(SB+p,{headers:{apikey:KEY,Authorization:"Bearer "+KEY},cache:"no-store"}).then(r=>{if(!r.ok)throw new Error(r.status);return r.json();});
 
+const JK={inicio:["▶","Início"],estado:["⋯","A fazer"],ideia:["💡","Ideia nova"],teste:["🧪","Teste"],mudanca:["🔧","Mudança"],erro:["⚠️","Erro"],fim:["🏁","Fim de sessão"]};
+const JF={all:"Tudo",ideia:"Ideias",teste:"Testes",mudanca:"Mudanças",erro:"Erros"};
+let JSEL="all", JLOG=[];
+function setJ(k){JSEL=k; activity(JLOG);}
 function activity(log){
-  const el=document.getElementById("log");
-  if(!log.length){el.innerHTML='<li class="muted">Sem atividade.</li>';return;}
-  const ICON={inicio:"▶",teste:"•",fim:"■",erro:"!",estado:"⋯"};
-  el.innerHTML=log.map(e=>`<li><span class="box" style="border:0">${ICON[e.kind]||"•"}</span><span><span class="muted small">${new Date(e.at).toLocaleString("pt-PT",{dateStyle:"short",timeStyle:"short"})}</span><br>${esc(e.message)}</span></li>`).join("");
+  JLOG=log;
+  document.getElementById("jchips").innerHTML=Object.entries(JF).map(([k,v])=>{const n=k==="all"?"":` ${log.filter(e=>e.kind===k).length}`;return `<button class="${k===JSEL?"on":""}" onclick="setJ('${k}')">${v}${n}</button>`;}).join("");
+  const el=document.getElementById("journal");
+  // sessoes: do mais recente para o mais antigo; 'estado' antigo esconde-se (so interessa o atual)
+  let items=log.filter(e=>JSEL==="all"?true:e.kind===JSEL);
+  if(JSEL==="all"){ const firstState=items.findIndex(e=>e.kind==="estado"); items=items.filter((e,i)=>e.kind!=="estado"||i===firstState); }
+  if(!items.length){el.innerHTML='<div class="empty small">Nada por aqui ainda.</div>';return;}
+  let html="", lastDay="";
+  items.forEach(e=>{
+    const d=new Date(e.at), day=d.toLocaleDateString("pt-PT",{weekday:"long",day:"numeric",month:"long"});
+    if(day!==lastDay){html+=`<div class="jsess">${day}</div>`; lastDay=day;}
+    const [ic,lab]=JK[e.kind]||["•",e.kind];
+    let msg=e.message, det=Array.isArray(e.details)?e.details:[];
+    if(!det.length && msg.includes(" | ")){const parts=msg.split(" | "); msg=parts.shift(); det=parts;}
+    html+=`<div class="jitem"><div class="jicon">${ic}</div><div class="jbody"><div class="jhead"><span class="jkind">${lab}</span><span class="jtime">${d.toLocaleTimeString("pt-PT",{hour:"2-digit",minute:"2-digit"})}</span></div>
+      <div class="jtitle">${esc(msg)}</div>${det.length?`<ul>${det.map(b=>`<li>${esc(b)}</li>`).join("")}</ul>`:""}</div></div>`;
+  });
+  el.innerHTML=html;
 }
-
 function load(){
   Promise.all([
     q("runs?select=*&order=created_at.desc"),
     q("state?select=key,value,updated_at"),
-    q("agent_log?select=*&order=at.desc&limit=40"),
+    q("agent_log?select=*&order=at.desc&limit=200"),
   ]).then(([runs,state,log])=>{
     const st=Object.fromEntries(state.map(r=>[r.key,r.value]));
     const d={runs:runs.map(r=>({...r,date:r.created_at.slice(0,16)})),todo:st.todo||[],summary:st.summary||"",holdoutLog:st.holdout_log||"",ideas:st.ideas||""};

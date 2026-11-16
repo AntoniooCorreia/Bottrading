@@ -53,11 +53,23 @@ O Antonio quer que o agente invente e teste ideias novas durante a noite. Regras
 6. Uma ideia que PASSE no dev vai uma vez ao holdout. Escreve no SUMMARY.md a leitura honesta, incluindo quantas
    ideias ja foram testadas no total (quanto mais, mais desconfianca num resultado isolado).
 
+## Diario (o que o Antonio ve no dashboard e no Telegram)
+O Antonio acompanha tudo pelo diario. Escreve para ele perceber sem ler codigo: frases curtas, portugues simples,
+numeros concretos. Usa `python sync.py --log <tipo> "titulo" -b "ponto" -b "ponto"`:
+- `estado` "o que estas a fazer agora" (sem pontos; nao vai para o Telegram)
+- `ideia` "<nome>: <hipotese numa frase>" com pontos: Porque pode funcionar / Entrada / Stop e alvo / Sessao / Fasquia (t >= 3.0)
+- `teste` "<variante>: PASSA|REPROVADA" com pontos: resultado por indice (R por trade e trades), win rate, R por mes,
+  e "O que aprendemos: ..." numa frase
+- `mudanca` "<o que mudou>" com pontos: o que mudou, porque, e o efeito (ex.: testes, resultados afetados)
+- `erro` "<o que falhou>" com pontos: causa provavel e o que fizeste
+- `fim` "<resumo numa linha>" com pontos: ideias testadas, o que passou, proximo passo
+
 ## Fluxo de cada sessao autonoma
 1. `git pull`; trabalha no branch `research` (cria-o a partir do main se nao existir).
 2. Se nao houver nenhum `[ ]` em TODO.md: modo ideias (seccao acima), dentro dos limites.
 3. Garante dados em data/m5 (download.py so se faltarem) e testes a passar.
-4. Pega nos itens `[ ]` por ordem. ANTES de cada um: `python sync.py --log estado "A correr <variante>"` (o dashboard mostra
-   isto em tempo real); depois corre-o, marca `[x]` com o veredicto e `python sync.py --log teste "<variante>: <veredicto>, t junto <t>"`.
+4. Pega nos itens `[ ]` por ordem. ANTES de cada um: `--log estado "A correr <variante>"`; depois corre-o, marca `[x]`
+   com o veredicto e regista um `--log teste` com pontos (ver Diario). Ideias novas: `--log ideia` com pontos antes de as testar;
+   mudancas ao motor ou ao projeto: `--log mudanca` com pontos.
 5. Atualiza `SUMMARY.md`: tabela curta do que passou/reprovou e a tua leitura honesta, em 10 linhas.
 6. Commit + push para `research`; se nao houver PR aberto de research -> main, abre um.
