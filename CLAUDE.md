@@ -24,6 +24,8 @@ o trabalho e confirmar ou desmentir com honestidade, nao "encontrar" algo.
   .csv.gz de 5m estao no repo, faz commit deles se os criares)
 - `python -m pytest -q` - TEM de passar antes de qualquer commit
 - `python run.py --play antonio --levels all --tp 1|2|3` - setup do Antonio em velas de 1m (sr/antonio.py; precisa de data/m1gz)
+- `python run_swing.py --idea <nome>` - ideias de prazo mais longo (15m/1h/4h/diario), registadas em sr/swing_ideas.py;
+  reporta custos de CFD (veredicto oficial) e de micro-futuros MNQ/MES/MYM
 - `python run.py --play bounce|break|fake --levels pdhl|pwhl|swing1h|round [--tp 2 --stop-atr 0.5 --fake-atr 0.3 --session rth|all]`
   regista sozinho uma linha em `results/RESULTS.md`
 
@@ -47,12 +49,15 @@ O Antonio quer que o agente invente e teste ideias novas durante a noite. Regras
 2. Cada ideia e registada em `IDEAS.md` ANTES de correr, com: data, nome curto, hipotese (porque podera ter edge,
    com base em comportamento de mercado conhecido, nao em olhar para os resultados), regras exatas de entrada,
    stop, alvo e sessao, e os parametros (fixos; nada de grelhas de otimizacao). Faz commit desse registo primeiro.
-3. Ideias de price action / niveis / sessoes nos indices EUA intraday (5m). Proibido: martingale, sem stop,
+3. FOCO (decidido a 2026-11-16 depois de tudo em 1m/5m dar ~0R antes de custos): ideias de PRAZO MAIS LONGO,
+   timeframes 15m, 1h, 4h e diario, trades de horas a dias, stops largos (custos passam de ~0.15-0.25R para ~0.03R).
+   Usa sr/swing.py + sr/swing_ideas.py + run_swing.py (os testes em tests/test_swing.py apanham a ideia sozinhos).
+   Intraday 1m/5m so com uma razao muito forte. Pode ser long-only. Proibido: martingale, sem stop,
    grid, mexer em custos, periodos ou criterios, usar dados do holdout, e repetir o que ja reprovou (ver historico
    e results/RESULTS.md).
-4. Implementa a ideia em sr/ como uma jogada (--play) ou definicao de nivel (--levels) nova, acrescenta-a aos
-   choices do run.py, e acrescenta-a aos testes de tests/test_engine.py (passeio aleatorio sem edge + sem lookahead).
-   pytest tem de passar antes de correr.
+4. Implementa a ideia como funcao em sr/swing_ideas.py e acrescenta-a ao dicionario IDEAS (timeframe, stop_atr,
+   tp_r, max_hold fixos). pytest tem de passar antes de correr (passeio aleatorio sem edge + sem lookahead).
+   Criterio em run_swing.py: >= 60 trades por indice, meanR > 0 em cada indice, t junto >= 3.0, com custos de CFD.
 5. Acrescenta a ideia ao TODO numa seccao "Ideias do agente (AAAA-MM-DD)" e corre-a como qualquer item.
    Ideias novas tem fasquia t >= 3.0 (automatico no run.py).
 6. Uma ideia que PASSE no dev vai uma vez ao holdout. Escreve no SUMMARY.md a leitura honesta, incluindo quantas

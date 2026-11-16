@@ -153,14 +153,15 @@ function badge(v){
 }
 
 
-const ORIG=new Set(["bounce","break","fake"].flatMap(p=>["pdhl","pwhl","swing1h","round"].map(l=>p+"|"+l)));
+const ORIG=new Set(["bounce","break","fake"].flatMap(p=>["pdhl","pwhl","swing1h","round"].map(l=>p+"|"+l)).concat(["antonio|all"]));
 function why(run){
-  const minT=ORIG.has(run.params.play+"|"+run.params.levels)?2.5:3.0;
+  const minT=ORIG.has(run.params.play+"|"+run.params.levels)||run.params.play==="antonio"?2.5:3.0;
   const ks=["nq","es","dow"].filter(k=>run.markets[k]);
   const m=k=>run.markets[k], nm=k=>MK_SHORT[k];
-  const c1=ks.every(k=>m(k).n>=100), c2=ks.every(k=>m(k).meanR>0), c3=run.pooled.t>=minT;
+  const minN=run.params.play==="swing"?60:100;
+  const c1=ks.every(k=>m(k).n>=minN), c2=ks.every(k=>m(k).meanR>0), c3=run.pooled.t>=minT;
   const items=[
-    [c1, `Trades suficientes (≥100 em cada índice): `+ks.map(k=>`${nm(k)} ${m(k).n}`).join(" · ")],
+    [c1, `Trades suficientes (≥${minN} em cada índice): `+ks.map(k=>`${nm(k)} ${m(k).n}`).join(" · ")],
     [c2, `Ganha dinheiro em todos os índices (média por trade > 0): `+ks.map(k=>`${nm(k)} ${fmt(m(k).meanR,3)}R`).join(" · ")],
     [c3, `Resultado forte o suficiente para não ser sorte (t junto ${fmt(run.pooled.t)} vs mínimo ${String(minT).replace(".",",")})`],
   ];
@@ -171,6 +172,7 @@ function why(run){
     else if(!c2) plain=`Reprovou: dá lucro em ${good.join(" e ")} mas perde em ${bad.join(" e ")}. Um edge real devia aparecer em todos, por isso o lucro onde aparece é provavelmente sorte.`;
     else if(!c1) plain="Reprovou: não há trades suficientes para tirar conclusões.";
     else plain=`Reprovou: dá lucro nos três índices, mas o resultado ainda é fraco demais (t ${fmt(run.pooled.t)}) para excluir a sorte.`; }
+  if(run.fut&&run.fut.markets){const f=run.fut.markets; plain+=` Com micro-futuros (sem financiamento, custos mais baixos): `+["nq","es","dow"].filter(k=>f[k]).map(k=>`${MK_SHORT[k]} ${fmt(f[k].meanR,3)}R`).join(" · ")+` → ${run.fut.verdict.startsWith("PASSA")?"passaria":"também não passa"}.`;}
   return `<div class="whybox"><b>Porquê?</b> ${esc(plain)}<ul class="why">${items.map(([ok,t])=>`<li><span class="ck ${ok?"ok":"no"}">${ok?"✓":"✕"}</span><span>${esc(t)}</span></li>`).join("")}</ul></div>`;
 }
 function whyShort(run){
@@ -179,7 +181,7 @@ function whyShort(run){
   const good=ks.filter(k=>m(k).meanR>0).map(k=>MK_SHORT[k]);
   if(!good.length) return "perde nos 3 índices";
   if(good.length<ks.length) return "lucro só em "+good.join(" e ");
-  if(ks.some(k=>m(k).n<100)) return "poucas trades";
+  if(ks.some(k=>m(k).n<(run.params.play==="swing"?60:100))) return "poucas trades";
   return "lucro nos 3, mas fraco (t "+fmt(run.pooled.t)+")";
 }
 

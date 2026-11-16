@@ -17,3 +17,6 @@
 | 2026-11-16 20:57 | `antonio-ifvg1m-tp1` | dev | 3314 / -0.184 / -10.60 | 2777 / -0.176 / -9.26 | 3751 / -0.171 / -10.44 | -17.52 | -8.46 | REPROVADA (negativa em pelo menos 1 indice) |
 | 2026-11-16 20:58 | `antonio-ifvg1m-tp2-be1R` | dev | 3272 / -0.174 / -8.16 | 2736 / -0.142 / -5.98 | 3703 / -0.164 / -8.21 | -12.97 | -7.89 | REPROVADA (negativa em pelo menos 1 indice) |
 | 2026-11-16 20:59 | `antonio-ifvg1m-tp3-be1R` | dev | 3245 / -0.175 / -7.12 | 2706 / -0.117 / -4.18 | 3689 / -0.164 / -7.11 | -10.70 | -7.88 | REPROVADA (negativa em pelo menos 1 indice) |
+| 2026-11-16 21:05 | `trend-sma100-d` (1d) | dev | 43 / +0.102 / +0.61 | 39 / +0.120 / +0.73 | 44 / -0.033 / -0.27 | +0.70 | 0.06 | REPROVADA (poucas trades, < 60) |
+| 2026-11-16 21:06 | `rsi2-dip-d` (1d) | dev | 58 / +0.134 / +2.62 | 64 / +0.057 / +0.93 | 67 / -0.081 / -1.19 | +0.89 | 0.11 | REPROVADA (poucas trades, < 60) |
+| 2026-11-16 21:06 | `donchian20-d` (1d) | dev | 53 / +0.155 / +1.13 | 70 / -0.056 / -0.53 | 67 / -0.099 / -0.89 | -0.19 | 0.11 | REPROVADA (poucas trades, < 60) |
