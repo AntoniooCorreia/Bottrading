@@ -6,10 +6,11 @@
 | setup do Antonio (IFVG 1m, tp 1/2/3) - NQ cerca de -0.18R por trade | -17.5 / -13.0 / -10.7 | 3/3 REPROVADAS |
 | ideias 1-6 do agente (gapfill, fake-onhl, break-nr4, break-lunchhl, gapgo-pdc, break-monhl) | -4.62 a **+2.34** | 6/6 REPROVADAS |
 | ideias de prazo longo (diario): trend-sma100-d / rsi2-dip-d / donchian20-d | +0.70 / +0.89 / -0.19 | 3/3 REPROVADAS (< 60 trades) |
+| mais trades: rsi2-dip-4h / ibs-dip-d / down3-d | ver TODO | 3/3 REPROVADAS no criterio oficial (Dow negativo ou ~0R) |
 
-Leitura honesta: 24 testes, 24 reprovados (12 do plano, 3 do Antonio, 9 ideias; hoje 9 entradas em IDEAS.md, limite de 8 atingido).
-NQ primeiro: nenhuma regra intraday tem R por trade positivo com folga depois de custos; o setup do Antonio perde ~0.18R por trade.
-O melhor isolado continua o `gapgo-pdc` (t 2.34, abaixo de 3.0); depois de 24 testes isso e o esperado por sorte.
-As ideias diarias dao poucas trades em 6 anos; o proximo passo (proxima noite) e 1h/4h, como manda o novo foco. Holdout intocado.
-Carteira (objetivo >= 14R/ano = +14% ao ano com 1% por trade): 0 ideias aceites (nenhuma passou o criterio nem foi positiva nos 3 indices dos EUA em 2012-2018 E 2019-2024; rsi2-dip-d falha no Dow em 2019-2024). Da 0% ao ano; falta tudo (14%).
-Sessao 3 de 2026-11-16: limite de ideias da noite ja atingido, nada testado. Total de ideias do agente testadas: 9.
+Leitura honesta: 27 testes, 27 reprovados no criterio oficial (12 do plano, 3 do Antonio, 12 ideias do agente). Total de ideias do agente testadas: 12.
+NQ primeiro: nenhuma regra intraday sobrevive aos custos; nas diarias de comprar quedas o NQ e positivo mas pequeno (rsi2-dip-d ~1.2R/ano).
+Carteira de referencia (rsi2-dip-d + ibs-dip-d + down3-d, 10 indices, max 3 abertas, 2012-2024): +8.7% ao ano, 5 anos >= 14%, pior queda -21.6%, ~175 trades/ano.
+Faltam ~5.3% ao ano para o objetivo de 14%. Atencao: nenhuma das 3 cumpre a regra de entrada a risca (Dow negativo no dev em todas); e a melhor aproximacao, nao um edge provado.
+Nota: a contagem por ano inclui um "2025" (-0.3%) de trades abertas em dez/2024 que fecham em 2025 (14 anos em vez de 13); efeito pequeno, a rever.
+Sessao 4 de 2026-11-16: limite de ideias da noite ja atingido (12 entradas hoje em IDEAS.md), nada novo testado. Holdout intocado.
