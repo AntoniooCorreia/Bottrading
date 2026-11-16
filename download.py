@@ -30,7 +30,10 @@ def get_year(inst: str, y: int) -> str | None:
     os.makedirs(tmp, exist_ok=True)
     os.makedirs(os.path.dirname(out), exist_ok=True)
     end = f"{y + 1}-01-01" if y < date.today().year else date.today().isoformat()
-    cmd = ["npx", "--yes", "dukascopy-node", "-i", inst, "-from", f"{y}-01-01", "-to", end,
+    npx = shutil.which("npx") or shutil.which("npx.cmd")
+    if not npx:
+        raise SystemExit("Nao encontrei o npx. Instala o Node.js (nodejs.org) e volta a correr.")
+    cmd = [npx, "--yes", "dukascopy-node", "-i", inst, "-from", f"{y}-01-01", "-to", end,
            "-t", "m1", "-f", "csv", "-dir", tmp, "-r", "3"]
     print(f"  {inst} {y}: a descarregar...", flush=True)
     r = subprocess.run(cmd, capture_output=True, text=True)
