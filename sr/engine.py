@@ -35,6 +35,8 @@ class Variant:
     min_risk_cost: float = 4.0
 
     def name(self) -> str:
+        if self.play == "antonio":
+            return f"antonio-ifvg1m-tp{self.tp_r:g}" + ("-be1R" if self.tp_r > 1 else "")
         return (f"{self.play}-{self.levels}-tp{self.tp_r:g}-sl{self.stop_atr:g}"
                 + (f"-fk{self.fake_atr:g}" if self.play == "fake" else "") + f"-{self.session}")
 

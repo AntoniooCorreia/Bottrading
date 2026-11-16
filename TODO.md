@@ -22,3 +22,11 @@ parametros tambem for positiva (nao um pico isolado).
 
 ## Fase 3 - holdout
 So variantes com PASSA no dev e vizinhanca positiva. Uma vez cada. Ver CLAUDE.md.
+
+## Setup do Antonio (pre-registado por ele em 2026-11-16) - prioridade maxima
+Regras em sr/antonio.py (niveis S/R de 15m/30m/1h + dia/semana/Asia/Londres, displacement + IFVG de 1m,
+stop no extremo do sweep, Asia+Londres+NY, max 3 trades/dia). Precisa de data/m1gz (se faltar, regista erro
+"faltam velas de 1m" e salta estes itens). Fasquia t >= 2.5 (pre-registado por humano). Foco do relatorio: NQ.
+- [ ] `python run.py --play antonio --levels all --tp 1`
+- [ ] `python run.py --play antonio --levels all --tp 2`
+- [ ] `python run.py --play antonio --levels all --tp 3`

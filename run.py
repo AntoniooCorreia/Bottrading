@@ -19,7 +19,8 @@ from datetime import datetime
 
 import pandas as pd
 
-from sr.data import INSTR, PERIODS, SPEC, load_m5
+from sr.antonio import backtest_antonio
+from sr.data import INSTR, PERIODS, SPEC, load_m1, load_m5
 from sr import supa
 from sr.engine import Variant, backtest
 from sr.stats import by_year, summarize
@@ -70,6 +71,7 @@ def period_tables(tr: pd.DataFrame) -> dict:
 # Tudo o que o agente inventar sozinho usa t >= 3.0: quanto mais ideias se testam,
 # mais provavel e uma passar por sorte, por isso a fasquia sobe. NAO MEXER.
 ORIGINAL = {(p, l) for p in ("bounce", "break", "fake") for l in ("pdhl", "pwhl", "swing1h", "round")}
+ORIGINAL |= {("antonio", "all")}   # setup do Antonio, pre-registado por ele (sr/antonio.py)
 
 
 def min_t_for(play: str, levels: str) -> float:
@@ -88,8 +90,8 @@ def verdict(per: dict, pooled_t: float, min_t: float = 2.5) -> str:
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--play", default="bounce", choices=["bounce", "break", "fake"])
-    ap.add_argument("--levels", default="pdhl", choices=["pdhl", "pwhl", "swing1h", "round"])
+    ap.add_argument("--play", default="bounce", choices=["bounce", "break", "fake", "antonio"])
+    ap.add_argument("--levels", default="pdhl", choices=["pdhl", "pwhl", "swing1h", "round", "all"])
     ap.add_argument("--tp", type=float, default=2.0)
     ap.add_argument("--stop-atr", type=float, default=0.5)
     ap.add_argument("--fake-atr", type=float, default=0.3)
@@ -106,9 +108,13 @@ def main():
     v = Variant(play=a.play, levels=a.levels, tp_r=a.tp, stop_atr=a.stop_atr, fake_atr=a.fake_atr, session=a.session)
     per, all_tr, yearly, curves, periods = {}, [], {}, {}, {}
     for key in a.markets.split(","):
-        m5 = load_m5(key, a.period)
-        yrs = max((m5.index[-1] - m5.index[0]).days / 365.25, 0.1)
-        tr = backtest(m5, v, SPEC[key]["cost_pts"], SPEC[key]["round"])
+        if a.play == "antonio":
+            bars = load_m1(key, a.period)
+            tr = backtest_antonio(bars, a.tp, SPEC[key]["cost_pts"])
+        else:
+            bars = load_m5(key, a.period)
+            tr = backtest(bars, v, SPEC[key]["cost_pts"], SPEC[key]["round"])
+        yrs = max((bars.index[-1] - bars.index[0]).days / 365.25, 0.1)
         per[key] = summarize(tr, yrs)
         yearly[key] = by_year(tr)
         curves[key] = equity_curve(tr)

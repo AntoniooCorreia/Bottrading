@@ -23,6 +23,7 @@ o trabalho e confirmar ou desmentir com honestidade, nao "encontrar" algo.
 - `python download.py` - descarrega 1m da Dukascopy e cria `data/m5/*.csv.gz` (so se faltarem; os
   .csv.gz de 5m estao no repo, faz commit deles se os criares)
 - `python -m pytest -q` - TEM de passar antes de qualquer commit
+- `python run.py --play antonio --levels all --tp 1|2|3` - setup do Antonio em velas de 1m (sr/antonio.py; precisa de data/m1gz)
 - `python run.py --play bounce|break|fake --levels pdhl|pwhl|swing1h|round [--tp 2 --stop-atr 0.5 --fake-atr 0.3 --session rth|all]`
   regista sozinho uma linha em `results/RESULTS.md`
 
