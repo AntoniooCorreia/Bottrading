@@ -209,7 +209,7 @@ function runsTable(d){
   box.innerHTML = `<div style="overflow-x:auto"><table class="runs"><thead><tr>
     <th>Variante</th><th>Veredicto</th><th class="num">t junto</th>
     <th class="num hide-sm">NQ (o teu)</th><th class="num hide-sm">S&amp;P</th><th class="num hide-sm">Dow</th></tr></thead><tbody>
-    ${runs.map((r,i)=>`<tr class="row" data-i="${i}"><td><code>${esc(r.variant)}</code><div class="small muted">${r.period==="dev"?"dev 2019–24":"HOLDOUT 2025–26"} · ${esc(r.date.replace("T"," "))}</div></td>
+    ${runs.map((r,i)=>`<tr class="row" data-i="${i}"><td><code>${esc(r.variant)}</code><div class="small muted">${r.period==="dev"?"dev 2019–24":r.period==="pre"?"às cegas 2012–18":"HOLDOUT 2025–26"} · ${esc(r.date.replace("T"," "))}</div></td>
       <td>${badge(r.verdict).replace(/<div class="small muted">.*<\/div>/,"")}<div class="small muted">${esc(whyShort(r))}</div></td><td class="num">${fmt(r.pooled.t)}</td>
       <td class="num hide-sm">${cell(r.markets.nq)}</td><td class="num hide-sm">${cell(r.markets.es)}</td><td class="num hide-sm">${cell(r.markets.dow)}</td></tr>`).join("")}
     </tbody></table></div>`;
@@ -281,7 +281,7 @@ function detail(run){
   const el=document.getElementById("detail"); el.hidden=false;
   const mk=Object.keys(run.markets);
   const years=[...new Set(mk.flatMap(k=>Object.keys(run.yearly[k]||{})))].sort();
-  el.innerHTML=`<h2><code>${esc(run.variant)}</code> <span class="muted small">· ${run.period==="dev"?"dev 2019–2024":"holdout 2025–2026"}</span></h2>
+  el.innerHTML=`<h2><code>${esc(run.variant)}</code> <span class="muted small">· ${run.period==="dev"?"dev 2019–2024":run.period==="pre"?"teste às cegas 2012–2018":"holdout 2025–2026"}</span></h2>
     <div style="margin-bottom:6px">${badge(run.verdict).replace(/<div class="small muted">.*<\/div>/,"")}</div>
     ${why(run)}
     <div class="small muted" style="margin:6px 0 2px">R acumulado por índice (depois de custos)</div>
