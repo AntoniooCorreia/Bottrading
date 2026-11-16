@@ -66,13 +66,23 @@ def period_tables(tr: pd.DataFrame) -> dict:
     return out
 
 
-def verdict(per: dict, pooled_t: float) -> str:
+# As 12 combinacoes do plano original (pre-registadas por humanos) usam t >= 2.5.
+# Tudo o que o agente inventar sozinho usa t >= 3.0: quanto mais ideias se testam,
+# mais provavel e uma passar por sorte, por isso a fasquia sobe. NAO MEXER.
+ORIGINAL = {(p, l) for p in ("bounce", "break", "fake") for l in ("pdhl", "pwhl", "swing1h", "round")}
+
+
+def min_t_for(play: str, levels: str) -> float:
+    return 2.5 if (play, levels) in ORIGINAL else 3.0
+
+
+def verdict(per: dict, pooled_t: float, min_t: float = 2.5) -> str:
     if any(s["n"] < 100 for s in per.values()):
         return "REPROVADA (poucas trades)"
     if any(s["meanR"] <= 0 for s in per.values()):
         return "REPROVADA (negativa em pelo menos 1 indice)"
-    if pooled_t < 2.5:
-        return "REPROVADA (t < 2.5)"
+    if pooled_t < min_t:
+        return f"REPROVADA (t < {min_t:g})"
     return "PASSA"
 
 
@@ -107,7 +117,7 @@ def main():
             all_tr.append(tr.assign(market=key))
     pooled = summarize(pd.concat(all_tr) if all_tr else None, 1.0)
     periods["all"] = period_tables(pd.concat(all_tr) if all_tr else None)
-    vd = verdict(per, pooled["t"])
+    vd = verdict(per, pooled["t"], min_t_for(a.play, a.levels))
 
     print(f"Variante: {v.name()}  |  periodo: {a.period}")
     print(pd.DataFrame(per).T.to_string())

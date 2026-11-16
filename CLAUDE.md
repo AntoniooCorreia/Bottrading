@@ -23,20 +23,39 @@ o trabalho e confirmar ou desmentir com honestidade, nao "encontrar" algo.
   regista sozinho uma linha em `results/RESULTS.md`
 
 ## Protocolo (OBRIGATORIO - e o que impede enganar-nos a nos proprios)
-1. So se testa o que esta em `TODO.md` com `[ ]`. Nao inventes variantes novas para testar.
-   Ideias novas vao para `IDEAS.md` (com o porque); o Antonio decide se passam para o TODO.
+1. So se testa o que esta em `TODO.md` com `[ ]`. Quando o TODO estiver vazio, entra o "modo ideias" (ver abaixo):
+   so assim podes acrescentar testes novos, e sempre registados ANTES de correr.
 2. Periodo `dev` (2019-2024) para tudo. O `holdout` (2025-2026) esta FECHADO.
 3. Criterio de aprovacao no dev e fixo e esta em run.py (>=100 trades por indice, meanR>0 em CADA
-   indice, t junto >= 2.5). Nao mexas nos criterios, nos custos (SPEC em sr/data.py) nem nos periodos.
+   indice, t junto >= 2.5 para o plano original e >= 3.0 para ideias do agente - min_t_for em run.py). Nao mexas nos criterios, nos custos (SPEC em sr/data.py) nem nos periodos.
 4. Holdout: so para variantes com veredicto PASSA no dev, UMA vez por variante, com
    `--period holdout --unlock-holdout`. Fica registado em HOLDOUT_LOG.md. Nunca afines depois de ver o holdout.
 5. Se mudares o motor (sr/), explica no commit, mantem/acrescenta testes (passeio aleatorio sem edge
    e sem lookahead) e volta a correr as variantes ja testadas que o bug possa ter afetado.
 6. Nunca apagues linhas de results/RESULTS.md.
 
+## Modo ideias (o agente pensa sozinho) - so quando o TODO nao tem [ ]
+O Antonio quer que o agente invente e teste ideias novas durante a noite. Regras para isso nao virar
+"procurar ate encontrar sorte":
+1. Limite: no maximo 3 ideias novas por sessao e 8 por noite (conta as entradas de hoje em IDEAS.md).
+   Se o limite da noite ja foi atingido: `python sync.py --log fim "Limite de ideias da noite atingido"` e termina.
+2. Cada ideia e registada em `IDEAS.md` ANTES de correr, com: data, nome curto, hipotese (porque podera ter edge,
+   com base em comportamento de mercado conhecido, nao em olhar para os resultados), regras exatas de entrada,
+   stop, alvo e sessao, e os parametros (fixos; nada de grelhas de otimizacao). Faz commit desse registo primeiro.
+3. Ideias de price action / niveis / sessoes nos indices EUA intraday (5m). Proibido: martingale, sem stop,
+   grid, mexer em custos, periodos ou criterios, usar dados do holdout, e repetir o que ja reprovou (ver historico
+   e results/RESULTS.md).
+4. Implementa a ideia em sr/ como uma jogada (--play) ou definicao de nivel (--levels) nova, acrescenta-a aos
+   choices do run.py, e acrescenta-a aos testes de tests/test_engine.py (passeio aleatorio sem edge + sem lookahead).
+   pytest tem de passar antes de correr.
+5. Acrescenta a ideia ao TODO numa seccao "Ideias do agente (AAAA-MM-DD)" e corre-a como qualquer item.
+   Ideias novas tem fasquia t >= 3.0 (automatico no run.py).
+6. Uma ideia que PASSE no dev vai uma vez ao holdout. Escreve no SUMMARY.md a leitura honesta, incluindo quantas
+   ideias ja foram testadas no total (quanto mais, mais desconfianca num resultado isolado).
+
 ## Fluxo de cada sessao autonoma
 1. `git pull`; trabalha no branch `research` (cria-o a partir do main se nao existir).
-2. Se nao houver nenhum `[ ]` em TODO.md: escreve no maximo 3 linhas em NOTES.md e termina. Nao gastes mais.
+2. Se nao houver nenhum `[ ]` em TODO.md: modo ideias (seccao acima), dentro dos limites.
 3. Garante dados em data/m5 (download.py so se faltarem) e testes a passar.
 4. Pega nos itens `[ ]` por ordem. ANTES de cada um: `python sync.py --log estado "A correr <variante>"` (o dashboard mostra
    isto em tempo real); depois corre-o, marca `[x]` com o veredicto e `python sync.py --log teste "<variante>: <veredicto>, t junto <t>"`.

@@ -97,6 +97,7 @@ details summary{cursor:pointer;color:var(--text-secondary);font-size:13px}
   <div class="now" id="now"><span class="dot" id="nowDot"></span><span id="nowTxt">A verificar o estado do agente…</span><span class="rt" id="rt"></span></div>
   <div class="tiles" id="tiles"></div>
   <section id="sumSec" hidden><h2>Leitura do agente</h2><div class="summary" id="summary"></div></section>
+  <section id="ideasSec" hidden><details><summary style="font-size:15px;font-weight:600;color:var(--text-primary)">Ideias do agente</summary><div class="summary" id="ideas" style="margin-top:8px"></div></details></section>
   <section>
     <h2>Variantes testadas <span class="muted small">· toca numa linha para ver a curva</span></h2>
     <div id="runsBox"></div>
@@ -358,7 +359,8 @@ function load(){
     q("agent_log?select=*&order=at.desc&limit=40"),
   ]).then(([runs,state,log])=>{
     const st=Object.fromEntries(state.map(r=>[r.key,r.value]));
-    const d={runs:runs.map(r=>({...r,date:r.created_at.slice(0,16)})),todo:st.todo||[],summary:st.summary||"",holdoutLog:st.holdout_log||""};
+    const d={runs:runs.map(r=>({...r,date:r.created_at.slice(0,16)})),todo:st.todo||[],summary:st.summary||"",holdoutLog:st.holdout_log||"",ideas:st.ideas||""};
+    if(d.ideas.split("\n").filter(l=>l.trim()).length>2){document.getElementById("ideasSec").hidden=false; document.getElementById("ideas").innerHTML=md(d.ideas);}
     const last=log[0]?new Date(log[0].at):null;
     document.getElementById("sub").textContent="Backtests NQ · S&P 500 · Dow em 5m, com custos de CFD"+(last?` · última atividade ${last.toLocaleString("pt-PT",{dateStyle:"short",timeStyle:"short"})}`:"");
     tiles(d); runsTable(d); todoList(d); activity(log); nowStatus(log); if(PV.run){const u=d.runs.find(r=>r.id===PV.run.id); if(u){PV.run=u; renderPeriods();}}

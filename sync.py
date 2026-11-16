@@ -40,7 +40,8 @@ def main():
     ok = [supa.set_state("todo", parse_todo(read("TODO.md"))),
           supa.set_state("summary", read("SUMMARY.md")),
           supa.set_state("notes", read("NOTES.md")),
-          supa.set_state("holdout_log", read("HOLDOUT_LOG.md"))]
+          supa.set_state("holdout_log", read("HOLDOUT_LOG.md")),
+          supa.set_state("ideas", read("IDEAS.md"))]
     for f in sorted(glob.glob(os.path.join("results", "runs", "*.json"))):
         ok.append(supa.report_run(json.load(open(f))))
     print(f"sync: {sum(ok)}/{len(ok)} enviados")
