@@ -11,3 +11,5 @@ Leitura honesta: 24 testes, 24 reprovados (12 do plano, 3 do Antonio, 9 ideias; 
 NQ primeiro: nenhuma regra intraday tem R por trade positivo com folga depois de custos; o setup do Antonio perde ~0.18R por trade.
 O melhor isolado continua o `gapgo-pdc` (t 2.34, abaixo de 3.0); depois de 24 testes isso e o esperado por sorte.
 As ideias diarias dao poucas trades em 6 anos; o proximo passo (proxima noite) e 1h/4h, como manda o novo foco. Holdout intocado.
+Carteira (objetivo >= 14R/ano = +14% ao ano com 1% por trade): 0 ideias aceites (nenhuma passou o criterio nem foi positiva nos 3 indices dos EUA em 2012-2018 E 2019-2024; rsi2-dip-d falha no Dow em 2019-2024). Da 0% ao ano; falta tudo (14%).
+Sessao 3 de 2026-11-16: limite de ideias da noite ja atingido, nada testado. Total de ideias do agente testadas: 9.
