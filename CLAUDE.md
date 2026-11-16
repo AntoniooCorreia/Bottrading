@@ -15,8 +15,11 @@ O Antonio arrisca SEMPRE 1% da conta por trade (1R = 1%). No diario e no Telegra
 OBJETIVO DO ANTONIO (2026-11-16): pelo menos +14% ao ano com 1% de risco por trade, ou seja >= 14R por ano no total
 da carteira de estrategias, com queda maxima pequena. Nenhuma estrategia sozinha chega la (a melhor ate agora,
 rsi2-dip-d, da ~1.2R/ano no NQ): o caminho e juntar VARIAS estrategias validadas e pouco correlacionadas
-(mais trades por ano com a mesma vantagem: 4h/1h, outras formas de comprar quedas, outros sinais). Em cada
-SUMMARY.md diz quanto falta para os 14R/ano e o que poderia juntar-se. Nunca chegar la aumentando o risco por trade.
+(mais trades por ano com a mesma vantagem: 4h/1h, outras formas de comprar quedas, outros sinais). O Antonio aceitou operar
+outros indices (DAX, FTSE, Nikkei, Euro Stoxx, CAC, ASX, Hang Seng) desde que o objetivo seja atingido sempre ou
+quase sempre. Uma ideia so entra na carteira se tiver passado no criterio oficial OU se for positiva nos 3 indices
+dos EUA em 2012-2018 e em 2019-2024. No fim de cada sessao corre portfolio.py com as ideias aceites e diz no
+SUMMARY.md e no --log fim quanto da (% ao ano, anos acima de 14%) e quanto falta. Nunca chegar la aumentando o risco por trade.
 
 Escreve tudo (commits, relatorios, notas) em portugues de Portugal, sem acentos nos ficheiros .py.
 
@@ -35,6 +38,9 @@ o trabalho e confirmar ou desmentir com honestidade, nao "encontrar" algo.
 - `python run.py --play antonio --levels all --tp 1|2|3` - setup do Antonio em velas de 1m (sr/antonio.py; precisa de data/m1gz)
 - `python run_swing.py --idea <nome>` - ideias de prazo mais longo (15m/1h/4h/diario), registadas em sr/swing_ideas.py;
   reporta custos de CFD (veredicto oficial) e de micro-futuros MNQ/MES/MYM
+- `python portfolio.py --ideas a,b,c [--markets nq,dax,...] [--period tudo]` - carteira de ideias em varios indices,
+  1% por trade: media % ao ano, anos acima de 14%, pior queda. Envia para o dashboard. E A METRICA DO OBJETIVO.
+  Indices disponiveis: nq es dow (confirmacao) + dax ftse nikkei estx cac asx hsi (carteira; ver sr/data.py)
 - `python run.py --play bounce|break|fake --levels pdhl|pwhl|swing1h|round [--tp 2 --stop-atr 0.5 --fake-atr 0.3 --session rth|all]`
   regista sozinho uma linha em `results/RESULTS.md`
 

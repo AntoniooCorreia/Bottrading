@@ -6,17 +6,31 @@ import os
 import pandas as pd
 
 TZ = "America/New_York"
-INSTR = {"nq": "usatechidxusd", "es": "usa500idxusd", "dow": "usa30idxusd"}
+INSTR = {"nq": "usatechidxusd", "es": "usa500idxusd", "dow": "usa30idxusd",
+         # outros indices para a carteira (2026-11-16: o Antonio aceita operar mais indices, sempre 1% por trade)
+         "dax": "deuidxeur", "ftse": "gbridxgbp", "nikkei": "jpnidxjpy", "estx": "eusidxeur",
+         "cac": "fraidxeur", "asx": "ausidxaud", "hsi": "hkgidxhkd"}
+US = ("nq", "es", "dow")                 # trio de confirmacao (criterio oficial)
+CARTEIRA = ("nq", "es", "dow", "dax", "ftse", "nikkei", "estx", "cac", "asx", "hsi")
 # custo ida-e-volta em pontos (spread CFD + slippage) e passo dos numeros redondos
 SPEC = {
     "nq": {"cost_pts": 2.0, "round": 250.0},
     "es": {"cost_pts": 0.6, "round": 50.0},
     "dow": {"cost_pts": 3.0, "round": 500.0},
+    # estimativas de spread CFD + slippage ida-e-volta (confirmar com os spreads reais da STARTRADER)
+    "dax": {"cost_pts": 2.0, "round": 500.0},
+    "ftse": {"cost_pts": 2.0, "round": 250.0},
+    "nikkei": {"cost_pts": 12.0, "round": 1000.0},
+    "estx": {"cost_pts": 2.5, "round": 250.0},
+    "cac": {"cost_pts": 2.0, "round": 250.0},
+    "asx": {"cost_pts": 2.5, "round": 250.0},
+    "hsi": {"cost_pts": 12.0, "round": 1000.0},
 }
 PERIODS = {
     "dev": ("2019-01-01", "2024-12-31"),       # para escolher / afinar
     "holdout": ("2025-01-01", "2030-12-31"),   # FECHADO: so com --unlock-holdout
-    "pre": ("2012-01-01", "2018-12-31"),       # anos antigos: teste "as cegas" para ideias ja vistas no dev
+    "pre": ("2012-01-01", "2018-12-31"),
+    "tudo": ("2012-01-01", "2024-12-31"),      # pre + dev juntos (nunca inclui o holdout)       # anos antigos: teste "as cegas" para ideias ja vistas no dev
 }
 M5_DIR = os.path.join("data", "m5")
 

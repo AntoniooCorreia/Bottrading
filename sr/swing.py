@@ -18,6 +18,9 @@ from .data import TZ, load_m5
 
 # custo ida-e-volta em pontos para micro-futuros: comissao ~1.2 USD ida-e-volta + 1 tick de slippage por lado
 FUT_COST = {"nq": 1.2 / 2 + 2 * 0.25, "es": 1.2 / 5 + 2 * 0.25, "dow": 1.2 / 0.5 + 2 * 1.0}
+# outros indices: sem micro-futuro simples equivalente -> usa o custo de CFD (sem financiamento)
+FUT_COST.update({k: v for k, v in {"dax": 2.0, "ftse": 2.0, "nikkei": 12.0, "estx": 2.5, "cac": 2.0,
+                                    "asx": 2.5, "hsi": 12.0}.items()})
 CFD_MARKUP = 0.025
 RF = {2018: 1.8, 2019: 2.2, 2020: 0.4, 2021: 0.1, 2022: 1.7, 2023: 5.0, 2024: 5.1, 2025: 4.2, 2026: 3.7}
 TF = {"15m": "15min", "1h": "1h", "4h": "4h", "1d": "1d"}

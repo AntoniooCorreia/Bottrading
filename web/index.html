@@ -186,14 +186,13 @@ function whyShort(run){
 }
 
 function goalTile(d){
-  // estrategias com lucro nos 3 indices; melhor % ao ano no NQ (1% de risco => R/ano = %/ano)
-  const ok=d.runs.filter(r=>["nq","es","dow"].every(k=>r.markets[k]&&r.markets[k].meanR>0));
-  const best=ok.sort((a,b)=>b.markets.nq["R/ano"]-a.markets.nq["R/ano"])[0];
-  const v=best?best.markets.nq["R/ano"]:0, pc=Math.max(0,Math.min(100,v/14*100));
-  return `<div class="tile" style="grid-column:1/-1"><div class="k">Objetivo: +14% ao ano (1% de risco por trade)</div>
-    <div style="display:flex;align-items:baseline;gap:8px"><div class="v">${v.toFixed(1).replace(".",",")}%</div><div class="s">melhor estratégia com lucro nos 3 índices${best?` · ${esc(best.variant)} (${best.period==="pre"?"2012–18":"2019–24"})`:""}</div></div>
+  const P=d.portfolio; const v=P?P.media:0, pc=Math.max(0,Math.min(100,v/14*100));
+  const yrs=P?Object.entries(P.por_ano).filter(([y])=>+y>=2013&&+y<=2024):[];
+  const bars=yrs.map(([y,x])=>`<div title="${y}: ${x>0?"+":""}${x}%" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="height:46px;width:100%;display:flex;align-items:flex-end;justify-content:center"><div style="width:70%;height:${Math.min(46,Math.abs(x)/14*46)}px;min-height:2px;border-radius:2px;background:${x>=14?"var(--good)":x>=0?"var(--series-1)":"var(--series-2)"}"></div></div><span style="font-size:9px;color:var(--text-muted)">${y.slice(2)}</span></div>`).join("");
+  return `<div class="tile" style="grid-column:1/-1"><div class="k">Objetivo: +14% ao ano · carteira com 1% de risco por trade</div>
+    <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap"><div class="v">${v>0?"+":""}${v.toFixed(1).replace(".",",")}%</div><div class="s">${P?`média por ano · ${P.anos_ok} de ${P.anos} anos acima de 14% · pior queda ${P.dd.toFixed(1).replace(".",",")}% · ${Math.round(P.trades_ano)} trades/ano · ${esc(P.ideas.join(", "))}`:"ainda sem carteira"}</div></div>
     <div style="height:8px;background:var(--grid);border-radius:4px;margin-top:6px;overflow:hidden"><div style="height:100%;width:${pc}%;background:var(--series-1);border-radius:4px"></div></div>
-    <div class="s" style="margin-top:4px">${pc.toFixed(0)}% do caminho · o objetivo vai ser atingido juntando várias estratégias validadas, nunca subindo o risco</div></div>`;
+    ${bars?`<div style="display:flex;gap:2px;margin-top:8px">${bars}</div><div class="s">% por ano (verde = acima de 14%)</div>`:""}</div>`;
 }
 function tiles(d){
   const dev = d.runs.filter(r=>r.period==="dev"), hold = d.runs.filter(r=>r.period==="holdout");
@@ -445,7 +444,7 @@ function load(){
     q("agent_log?select=*&order=at.desc&limit=200"),
   ]).then(([runs,state,log])=>{
     const st=Object.fromEntries(state.map(r=>[r.key,r.value]));
-    const d={runs:runs.map(r=>({...r,date:r.created_at.slice(0,16)})),todo:st.todo||[],summary:st.summary||"",holdoutLog:st.holdout_log||"",ideas:st.ideas||""};
+    const d={runs:runs.map(r=>({...r,date:r.created_at.slice(0,16)})),todo:st.todo||[],summary:st.summary||"",holdoutLog:st.holdout_log||"",ideas:st.ideas||"",portfolio:st.portfolio||null};
     if(d.ideas.split("\n").filter(l=>l.trim()).length>2){document.getElementById("ideasSec").hidden=false; document.getElementById("ideas").innerHTML=md(d.ideas);}
     const last=log[0]?new Date(log[0].at):null;
     document.getElementById("sub").textContent="Backtests NQ · S&P 500 · Dow em 5m, com custos de CFD"+(last?` · última atividade ${last.toLocaleString("pt-PT",{dateStyle:"short",timeStyle:"short"})}`:"");
