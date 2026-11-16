@@ -25,6 +25,6 @@ So variantes com PASSA no dev e vizinhanca positiva. Uma vez cada. Ver CLAUDE.md
 
 ## Ideias do agente (2026-11-16)
 Registadas em IDEAS.md antes de correr. Fasquia t >= 3.0.
-- [ ] `python run.py --play gapfill --levels pdc`
-- [ ] `python run.py --play fake --levels onhl`
-- [ ] `python run.py --play break --levels nr4`
+- [x] `python run.py --play gapfill --levels pdc` -> REPROVADA, t junto -1.34 (NQ -0.08R, ES +0.01R, Dow -0.01R)
+- [x] `python run.py --play fake --levels onhl` -> REPROVADA, t junto -4.62 (negativa nos 3)
+- [x] `python run.py --play break --levels nr4` -> REPROVADA, t junto -1.12 (so NQ positivo, +0.07R)

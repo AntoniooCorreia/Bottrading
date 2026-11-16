@@ -1,15 +1,14 @@
 # Resumo (periodo dev 2019-2024, custos CFD incluidos)
 
-| play \ niveis | pdhl | pwhl | swing1h | round |
-|---|---|---|---|---|
-| bounce | -11.29 | -6.90 | -15.79 | -10.02 |
-| break  | -4.55  | **+1.34** | -5.49 | -3.65 |
-| fake   | -6.86  | -1.12 | -7.62 | -4.19 |
+| variante | t junto | veredicto |
+|---|---|---|
+| plano original: 12 combinacoes bounce/break/fake x pdhl/pwhl/swing1h/round | -15.79 a +1.34 | 12/12 REPROVADAS |
+| ideia `gapfill-pdc` (fade do gap 0.1-0.6% ate ao fecho anterior) | -1.34 | REPROVADA |
+| ideia `fake-onhl` (falso rompimento max/min overnight) | -4.62 | REPROVADA |
+| ideia `break-nr4` (rompimento do dia anterior apos dia NR4) | -1.12 | REPROVADA |
 
-(t junto; todas REPROVADAS. Criterio: meanR>0 nos 3 indices e t junto >= 2.5.)
-
-Leitura honesta: 12/12 reprovadas, 11 com t negativo. Comprar/vender o toque no nivel (bounce) e claramente perdedor
-(-0.25 a -0.49R por trade). O unico sinal de vida e o rompimento da maxima/minima da semana anterior (break-pwhl):
-+0.13R em NQ e ES, mas negativo no Dow e com ~35 trades/ano por indice; t 1.34 e compativel com ruido apos 12 testes.
-Nenhuma combinacao chega a t >= 1.5, por isso a fase 2 fica vazia. Confirma o historico: S/R mecanico intraday nos
-indices EUA com custos de CFD nao tem edge. Proximo passo cabe ao Antonio (fechar a linha de pesquisa ou aprovar ideias novas).
+Leitura honesta: 15/15 testes reprovados (12 do plano + 3 ideias do agente; total de ideias do agente: 3). O gap fill
+fecha ~50% das vezes com alvo 1:1, ou seja moeda ao ar antes de custos e ligeiramente negativo depois. O sweep da
+max/min overnight e claramente perdedor (os rompimentos "falsos" continuam mais vezes do que voltam). O NR4 so ajuda
+no NQ (+0.07R) e piora ES/Dow. Nada chega perto de t 3.0; o unico t positivo continua a ser break-pwhl (+1.34).
+Confirma o historico: regras mecanicas intraday nos indices EUA com custos de CFD nao mostram edge. Holdout intocado.

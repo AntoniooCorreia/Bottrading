@@ -14,3 +14,6 @@
 | 2026-11-16 20:09 | `fake-pwhl-tp2-sl0.5-fk0.3-rth` | dev | 175 / -0.117 / -1.12 | 160 / -0.196 / -1.84 | 203 / +0.076 / +0.75 | -1.12 | -0.28 | REPROVADA (negativa em pelo menos 1 indice) |
 | 2026-11-16 20:09 | `fake-swing1h-tp2-sl0.5-fk0.3-rth` | dev | 1486 / -0.212 / -6.06 | 1304 / -0.156 / -4.08 | 1583 / -0.109 / -3.14 | -7.62 | -4.38 | REPROVADA (negativa em pelo menos 1 indice) |
 | 2026-11-16 20:09 | `fake-round-tp2-sl0.5-fk0.3-rth` | dev | 679 / -0.122 / -2.30 | 650 / -0.159 / -2.97 | 620 / -0.110 / -1.98 | -4.19 | -1.15 | REPROVADA (negativa em pelo menos 1 indice) |
+| 2026-11-16 20:24 | `gapfill-pdc-tp2-sl0.5-rth` | dev | 770 / -0.082 / -2.32 | 880 / +0.009 / +0.29 | 904 / -0.011 / -0.35 | -1.34 | -0.88 | REPROVADA (negativa em pelo menos 1 indice) |
+| 2026-11-16 20:24 | `fake-onhl-tp2-sl0.5-fk0.3-rth` | dev | 970 / -0.191 / -4.37 | 824 / -0.121 / -2.50 | 1040 / -0.054 / -1.24 | -4.62 | -2.58 | REPROVADA (negativa em pelo menos 1 indice) |
+| 2026-11-16 20:24 | `break-nr4-tp2-sl0.5-rth` | dev | 285 / +0.072 / +0.83 | 237 / -0.114 / -1.25 | 307 / -0.128 / -1.62 | -1.12 | 0.28 | REPROVADA (negativa em pelo menos 1 indice) |
