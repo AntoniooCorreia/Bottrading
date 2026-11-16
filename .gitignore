@@ -1,0 +1,8 @@
+data/m1/
+data/tmp/
+reports/
+__pycache__/
+.pytest_cache/
+*.env
+.env
+*.zip
