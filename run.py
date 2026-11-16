@@ -20,13 +20,28 @@ from datetime import datetime
 import pandas as pd
 
 from sr.data import INSTR, PERIODS, SPEC, load_m5
+from sr import supa
 from sr.engine import Variant, backtest
 from sr.stats import by_year, summarize
 
 RESULTS = os.path.join("results", "RESULTS.md")
 HOLDOUT_LOG = "HOLDOUT_LOG.md"
+RUNS_DIR = os.path.join("results", "runs")
 HEADER = ("| data | variante | periodo | NQ n / meanR / t | ES n / meanR / t | Dow n / meanR / t | "
           "junto t | R/mes (NQ) | veredicto |\n|---|---|---|---|---|---|---|---|---|\n")
+
+
+def equity_curve(tr: pd.DataFrame, max_pts: int = 400) -> list:
+    """[[data ISO, R acumulado], ...] reduzido a max_pts pontos (para o dashboard)."""
+    if tr is None or len(tr) == 0:
+        return []
+    eq = tr["R"].cumsum().to_numpy()
+    t = pd.DatetimeIndex(tr["time"])
+    step = max(1, len(eq) // max_pts)
+    keep = list(range(0, len(eq), step))
+    if keep[-1] != len(eq) - 1:
+        keep.append(len(eq) - 1)
+    return [[t[i].strftime("%Y-%m-%d"), round(float(eq[i]), 2)] for i in keep]
 
 
 def verdict(per: dict, pooled_t: float) -> str:
@@ -57,13 +72,14 @@ def main():
         raise SystemExit("O holdout esta FECHADO. Ver regras em CLAUDE.md antes de usar --unlock-holdout.")
 
     v = Variant(play=a.play, levels=a.levels, tp_r=a.tp, stop_atr=a.stop_atr, fake_atr=a.fake_atr, session=a.session)
-    per, all_tr, yearly = {}, [], {}
+    per, all_tr, yearly, curves = {}, [], {}, {}
     for key in a.markets.split(","):
         m5 = load_m5(key, a.period)
         yrs = max((m5.index[-1] - m5.index[0]).days / 365.25, 0.1)
         tr = backtest(m5, v, SPEC[key]["cost_pts"], SPEC[key]["round"])
         per[key] = summarize(tr, yrs)
         yearly[key] = by_year(tr)
+        curves[key] = equity_curve(tr)
         if len(tr):
             all_tr.append(tr.assign(market=key))
     pooled = summarize(pd.concat(all_tr) if all_tr else None, 1.0)
@@ -86,6 +102,16 @@ def main():
     with open(RESULTS, "a") as f:
         f.write(f"| {datetime.now():%Y-%m-%d %H:%M} | `{v.name()}` | {a.period} | {cell('nq')} | {cell('es')} | "
                 f"{cell('dow')} | {pooled['t']:+.2f} | {per.get('nq', {}).get('R/mes', 0)} | {vd} |\n")
+    os.makedirs(RUNS_DIR, exist_ok=True)
+    run_doc = {"variant": v.name(), "params": v.to_dict(), "period": a.period,
+                   "date": datetime.now().astimezone().isoformat(timespec="minutes"), "verdict": vd,
+                   "pooled": pooled, "markets": per,
+                   "yearly": {k: {str(y): float(r) for y, r in s.items()} for k, s in yearly.items()},
+                   "equity": curves}
+    with open(os.path.join(RUNS_DIR, f"{v.name()}__{a.period}.json"), "w") as f:
+        json.dump(run_doc, f)
+    if supa.report_run(run_doc):
+        print("(enviado para o dashboard)")
     if a.period == "holdout":
         with open(HOLDOUT_LOG, "a") as f:
             f.write(f"- {datetime.now():%Y-%m-%d %H:%M} `{v.name()}` -> {vd} | {json.dumps(per)}\n")

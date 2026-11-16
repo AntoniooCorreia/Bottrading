@@ -1,0 +1,6 @@
+{
+  "buildCommand": "node web/build.mjs",
+  "outputDirectory": "public",
+  "installCommand": "echo sem-dependencias",
+  "framework": null
+}
