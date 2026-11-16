@@ -42,6 +42,10 @@ def get_year(inst: str, y: int) -> str | None:
         print(f"  {inst} {y}: FALHOU\n{r.stdout[-500:]}\n{r.stderr[-500:]}")
         shutil.rmtree(tmp, ignore_errors=True)
         return None
+    if os.path.getsize(files[0]) < 1000:      # a Dukascopy nao tem dados para este ano (ficheiro vazio)
+        print(f"  {inst} {y}: sem dados na Dukascopy (ignorado)")
+        shutil.rmtree(tmp, ignore_errors=True)
+        return None
     shutil.move(files[0], out)
     shutil.rmtree(tmp, ignore_errors=True)
     return out
@@ -53,7 +57,7 @@ def main():
         parts = []
         for y in range(Y0, Y1 + 1):
             f = get_year(inst, y)
-            if f:
+            if f and os.path.getsize(f) > 1000:
                 df = pd.read_csv(f)
                 df.columns = [c.strip().lower() for c in df.columns]
                 df.index = pd.to_datetime(df["timestamp"].astype("int64"), unit="ms", utc=True)
