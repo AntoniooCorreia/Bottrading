@@ -22,6 +22,8 @@ dos EUA em 2012-2018 e em 2019-2024. Carteira de referencia atual (2026-11-16): 
 -24.9%. So substituis o estado "portfolio" do dashboard por uma carteira MELHOR (mais % ao ano ou mais anos >= 14%);
 nunca o apagues nem o troques por uma carteira vazia. No fim de cada sessao corre portfolio.py com as ideias aceites e diz no
 SUMMARY.md e no --log fim quanto da (% ao ano, anos acima de 14%) e quanto falta. Nunca chegar la aumentando o risco por trade.
+FREQUENCIA (pedido do Antonio): a carteira deve fazer em media 2 a 3 trades por semana (~100-150 por ano). Da prioridade
+a ideias com mais trades (4h, 1h, sinais mais frequentes), sempre com as mesmas regras de validacao.
 
 Escreve tudo (commits, relatorios, notas) em portugues de Portugal, sem acentos nos ficheiros .py.
 

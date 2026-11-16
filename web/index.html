@@ -190,7 +190,7 @@ function goalTile(d){
   const yrs=P?Object.entries(P.por_ano).filter(([y])=>+y>=2013&&+y<=2024):[];
   const bars=yrs.map(([y,x])=>`<div title="${y}: ${x>0?"+":""}${x}%" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="height:46px;width:100%;display:flex;align-items:flex-end;justify-content:center"><div style="width:70%;height:${Math.min(46,Math.abs(x)/14*46)}px;min-height:2px;border-radius:2px;background:${x>=14?"var(--good)":x>=0?"var(--series-1)":"var(--series-2)"}"></div></div><span style="font-size:9px;color:var(--text-muted)">${y.slice(2)}</span></div>`).join("");
   return `<div class="tile" style="grid-column:1/-1"><div class="k">Objetivo: +14% ao ano · carteira com 1% de risco por trade</div>
-    <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap"><div class="v">${v>0?"+":""}${v.toFixed(1).replace(".",",")}%</div><div class="s">${P?`média por ano · ${P.anos_ok} de ${P.anos} anos acima de 14% · pior queda ${P.dd.toFixed(1).replace(".",",")}% · ${Math.round(P.trades_ano)} trades/ano · ${esc(P.ideas.join(", "))}`:"ainda sem carteira"}</div></div>
+    <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap"><div class="v">${v>0?"+":""}${v.toFixed(1).replace(".",",")}%</div><div class="s">${P?`média por ano · ${P.anos_ok} de ${P.anos} anos acima de 14% · pior queda ${P.dd.toFixed(1).replace(".",",")}% · ${(P.trades_ano/52).toFixed(1).replace(".",",")} trades/semana (objetivo 2–3) · ${esc(P.ideas.join(", "))}`:"ainda sem carteira"}</div></div>
     <div style="height:8px;background:var(--grid);border-radius:4px;margin-top:6px;overflow:hidden"><div style="height:100%;width:${pc}%;background:var(--series-1);border-radius:4px"></div></div>
     ${bars?`<div style="display:flex;gap:2px;margin-top:8px">${bars}</div><div class="s">% por ano (verde = acima de 14%)</div>`:""}</div>`;
 }
@@ -212,7 +212,7 @@ let LASTD=null;
 function portfolioRow(P){
   return `<tr class="row" data-pf="1"><td><code>Carteira: ${esc(P.ideas.join(" + "))}</code><div class="small muted">${P.por_indice.length} índices · 2012–2024 · 1% por trade</div></td>
     <td><span class="badge ${P.anos_ok>=P.anos-1?"ok":"bad"}"><i>${P.anos_ok>=P.anos-1?"✓":"✕"}</i><span class="lbl">${P.media>=14?"Objetivo atingido":"Abaixo dos 14%"}</span></span><div class="small muted">${P.media>0?"+":""}${P.media.toFixed(1).replace(".",",")}% ao ano · ${P.anos_ok}/${P.anos} anos ≥14%</div></td>
-    <td class="num">—</td><td class="num hide-sm" colspan="3">pior queda ${P.dd.toFixed(1).replace(".",",")}% · ${Math.round(P.trades_ano)} trades/ano</td></tr>`;
+    <td class="num">—</td><td class="num hide-sm" colspan="3">pior queda ${P.dd.toFixed(1).replace(".",",")}% · ${(P.trades_ano/52).toFixed(1).replace(".",",")} trades/semana</td></tr>`;
 }
 function portfolioDetail(P){
   const el=document.getElementById("detail"); el.hidden=false; PV.run=null;

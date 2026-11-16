@@ -30,3 +30,9 @@ stop no extremo do sweep, Asia+Londres+NY, max 3 trades/dia). Precisa de data/m1
 - [x] `python run.py --play antonio --levels all --tp 1` -> REPROVADA (NQ -0.18R/trade, t junto -17.5)
 - [x] `python run.py --play antonio --levels all --tp 2` -> REPROVADA (NQ -0.17R/trade, t junto -13.0)
 - [x] `python run.py --play antonio --levels all --tp 3` -> REPROVADA (NQ -0.18R/trade, t junto -10.7)
+
+## Mais trades (pedido do Antonio, 2026-11-16) - correr com run_swing.py e depois em pre e na carteira
+- [ ] `python run_swing.py --idea rsi2-dip-4h` (e `--period pre`)
+- [ ] `python run_swing.py --idea ibs-dip-d` (e `--period pre`)
+- [ ] `python run_swing.py --idea down3-d` (e `--period pre`)
+- [ ] `python portfolio.py --ideas <as que forem positivas nos 3 EUA em pre e dev>,rsi2-dip-d` e diz trades por semana
