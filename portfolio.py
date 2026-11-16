@@ -26,6 +26,8 @@ def main():
     ap.add_argument("--ideas", required=True)
     ap.add_argument("--markets", default=",".join(CARTEIRA))
     ap.add_argument("--period", default="tudo", choices=[p for p in PERIODS if p != "holdout"])
+    ap.add_argument("--max-open", type=int, default=3,
+                    help="maximo de trades abertas ao mesmo tempo (risco total maximo = max_open %%)")
     a = ap.parse_args()
     ideas = a.ideas.split(",")
     rows, trades = [], []
@@ -41,14 +43,28 @@ def main():
                 continue
             t = pd.DatetimeIndex(tr["exit"])
             t = t.tz_localize(None) if t.tz is not None else t
-            trades.append(pd.DataFrame({"t": t, "R": tr["R"].to_numpy(), "mk": key, "idea": name}))
+            t0 = pd.DatetimeIndex(tr["time"])
+            t0 = t0.tz_localize(None) if t0.tz is not None else t0
+            trades.append(pd.DataFrame({"t0": t0, "t": t, "R": tr["R"].to_numpy(), "mk": key, "idea": name}))
             yrs = max((b.index[-1] - b.index[0]).days / 365.25, 0.1)
             rows.append({"indice": key, "ideia": name, "trades": len(tr), "R/trade": round(tr["R"].mean(), 3),
                          "%/ano": round(tr["R"].sum() / yrs, 2)})
     if not trades:
         raise SystemExit("Sem trades.")
-    allt = pd.concat(trades).sort_values("t")
+    allt = pd.concat(trades).sort_values("t0").reset_index(drop=True)
+    # limite de risco: no maximo max_open trades abertas ao mesmo tempo e 1 por indice (as outras sao ignoradas)
+    keep, open_ = [], []
+    for i, row in allt.iterrows():
+        open_ = [o for o in open_ if o[0] > row.t0]
+        if len(open_) >= a.max_open or any(o[1] == row.mk for o in open_):
+            continue
+        open_.append((row.t, row.mk))
+        keep.append(i)
+    dropped = len(allt) - len(keep)
+    allt = allt.loc[keep].sort_values("t")
     per = pd.DataFrame(rows)
+    real = allt.groupby(["mk", "idea"]).size()
+    per["trades"] = [int(real.get((r.indice, r.ideia), 0)) for r in per.itertuples()]
     yearly = allt.groupby(allt["t"].dt.year)["R"].sum()          # 1% por trade -> R = % da conta
     eq = allt["R"].cumsum().to_numpy()
     dd = float((eq - np.maximum.accumulate(np.maximum(eq, 0))).min())
@@ -58,12 +74,13 @@ def main():
     print("\nPor ano (% da conta, 1% de risco por trade):")
     print(yearly.round(1).to_string())
     print(f"\nMedia: {media:+.1f}% ao ano | anos >= {OBJETIVO:g}%: {years_ok} de {len(yearly)} | "
-          f"pior queda: {dd:.1f}% | trades/ano: {len(allt) / len(yearly):.0f}")
+          f"pior queda: {dd:.1f}% | trades/ano: {len(allt) / len(yearly):.0f} | "
+          f"max {a.max_open} abertas, {dropped} sinais ignorados por limite de risco")
     os.makedirs("results", exist_ok=True)
     with open(os.path.join("results", "PORTFOLIO.md"), "w") as f:
         f.write(f"# Carteira ({a.period})\n\nIdeias: {', '.join(ideas)}\n\n{per.to_markdown(index=False) if hasattr(per, 'to_markdown') else per.to_string(index=False)}\n\n"
                 f"Media {media:+.1f}% ao ano, anos >= {OBJETIVO:g}%: {years_ok}/{len(yearly)}, pior queda {dd:.1f}%\n")
-    doc = {"ideas": ideas, "period": a.period, "media": round(media, 2), "anos_ok": years_ok, "anos": int(len(yearly)),
+    doc = {"max_open": a.max_open, "ideas": ideas, "period": a.period, "media": round(media, 2), "anos_ok": years_ok, "anos": int(len(yearly)),
            "dd": round(dd, 2), "trades_ano": round(len(allt) / len(yearly), 1),
            "por_ano": {str(k): round(float(v), 2) for k, v in yearly.items()},
            "por_indice": per.to_dict(orient="records")}
