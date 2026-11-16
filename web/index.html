@@ -99,6 +99,11 @@ li.done .box{background:var(--text-muted);color:var(--surface-1);border-color:va
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
 .chips button{border:1px solid var(--border);background:var(--surface-1);color:var(--text-secondary);border-radius:999px;padding:4px 10px;font:inherit;font-size:12px;cursor:pointer}
 .chips button.on{background:var(--text-primary);color:var(--surface-1);border-color:var(--text-primary)}
+.why{list-style:none;margin:6px 0 4px;padding:0;font-size:13px}
+.why li{display:flex;gap:8px;padding:3px 0;align-items:flex-start}
+.why .ck{flex:none;width:18px;height:18px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:11px;margin-top:1px}
+.why .ok{background:var(--good)} .why .no{background:var(--critical)}
+.whybox{background:var(--grid);border-radius:10px;padding:8px 12px;margin:8px 0}
 details summary{cursor:pointer;color:var(--text-secondary);font-size:13px}
 </style>
 </head>
@@ -147,6 +152,37 @@ function badge(v){
     + (why ? `<div class="small muted">${esc(why)}</div>` : "");
 }
 
+
+const ORIG=new Set(["bounce","break","fake"].flatMap(p=>["pdhl","pwhl","swing1h","round"].map(l=>p+"|"+l)));
+function why(run){
+  const minT=ORIG.has(run.params.play+"|"+run.params.levels)?2.5:3.0;
+  const ks=["nq","es","dow"].filter(k=>run.markets[k]);
+  const m=k=>run.markets[k], nm=k=>MK_SHORT[k];
+  const c1=ks.every(k=>m(k).n>=100), c2=ks.every(k=>m(k).meanR>0), c3=run.pooled.t>=minT;
+  const items=[
+    [c1, `Trades suficientes (≥100 em cada índice): `+ks.map(k=>`${nm(k)} ${m(k).n}`).join(" · ")],
+    [c2, `Ganha dinheiro em todos os índices (média por trade > 0): `+ks.map(k=>`${nm(k)} ${fmt(m(k).meanR,3)}R`).join(" · ")],
+    [c3, `Resultado forte o suficiente para não ser sorte (t junto ${fmt(run.pooled.t)} vs mínimo ${String(minT).replace(".",",")})`],
+  ];
+  let plain;
+  if(c1&&c2&&c3) plain="Passou: dá lucro nos três índices, com trades suficientes e um resultado demasiado forte para ser só sorte.";
+  else { const bad=ks.filter(k=>m(k).meanR<=0).map(nm), good=ks.filter(k=>m(k).meanR>0).map(nm);
+    if(!c2 && !good.length) plain="Reprovou: perde dinheiro em todos os índices depois de custos.";
+    else if(!c2) plain=`Reprovou: dá lucro em ${good.join(" e ")} mas perde em ${bad.join(" e ")}. Um edge real devia aparecer em todos, por isso o lucro onde aparece é provavelmente sorte.`;
+    else if(!c1) plain="Reprovou: não há trades suficientes para tirar conclusões.";
+    else plain=`Reprovou: dá lucro nos três índices, mas o resultado ainda é fraco demais (t ${fmt(run.pooled.t)}) para excluir a sorte.`; }
+  return `<div class="whybox"><b>Porquê?</b> ${esc(plain)}<ul class="why">${items.map(([ok,t])=>`<li><span class="ck ${ok?"ok":"no"}">${ok?"✓":"✕"}</span><span>${esc(t)}</span></li>`).join("")}</ul></div>`;
+}
+function whyShort(run){
+  const ks=["nq","es","dow"].filter(k=>run.markets[k]); const m=k=>run.markets[k];
+  if(run.verdict.startsWith("PASSA")) return "lucro nos 3 índices e t forte";
+  const good=ks.filter(k=>m(k).meanR>0).map(k=>MK_SHORT[k]);
+  if(!good.length) return "perde nos 3 índices";
+  if(good.length<ks.length) return "lucro só em "+good.join(" e ");
+  if(ks.some(k=>m(k).n<100)) return "poucas trades";
+  return "lucro nos 3, mas fraco (t "+fmt(run.pooled.t)+")";
+}
+
 function tiles(d){
   const dev = d.runs.filter(r=>r.period==="dev"), hold = d.runs.filter(r=>r.period==="holdout");
   const pass = dev.filter(r=>r.verdict.startsWith("PASSA")).length;
@@ -172,7 +208,7 @@ function runsTable(d){
     <th>Variante</th><th>Veredicto</th><th class="num">t junto</th>
     <th class="num hide-sm">NQ</th><th class="num hide-sm">S&amp;P</th><th class="num hide-sm">Dow</th></tr></thead><tbody>
     ${runs.map((r,i)=>`<tr class="row" data-i="${i}"><td><code>${esc(r.variant)}</code><div class="small muted">${r.period==="dev"?"dev 2019–24":"HOLDOUT 2025–26"} · ${esc(r.date.replace("T"," "))}</div></td>
-      <td>${badge(r.verdict)}</td><td class="num">${fmt(r.pooled.t)}</td>
+      <td>${badge(r.verdict).replace(/<div class="small muted">.*<\/div>/,"")}<div class="small muted">${esc(whyShort(r))}</div></td><td class="num">${fmt(r.pooled.t)}</td>
       <td class="num hide-sm">${cell(r.markets.nq)}</td><td class="num hide-sm">${cell(r.markets.es)}</td><td class="num hide-sm">${cell(r.markets.dow)}</td></tr>`).join("")}
     </tbody></table></div>`;
   box.querySelectorAll("tr.row").forEach(tr=>tr.addEventListener("click",()=>{
@@ -244,7 +280,8 @@ function detail(run){
   const mk=Object.keys(run.markets);
   const years=[...new Set(mk.flatMap(k=>Object.keys(run.yearly[k]||{})))].sort();
   el.innerHTML=`<h2><code>${esc(run.variant)}</code> <span class="muted small">· ${run.period==="dev"?"dev 2019–2024":"holdout 2025–2026"}</span></h2>
-    <div style="margin-bottom:6px">${badge(run.verdict)}</div>
+    <div style="margin-bottom:6px">${badge(run.verdict).replace(/<div class="small muted">.*<\/div>/,"")}</div>
+    ${why(run)}
     <div class="small muted" style="margin:6px 0 2px">R acumulado por índice (depois de custos)</div>
     ${chart(run)}
     <div class="grid2" style="margin-top:10px">
