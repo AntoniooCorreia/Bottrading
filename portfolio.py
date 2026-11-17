@@ -19,6 +19,8 @@ from sr.swing import FUT_COST, load_tf, run_positions
 from sr.swing_ideas import IDEAS
 
 OBJETIVO = 14.0
+REGIAO = {"nq": "eua", "es": "eua", "dow": "eua", "dax": "europa", "ftse": "europa", "estx": "europa",
+          "cac": "europa", "nikkei": "asia", "asx": "asia", "hsi": "asia"}
 
 
 def main():
@@ -26,6 +28,11 @@ def main():
     ap.add_argument("--ideas", required=True)
     ap.add_argument("--markets", default=",".join(CARTEIRA))
     ap.add_argument("--period", default="tudo", choices=[p for p in PERIODS if p != "holdout"])
+    ap.add_argument("--only", default="", help="lista indice:ideia a usar (ex.: nq:rsi2-dip-d,es:ibs-dip-d)")
+    ap.add_argument("--region-cap", type=int, default=0, help="maximo de trades abertas por regiao (EUA/Europa/Asia); 0 = sem limite")
+    ap.add_argument("--month-stop", type=float, default=0.0, help="para de abrir trades no mes depois de perder X%% (0 = desligado)")
+    ap.add_argument("--vol-filter", action="store_true", help="nao entra quando a volatilidade de 20 dias do indice esta acima do percentil 80 do ultimo ano")
+    ap.add_argument("--no-push", action="store_true")
     ap.add_argument("--max-open", type=int, default=3,
                     help="maximo de trades abertas ao mesmo tempo (risco total maximo = max_open %%)")
     a = ap.parse_args()
@@ -36,6 +43,8 @@ def main():
             print(f"  {key}: sem dados (python download.py 2012 2026 {key})")
             continue
         for name in ideas:
+            if a.only and f"{key}:{name}" not in a.only.split(","):
+                continue
             fn, tf, st, tp, mh = IDEAS[name]
             b = load_tf(key, tf, a.period)
             tr = run_positions(b, fn(b), st, SPEC[key]["cost_pts"], FUT_COST[key], tp, mh)
@@ -45,7 +54,15 @@ def main():
             t = t.tz_localize(None) if t.tz is not None else t
             t0 = pd.DatetimeIndex(tr["time"])
             t0 = t0.tz_localize(None) if t0.tz is not None else t0
-            trades.append(pd.DataFrame({"t0": t0, "t": t, "R": tr["R"].to_numpy(), "mk": key, "idea": name}))
+            df = pd.DataFrame({"t0": t0, "t": t, "R": tr["R"].to_numpy(), "mk": key, "idea": name})
+            if a.vol_filter:
+                d = load_tf(key, "1d", a.period)["close"]
+                d.index = d.index.tz_localize(None) if d.index.tz is not None else d.index
+                rv = d.pct_change().rolling(20).std() * np.sqrt(252)
+                thr = rv.rolling(252, min_periods=120).quantile(0.8)
+                hv = (rv > thr).shift(1).fillna(False)          # so informacao do dia anterior
+                df["hivol"] = hv.reindex(df["t0"].dt.normalize(), method="ffill").fillna(False).to_numpy()
+            trades.append(df)
             yrs = max((b.index[-1] - b.index[0]).days / 365.25, 0.1)
             rows.append({"indice": key, "ideia": name, "trades": len(tr), "R/trade": round(tr["R"].mean(), 3),
                          "%/ano": round(tr["R"].sum() / yrs, 2)})
@@ -53,22 +70,40 @@ def main():
         raise SystemExit("Sem trades.")
     allt = pd.concat(trades).sort_values("t0").reset_index(drop=True)
     # limite de risco: no maximo max_open trades abertas ao mesmo tempo e 1 por indice (as outras sao ignoradas)
-    keep, open_ = [], []
+    keep, open_, closed = [], [], []
     for i, row in allt.iterrows():
+        closed += [o for o in open_ if o[0] <= row.t0]
         open_ = [o for o in open_ if o[0] > row.t0]
         if len(open_) >= a.max_open or any(o[1] == row.mk for o in open_):
             continue
-        open_.append((row.t, row.mk))
+        if a.region_cap and sum(REGIAO[o[1]] == REGIAO[row.mk] for o in open_) >= a.region_cap:
+            continue
+        if a.vol_filter and bool(row.get("hivol", False)):
+            continue
+        if a.month_stop:
+            m = (row.t0.year, row.t0.month)
+            pnl = sum(o[2] for o in closed if (o[0].year, o[0].month) == m)
+            if pnl <= -a.month_stop:
+                continue
+        open_.append((row.t, row.mk, row.R))
         keep.append(i)
     dropped = len(allt) - len(keep)
     allt = allt.loc[keep].sort_values("t")
     per = pd.DataFrame(rows)
-    real = allt.groupby(["mk", "idea"]).size()
-    per["trades"] = [int(real.get((r.indice, r.ideia), 0)) for r in per.itertuples()]
+    # numeros por indice/ideia DEPOIS do limite de risco (so as trades que a carteira fez mesmo)
+    nyears = max((allt["t"].max() - allt["t"].min()).days / 365.25, 0.1)
+    g = allt.groupby(["mk", "idea"])["R"]
+    per = pd.DataFrame({"indice": [k[0] for k in g.groups], "ideia": [k[1] for k in g.groups],
+                        "trades": g.size().to_numpy(), "R/trade": g.mean().round(3).to_numpy(),
+                        "%/ano": (g.sum() / nyears).round(2).to_numpy()})
+    per = per.sort_values("%/ano", ascending=False)
     yearly = allt.groupby(allt["t"].dt.year)["R"].sum()          # 1% por trade -> R = % da conta
     eq = allt["R"].cumsum().to_numpy()
     dd = float((eq - np.maximum.accumulate(np.maximum(eq, 0))).min())
     years_ok = int((yearly >= OBJETIVO).sum())
+    allm = allt.groupby([allt["t"].dt.year, allt["t"].dt.month])["R"].sum()
+    rng = pd.period_range(allt["t"].min(), allt["t"].max(), freq="M")
+    monthly = pd.Series([float(allm.get((p.year, p.month), 0.0)) for p in rng], index=[str(p) for p in rng])
     media = float(yearly.mean())
     print(per.to_string(index=False))
     print("\nPor ano (% da conta, 1% de risco por trade):")
@@ -76,15 +111,21 @@ def main():
     print(f"\nMedia: {media:+.1f}% ao ano | anos >= {OBJETIVO:g}%: {years_ok} de {len(yearly)} | "
           f"pior queda: {dd:.1f}% | trades/ano: {len(allt) / len(yearly):.0f} | "
           f"max {a.max_open} abertas, {dropped} sinais ignorados por limite de risco")
+    print(f"Meses: pior {monthly.min():.1f}% | meses positivos {int((monthly > 0).sum())}/{len(monthly)} "
+          f"| meses abaixo de -3%: {int((monthly < -3).sum())} | pior ano {yearly.min():.1f}% | anos negativos {int((yearly < 0).sum())}")
     os.makedirs("results", exist_ok=True)
     with open(os.path.join("results", "PORTFOLIO.md"), "w") as f:
         f.write(f"# Carteira ({a.period})\n\nIdeias: {', '.join(ideas)}\n\n{per.to_markdown(index=False) if hasattr(per, 'to_markdown') else per.to_string(index=False)}\n\n"
                 f"Media {media:+.1f}% ao ano, anos >= {OBJETIVO:g}%: {years_ok}/{len(yearly)}, pior queda {dd:.1f}%\n")
-    doc = {"max_open": a.max_open, "ideas": ideas, "period": a.period, "media": round(media, 2), "anos_ok": years_ok, "anos": int(len(yearly)),
+    doc = {"regras": {"max_open": a.max_open, "region_cap": a.region_cap, "month_stop": a.month_stop, "vol_filter": a.vol_filter},
+           "pior_mes": round(float(monthly.min()), 2), "meses_pos": int((monthly > 0).sum()), "meses": int(len(monthly)),
+           "pior_ano": round(float(yearly.min()), 2), "anos_neg": int((yearly < 0).sum()),
+           "por_mes": {k: round(v, 2) for k, v in monthly.items()},
+           "max_open": a.max_open, "ideas": ideas, "period": a.period, "media": round(media, 2), "anos_ok": years_ok, "anos": int(len(yearly)),
            "dd": round(dd, 2), "trades_ano": round(len(allt) / len(yearly), 1),
            "por_ano": {str(k): round(float(v), 2) for k, v in yearly.items()},
            "por_indice": per.to_dict(orient="records")}
-    if supa.set_state("portfolio", doc):
+    if not a.no_push and supa.set_state("portfolio", doc):
         print("(enviado para o dashboard)")
 
 
