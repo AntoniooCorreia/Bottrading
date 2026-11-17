@@ -18,9 +18,12 @@ rsi2-dip-d, da ~1.2R/ano no NQ): o caminho e juntar VARIAS estrategias validadas
 (mais trades por ano com a mesma vantagem: 4h/1h, outras formas de comprar quedas, outros sinais). O Antonio aceitou operar
 outros indices (DAX, FTSE, Nikkei, Euro Stoxx, CAC, ASX, Hang Seng) desde que o objetivo seja atingido sempre ou
 quase sempre. Uma ideia so entra na carteira se tiver passado no criterio oficial OU se for positiva nos 3 indices
-dos EUA em 2012-2018 e em 2019-2024. Carteira de referencia atual (2026-11-16): rsi2-dip-d + ibs-dip-d + down3-d nos 10 indices, com no maximo 3 trades
-abertas ao mesmo tempo (portfolio.py --max-open 3, risco total maximo 3%): +8.7%/ano, 5/13 anos >= 14%, pior queda
--21.6%, ~175 trades/ano. Sem o limite de 3 abertas a pior queda chega a -70%: o limite e obrigatorio. So substituis o estado "portfolio" do dashboard por uma carteira MELHOR (mais % ao ano ou mais anos >= 14%);
+dos EUA em 2012-2018 e em 2019-2024. Carteira de referencia atual (2026-11-17): rsi2-dip-d + ibs-dip-d + down3-d nos 10 indices com REGRAS DE RISCO
+OBRIGATORIAS (portfolio.py --max-open 3 --region-cap 1 --month-stop 3): no maximo 3 trades abertas, 1 por indice,
+1 por regiao (EUA/Europa/Asia), e no mes em que as trades fechadas perderem 3% nao se abre mais nenhuma ate ao mes
+seguinte. Resultado 2012-2024: +9.5%/ano, pior mes -5.1%, pior ano -2.5%, pior queda -10.7%, 102/148 meses positivos.
+O Antonio quer CONSISTENCIA (meses sem quedas grandes) tanto como os 14%/ano: compara sempre pior mes e pior ano.
+So substituis o estado "portfolio" do dashboard por uma carteira MELHOR (mais % ao ano ou mais anos >= 14%);
 nunca o apagues nem o troques por uma carteira vazia. No fim de cada sessao corre portfolio.py com as ideias aceites e diz no
 SUMMARY.md e no --log fim quanto da (% ao ano, anos acima de 14%) e quanto falta. Nunca chegar la aumentando o risco por trade.
 FREQUENCIA (pedido do Antonio): a carteira deve fazer em media 2 a 3 trades por semana (~100-150 por ano). Da prioridade
