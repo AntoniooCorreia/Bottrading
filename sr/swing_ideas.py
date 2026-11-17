@@ -98,6 +98,34 @@ def down3_d(b: pd.DataFrame) -> pd.Series:
     return _enter_exit(dn3 & (c > c.rolling(200).mean()), c > b["high"].shift(1))
 
 
+def tom_d(b: pd.DataFrame) -> pd.Series:
+    """Diario. Viragem do mes: long do ultimo dia util do mes ate ao fecho do 3.o dia util do mes seguinte.
+    Usa so o calendario de dias uteis (seg-sex), conhecido com antecedencia: no fecho do dia d o sinal e 1 se o
+    proximo dia util for o ultimo do mes ou um dos 3 primeiros do mes."""
+    from pandas.tseries.offsets import BDay
+    idx = b.index.tz_localize(None) if b.index.tz is not None else b.index
+    nxt = idx.normalize() + BDay(1)
+    last = (nxt + BDay(1)).month != nxt.month
+    first = nxt.to_period("M").to_timestamp()
+    nfirst = np.array([len(pd.bdate_range(f, x)) for f, x in zip(first, nxt)])
+    return pd.Series(np.where(last | (nfirst <= 3), 1, 0), index=b.index)
+
+
+def overnight_us_1h(b: pd.DataFrame) -> pd.Series:
+    """1h, horas de Nova Iorque. Long na vela das 16:00 (sinal no fecho da vela das 15:00) e sai no fecho da vela
+    das 08:00 (09:00 NY, antes da abertura do cash). So para NQ/S&P/Dow."""
+    h = b.index.tz_convert("America/New_York").hour if b.index.tz is not None else b.index.hour
+    return pd.Series(np.where((h >= 15) | (h < 8), 1, 0), index=b.index)
+
+
+def double7_d(b: pd.DataFrame) -> pd.Series:
+    """Diario. Connors 'Double 7s': long quando o fecho e o mais baixo dos ultimos 7 fechos e esta acima da media de
+    200 dias; sai quando o fecho e o mais alto dos ultimos 7 fechos."""
+    c = b["close"]
+    lo7, hi7 = c.rolling(7).min(), c.rolling(7).max()
+    return _enter_exit((c <= lo7) & (c > c.rolling(200).mean()), c >= hi7)
+
+
 # nome -> (funcao, timeframe, stop_atr, tp_r, max_hold)
 IDEAS = {
     "trend-sma100-d": (trend_sma100, "1d", 3.0, 0.0, 0),
@@ -106,4 +134,7 @@ IDEAS = {
     "rsi2-dip-4h": (rsi2_dip_4h, "4h", 3.0, 0.0, 30),
     "ibs-dip-d": (ibs_dip_d, "1d", 3.0, 0.0, 10),
     "down3-d": (down3_d, "1d", 3.0, 0.0, 10),
+    "tom-d": (tom_d, "1d", 3.0, 0.0, 6),
+    "overnight-us-1h": (overnight_us_1h, "1h", 3.0, 0.0, 24),
+    "double7-d": (double7_d, "1d", 3.0, 0.0, 10),
 }

@@ -100,3 +100,5 @@ Parametros fixos, sem grelhas. Criterio oficial: run_swing.py (>= 60 trades por 
 - Entrada: long na abertura seguinte quando o fecho e o mais baixo dos ultimos 7 fechos e fecho > media de 200 dias.
 - Saida: quando o fecho e o mais alto dos ultimos 7 fechos. Stop 3 ATR(14), sem alvo, max 10 dias.
 - Timeframe: diario. Long-only.
+- Nota de implementacao (antes de correr): como em todas as ideias do motor, se o stop for tocado e o sinal continuar
+  ligado, o motor volta a entrar na vela seguinte (overnight: na mesma noite; tom-d: dentro da mesma janela). E raro com stop de 3 ATR.
