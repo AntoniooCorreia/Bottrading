@@ -62,3 +62,7 @@ Registadas em IDEAS.md antes de correr. Fasquia t >= 3.0. Correr dev e depois `-
   Positiva nos 3 dos EUA tambem em 2012-2018 (t +2.71, Dow com 57 trades) -> pode ir a carteira pela regra do CLAUDE.md
 - [x] carteira + week-rev-d (2012-2024, mesmas regras de risco): nos 10 indices piora (+5.8%/ano, pior queda -13.8%); so nos EUA
   tambem piora (+8.9%/ano, pior queda -14.5%, 19 meses abaixo de -3%). Carteira de referencia mantem-se (+9.5%/ano)
+
+## Ideias do agente (2026-11-17, sessao 3)
+Registada em IDEAS.md antes de correr. Fasquia t >= 3.0. Correr dev e depois `--period pre` (2012-2018) como confirmacao.
+- [ ] `python run_swing.py --idea rsi2-pop-short-4h` (e `--period pre`)

@@ -131,3 +131,19 @@ calculados so com velas de segunda a sexta; a vela de domingo herda a posicao de
 - Entrada: no fecho de sexta, se o fecho de sexta < fecho do ultimo dia da semana anterior e fecho > media de 200,
   long na abertura seguinte. Saida no fecho da sexta seguinte (se a condicao se repetir, mantem). Stop 3 ATR(14), sem alvo.
 - Timeframe: diario. Long-only. ~15-20 trades por ano por indice.
+
+## 2026-11-17 - sessao 3 (1 ideia; total de ideias do agente ate agora: 19; hoje: 7 de 8) - registada antes de correr
+Objetivo: a carteira so tem compras (long) de quedas; os meses maus sao quedas em tendencia (2020, 2022).
+Uma ideia do lado VENDEDOR, so em tendencia de baixa, daria trades pouco correlacionadas. So 1 ideia nesta sessao
+(nao ha outra com hipotese forte e trades suficientes; nao vale a pena gastar o limite).
+Verificacao de frequencia (contagem de sinais, sem olhar a resultados): a versao diaria teria ~20 sinais por indice
+em 2019-2024 (< 60, nao pode passar), por isso regista-se so a versao 4h (~200 sinais por indice).
+
+### Ideia 19 - `rsi2-pop-short-4h`: vender subidas curtas em tendencia de baixa (4h)
+- Hipotese: em tendencia de baixa as subidas curtas e fortes (short covering, "bear market rallies") tendem a falhar e
+  o preco volta a cair (reversao de curto prazo, espelho do Connors RSI(2) do lado curto). Diversifica a carteira
+  (so vende quando os indices estao abaixo da media longa, que e quando as compras de quedas perdem).
+- Expectativa honesta: baixa. A versao long em 4h (rsi2-dip-4h) deu ~0R e os indices tem deriva para cima.
+- Entrada: short na abertura da vela seguinte quando RSI(2) > 90 e fecho < media de 200 velas de 4h.
+- Saida: quando o fecho fica abaixo da media de 5 velas. Stop 3 ATR(14) de 4h, sem alvo, max 30 velas.
+- Timeframe: 4h, todas as sessoes. Short-only. Parametros fixos (os mesmos do rsi2-dip-4h, espelhados).
