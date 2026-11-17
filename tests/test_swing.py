@@ -70,3 +70,10 @@ def test_tom_window():
     # sai no fecho do 3.o dia util do mes seguinte
     for t in pd.DatetimeIndex(tr["exit"])[:-1]:
         assert len(pd.bdate_range(t.replace(day=1).tz_localize(None), t.tz_localize(None))) == 3
+
+
+def test_rsi2_pop_short_only_short():
+    from sr.swing_ideas import rsi2_pop_short_4h
+    b = synth_d(n=3000, seed=2)
+    p = rsi2_pop_short_4h(b)
+    assert set(p.unique()) <= {0, -1} and (p == -1).sum() > 50

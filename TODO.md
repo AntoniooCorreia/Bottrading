@@ -65,4 +65,4 @@ Registadas em IDEAS.md antes de correr. Fasquia t >= 3.0. Correr dev e depois `-
 
 ## Ideias do agente (2026-11-17, sessao 3)
 Registada em IDEAS.md antes de correr. Fasquia t >= 3.0. Correr dev e depois `--period pre` (2012-2018) como confirmacao.
-- [ ] `python run_swing.py --idea rsi2-pop-short-4h` (e `--period pre`)
+- [x] `python run_swing.py --idea rsi2-pop-short-4h` (e `--period pre`) -> REPROVADA, t junto -2.46 (dev negativa nos 3: NQ -0.01R, S&P -0.08R, Dow -0.08R; pre tambem negativa nos 3, t -2.09). Vender subidas em tendencia de baixa perde dinheiro: nao entra na carteira

@@ -174,6 +174,14 @@ def week_rev_d(b: pd.DataFrame) -> pd.Series:
 
 
 # nome -> (funcao, timeframe, stop_atr, tp_r, max_hold)
+def rsi2_pop_short_4h(b: pd.DataFrame) -> pd.Series:
+    """4h. Espelho do rsi2-dip-4h do lado vendedor: short quando RSI(2) > 90 e fecho abaixo da media de 200 velas
+    (tendencia de baixa); sai quando fecha abaixo da media de 5 velas. Short-only."""
+    c = b["close"]
+    r, sma200, sma5 = _rsi(c, 2), c.rolling(200).mean(), c.rolling(5).mean()
+    return -_enter_exit((r > 90) & (c < sma200), c < sma5)
+
+
 IDEAS = {
     "trend-sma100-d": (trend_sma100, "1d", 3.0, 0.0, 0),
     "rsi2-dip-d": (rsi2_dip, "1d", 3.0, 0.0, 10),
@@ -187,4 +195,5 @@ IDEAS = {
     "opex-week-d": (opex_week_d, "1d", 3.0, 0.0, 0),
     "nr7-up-d": (nr7_up_d, "1d", 3.0, 0.0, 0),
     "week-rev-d": (week_rev_d, "1d", 3.0, 0.0, 0),
+    "rsi2-pop-short-4h": (rsi2_pop_short_4h, "4h", 3.0, 0.0, 30),
 }
