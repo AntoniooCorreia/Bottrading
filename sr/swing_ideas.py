@@ -126,6 +126,53 @@ def double7_d(b: pd.DataFrame) -> pd.Series:
     return _enter_exit((c <= lo7) & (c > c.rolling(200).mean()), c >= hi7)
 
 
+def _naive(idx: pd.DatetimeIndex) -> pd.DatetimeIndex:
+    return idx.tz_localize(None) if idx.tz is not None else idx
+
+
+def opex_week_d(b: pd.DataFrame) -> pd.Series:
+    """Diario. Semana de vencimento das opcoes mensais (3.a sexta-feira): no fecho do dia d o sinal e 1 se o proximo
+    dia util (seg-sex, calendario conhecido com antecedencia) estiver entre a segunda e a 3.a sexta dessa semana."""
+    from pandas.tseries.offsets import BDay
+    nxt = _naive(b.index).normalize() + BDay(1)
+    # 3.a sexta do mes do proximo dia util: primeira sexta + 14 dias
+    first = nxt.to_period("M").to_timestamp()
+    fri3 = first + pd.to_timedelta((4 - first.dayofweek) % 7 + 14, unit="D")
+    inwk = (nxt <= fri3) & (nxt >= fri3 - pd.Timedelta(days=4))
+    return pd.Series(np.where(inwk, 1, 0), index=b.index)
+
+
+def _weekdays(b: pd.DataFrame) -> pd.DataFrame:
+    """So velas de segunda a sexta (a vela de domingo tem precos parados do fim de semana)."""
+    return b[_naive(b.index).dayofweek < 5]
+
+
+def nr7_up_d(b: pd.DataFrame) -> pd.Series:
+    """Diario. NR7 (amplitude menor que a de cada um dos 6 dias anteriores) com fecho > media de 200 -> long durante
+    os 5 dias de semana seguintes (sai no fecho do 5.o). Um novo NR7 prolonga a janela."""
+    w = _weekdays(b)
+    rng = w["high"] - w["low"]
+    nr7 = rng < rng.shift(1).rolling(6).min()
+    sig = (nr7 & (w["close"] > w["close"].rolling(200).mean())).astype(int)
+    pos = sig.rolling(5, min_periods=1).max()      # dia do sinal + 4 dias seguintes em posicao no fecho
+    return pos.reindex(b.index).ffill().fillna(0).astype(int)
+
+
+def week_rev_d(b: pd.DataFrame) -> pd.Series:
+    """Diario. No fecho de sexta: se o fecho < fecho do ultimo dia da semana anterior e fecho > media de 200 -> long
+    ate ao fecho da sexta seguinte (reavaliado a cada sexta)."""
+    w = _weekdays(b)
+    c = w["close"]
+    d = _naive(w.index)
+    wk = d.to_period("W-FRI")
+    last = c.groupby(wk).transform("last")
+    prev_last = pd.Series(last.groupby(wk).first().shift(1).reindex(wk).to_numpy(), index=c.index)
+    fri = pd.Series(d.dayofweek == 4, index=c.index)
+    sig = ((c < prev_last) & (c > c.rolling(200).mean())).astype(float)
+    pos = sig.where(fri).ffill().fillna(0)
+    return pos.reindex(b.index).ffill().fillna(0).astype(int)
+
+
 # nome -> (funcao, timeframe, stop_atr, tp_r, max_hold)
 IDEAS = {
     "trend-sma100-d": (trend_sma100, "1d", 3.0, 0.0, 0),
@@ -137,4 +184,7 @@ IDEAS = {
     "tom-d": (tom_d, "1d", 3.0, 0.0, 6),
     "overnight-us-1h": (overnight_us_1h, "1h", 3.0, 0.0, 24),
     "double7-d": (double7_d, "1d", 3.0, 0.0, 10),
+    "opex-week-d": (opex_week_d, "1d", 3.0, 0.0, 0),
+    "nr7-up-d": (nr7_up_d, "1d", 3.0, 0.0, 0),
+    "week-rev-d": (week_rev_d, "1d", 3.0, 0.0, 0),
 }
