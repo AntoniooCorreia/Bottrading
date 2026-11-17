@@ -66,3 +66,11 @@ Registadas em IDEAS.md antes de correr. Fasquia t >= 3.0. Correr dev e depois `-
 ## Ideias do agente (2026-11-17, sessao 3)
 Registada em IDEAS.md antes de correr. Fasquia t >= 3.0. Correr dev e depois `--period pre` (2012-2018) como confirmacao.
 - [x] `python run_swing.py --idea rsi2-pop-short-4h` (e `--period pre`) -> REPROVADA, t junto -2.46 (dev negativa nos 3: NQ -0.01R, S&P -0.08R, Dow -0.08R; pre tambem negativa nos 3, t -2.09). Vender subidas em tendencia de baixa perde dinheiro: nao entra na carteira
+
+## Ideias do agente (2026-11-17, sessao 4)
+Registada em IDEAS.md antes de correr. Fasquia t >= 3.0. Correr dev e depois `--period pre` (2012-2018) como confirmacao.
+- [x] `python run_swing.py --idea ibs-bear-d` (e `--period pre`) -> REPROVADA no criterio oficial (poucas trades: NQ 51 < 60), t junto +1.62
+  (dev NQ +0.056R, S&P +0.043R, Dow +0.048R; pre positiva nos 3, t +1.02) -> positiva nos 3 dos EUA nos dois periodos: pode ir a carteira
+- [x] carteira + ibs-bear-d (2012-2025, mesmas regras de risco, 10 indices): MELHORA -> +12.5%/ano (era +9.5%), 6/14 anos >= 14% (era 5),
+  pior queda -9.1% (era -10.7%), meses positivos 108/148 (era 102); piora pior mes -5.5% (era -5.1%) e pior ano -4.5% (era -2.5%, 2018).
+  Positiva em todos os 10 indices. Ganho vem de 2020 (+7.9 -> +18.7%) e 2022 (-2.5 -> +10.4%). Nova carteira de referencia

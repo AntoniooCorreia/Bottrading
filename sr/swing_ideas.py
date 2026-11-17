@@ -182,6 +182,15 @@ def rsi2_pop_short_4h(b: pd.DataFrame) -> pd.Series:
     return -_enter_exit((r > 90) & (c < sma200), c < sma5)
 
 
+def ibs_bear_d(b: pd.DataFrame) -> pd.Series:
+    """Diario. Espelho de regime do ibs-dip-d: long quando IBS < 0.2 e fecho ABAIXO da media de 200 dias
+    (reversao de curto prazo com volatilidade alta, Nagel 2012); sai quando IBS > 0.7."""
+    rng = (b["high"] - b["low"]).replace(0, np.nan)
+    ibs = (b["close"] - b["low"]) / rng
+    sma200 = b["close"].rolling(200).mean()
+    return _enter_exit((ibs < 0.2) & (b["close"] < sma200), ibs > 0.7)
+
+
 IDEAS = {
     "trend-sma100-d": (trend_sma100, "1d", 3.0, 0.0, 0),
     "rsi2-dip-d": (rsi2_dip, "1d", 3.0, 0.0, 10),
@@ -196,4 +205,5 @@ IDEAS = {
     "nr7-up-d": (nr7_up_d, "1d", 3.0, 0.0, 0),
     "week-rev-d": (week_rev_d, "1d", 3.0, 0.0, 0),
     "rsi2-pop-short-4h": (rsi2_pop_short_4h, "4h", 3.0, 0.0, 30),
+    "ibs-bear-d": (ibs_bear_d, "1d", 3.0, 0.0, 10),
 }
