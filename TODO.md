@@ -48,6 +48,8 @@ stop no extremo do sweep, Asia+Londres+NY, max 3 trades/dia). Precisa de data/m1
 
 ## Ideias do agente (2026-11-17)
 Registadas em IDEAS.md antes de correr. Fasquia t >= 3.0. Correr dev e depois `--period pre` (2012-2018) como confirmacao.
-- [ ] `python run_swing.py --idea tom-d` (e `--period pre`)
-- [ ] `python run_swing.py --idea overnight-us-1h` (e `--period pre`)
-- [ ] `python run_swing.py --idea double7-d` (e `--period pre`)
+- [x] `python run_swing.py --idea tom-d` (e `--period pre`) -> REPROVADA, t junto +1.30 (dev positiva nos 3 mas pequena: NQ +0.06R; pre negativa nos 3, t -0.47)
+- [x] `python run_swing.py --idea overnight-us-1h` (e `--period pre`) -> REPROVADA, t junto -1.60 (dev NQ -0.005R, S&P -0.02R, Dow -0.05R; pre negativa nos 3, t -5.44). Nota: os dados tem velas paradas ao fim de semana, por isso a trade de sexta sai no sabado e volta a entrar (custo a dobrar ~1 vez/semana); com futuros o NQ dava +0.04R mas S&P/Dow ~0 ou negativos, nao muda a conclusao
+- [x] `python run_swing.py --idea double7-d` (e `--period pre`) -> PASSA no dev, t junto +3.07 (NQ +0.20R, S&P +0.14R, Dow +0.04R); pre tambem PASSA (t +3.46). Holdout (uma vez): positiva nos 3 mas so 78 trades, t +1.51 (ver HOLDOUT_LOG.md)
+- [x] carteira + double7-d (2012-2024, mesmas regras de risco): nos 10 indices piora (+7.3%/ano, pior queda -16.5%: double7 e negativa em FTSE/Nikkei/ASX/HSI);
+  so nos EUA (onde foi validada) fica igual (+9.4%/ano, pior queda -9.7%, pior ano -1.8%). Carteira de referencia mantem-se.
