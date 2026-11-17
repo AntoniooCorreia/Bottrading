@@ -45,3 +45,9 @@ stop no extremo do sweep, Asia+Londres+NY, max 3 trades/dia). Precisa de data/m1
 - [x] `python run_swing.py --idea ibs-dip-d` (e `--period pre`) -> NQ e S&P positivos nos dois periodos, Dow ligeiramente negativo
 - [x] `python run_swing.py --idea down3-d` (e `--period pre`) -> pre positiva nos 3 (t 3.7), dev Dow negativo
 - [x] carteira rsi2+ibs+down3, max 3 abertas: +8.7%/ano, 5/13 anos >= 14%, pior queda -21.6%, ~3.4 trades/semana
+
+## Ideias do agente (2026-11-17)
+Registadas em IDEAS.md antes de correr. Fasquia t >= 3.0. Correr dev e depois `--period pre` (2012-2018) como confirmacao.
+- [ ] `python run_swing.py --idea tom-d` (e `--period pre`)
+- [ ] `python run_swing.py --idea overnight-us-1h` (e `--period pre`)
+- [ ] `python run_swing.py --idea double7-d` (e `--period pre`)

@@ -72,3 +72,31 @@ Registo de ideias criadas pelo agente no modo ideias (ver CLAUDE.md). Cada ideia
 - **rsi2-dip-4h** (4h): RSI(2) < 10 e fecho > media de 200 velas -> long; sai acima da media de 5. Stop 3 ATR, max 30 velas.
 - **ibs-dip-d** (diario): IBS < 0.2 e fecho > media de 200 dias -> long; sai com IBS > 0.7. Stop 3 ATR, max 10 dias.
 - **down3-d** (diario): 3 fechos seguidos em queda, acima da media de 200 -> long; sai ao fechar acima do maximo anterior.
+
+## 2026-11-17 - sessao 1 (3 ideias; total de ideias do agente ate agora: 15; hoje: 3 de 8) - registadas antes de correr
+Objetivo: mais trades por ano e POUCO correlacionadas com as compras de quedas (rsi2/ibs/down3). Duas sao efeitos de
+calendario/horario documentados na literatura (nao dependem de olhar para graficos), a terceira e outra forma de comprar quedas.
+Parametros fixos, sem grelhas. Criterio oficial: run_swing.py (>= 60 trades por indice, meanR > 0 nos 3, t junto >= 3.0, CFD).
+
+### Ideia 13 - `tom-d`: efeito de viragem do mes (turn of the month)
+- Hipotese: os indices sobem mais no ultimo dia util do mes e nos 3 primeiros do mes seguinte (entradas de salarios,
+  planos de pensoes e fundos que investem no inicio do mes; Lakonishok-Smidt 1988, McConnell-Xu 2008). Nao depende de quedas.
+- Entrada: long na abertura do ultimo dia util do mes (sinal no fecho do dia anterior, calendario de dias uteis seg-sex,
+  conhecido com antecedencia; sem calendario de feriados).
+- Saida: no fecho do 3.o dia util do mes seguinte. Stop 3 ATR(14) diario, sem alvo, max 6 dias.
+- Timeframe: diario (dia CME). Long-only. ~12 trades por ano por indice.
+
+### Ideia 14 - `overnight-us-1h`: deriva da noite nos indices dos EUA
+- Hipotese: quase todo o retorno historico das acoes dos EUA acontece entre o fecho e a abertura (Cliff-Cooper-Gulen
+  "Return differences between trading and non-trading hours"; Lou-Polk-Skouras 2019 "A tug of war"). Comprar ao fecho
+  e vender a abertura captura isso. Muitas trades (~250 por ano por indice); risco: financiamento de 1 noite do CFD.
+- Entrada: long na abertura da vela de 1h das 16:00 NY (sinal no fecho da vela das 15:00).
+- Saida: no fecho da vela das 08:00 NY (09:00), antes da abertura do cash. Stop 3 ATR(14) de 1h, sem alvo, max 24 velas.
+- Timeframe: 1h, horas de Nova Iorque: so faz sentido para NQ/S&P/Dow (nao entra na carteira de outros indices).
+
+### Ideia 15 - `double7-d`: comprar o minimo de 7 dias em tendencia de alta
+- Hipotese: reversao de curto prazo em indices em tendencia (Connors "Double 7s"): um fecho no minimo de 7 dias
+  acima da media de 200 tende a recuperar. Outra forma de comprar quedas (pedido no CLAUDE.md), sinal diferente do RSI/IBS.
+- Entrada: long na abertura seguinte quando o fecho e o mais baixo dos ultimos 7 fechos e fecho > media de 200 dias.
+- Saida: quando o fecho e o mais alto dos ultimos 7 fechos. Stop 3 ATR(14), sem alvo, max 10 dias.
+- Timeframe: diario. Long-only.
