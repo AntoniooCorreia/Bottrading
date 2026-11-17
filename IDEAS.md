@@ -147,3 +147,21 @@ em 2019-2024 (< 60, nao pode passar), por isso regista-se so a versao 4h (~200 s
 - Entrada: short na abertura da vela seguinte quando RSI(2) > 90 e fecho < media de 200 velas de 4h.
 - Saida: quando o fecho fica abaixo da media de 5 velas. Stop 3 ATR(14) de 4h, sem alvo, max 30 velas.
 - Timeframe: 4h, todas as sessoes. Short-only. Parametros fixos (os mesmos do rsi2-dip-4h, espelhados).
+
+## 2026-11-17 - sessao 4 (1 ideia; total de ideias do agente ate agora: 20; hoje: 8 de 8) - registada antes de correr
+Objetivo: a carteira so compra quedas ACIMA da media de 200 dias; quando os indices estao abaixo dela fica parada
+(2020, 2022). Uma compra de quedas so ABAIXO da media de 200 da trades noutros meses (pouco correlacionadas por construcao).
+Verificacao de frequencia (contagem de sinais, sem olhar a resultados, dev 2019-2024): RSI(2) < 10 abaixo da media
+de 200 da ~28 sinais por indice (pouco); IBS < 0.2 abaixo da media de 200 da 50 (NQ), 57 (S&P), 63 (Dow).
+Regista-se a versao IBS, com os MESMOS parametros do ibs-dip-d (so muda o lado da media). Fica abaixo de 60 trades no NQ,
+por isso quase de certeza nao passa no criterio oficial; so pode entrar na carteira pela outra regra do CLAUDE.md
+(positiva nos 3 dos EUA em 2012-2018 e em 2019-2024). Se nao for, fica reprovada.
+
+### Ideia 20 - `ibs-bear-d`: comprar quedas curtas em tendencia de BAIXA
+- Hipotese: a reversao de curto prazo e mais forte quando a volatilidade e alta, porque quem da liquidez exige mais
+  premio (Nagel 2012, "Evaporating liquidity"; Avramov-Chordia-Goyal 2006). Abaixo da media de 200 a volatilidade e alta,
+  por isso um fecho perto do minimo do dia (IBS baixo) deve recuperar no(s) dia(s) seguinte(s). Risco conhecido:
+  quedas em cascata (marco 2020); o stop de 3 ATR limita.
+- Entrada: long na abertura seguinte quando IBS < 0.2 e fecho < media de 200 dias.
+- Saida: quando IBS > 0.7. Stop 3 ATR(14), sem alvo, max 10 dias.
+- Timeframe: diario. Long-only. Parametros fixos (iguais ao ibs-dip-d).
