@@ -56,6 +56,9 @@ Registadas em IDEAS.md antes de correr. Fasquia t >= 3.0. Correr dev e depois `-
 
 ## Ideias do agente (2026-11-17, sessao 2)
 Registadas em IDEAS.md antes de correr. Fasquia t >= 3.0. Correr dev e depois `--period pre` (2012-2018) como confirmacao.
-- [ ] `python run_swing.py --idea opex-week-d` (e `--period pre`)
-- [ ] `python run_swing.py --idea nr7-up-d` (e `--period pre`)
-- [ ] `python run_swing.py --idea week-rev-d` (e `--period pre`)
+- [x] `python run_swing.py --idea opex-week-d` (e `--period pre`) -> REPROVADA, t junto -0.98 (dev negativa nos 3: NQ -0.01R, S&P -0.06R, Dow -0.04R). Em 2012-2018 passava (t +3.38): o efeito parece ter desaparecido
+- [x] `python run_swing.py --idea nr7-up-d` (e `--period pre`) -> REPROVADA, t junto -0.77 (dev negativa nos 3; pre t +1.86, so NQ claramente positivo)
+- [x] `python run_swing.py --idea week-rev-d` (e `--period pre`) -> REPROVADA (t < 3), t junto +1.83 (dev NQ +0.15R, S&P +0.11R, Dow +0.04R; ~11 trades/ano por indice).
+  Positiva nos 3 dos EUA tambem em 2012-2018 (t +2.71, Dow com 57 trades) -> pode ir a carteira pela regra do CLAUDE.md
+- [x] carteira + week-rev-d (2012-2024, mesmas regras de risco): nos 10 indices piora (+5.8%/ano, pior queda -13.8%); so nos EUA
+  tambem piora (+8.9%/ano, pior queda -14.5%, 19 meses abaixo de -3%). Carteira de referencia mantem-se (+9.5%/ano)
