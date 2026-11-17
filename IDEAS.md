@@ -102,3 +102,32 @@ Parametros fixos, sem grelhas. Criterio oficial: run_swing.py (>= 60 trades por 
 - Timeframe: diario. Long-only.
 - Nota de implementacao (antes de correr): como em todas as ideias do motor, se o stop for tocado e o sinal continuar
   ligado, o motor volta a entrar na vela seguinte (overnight: na mesma noite; tom-d: dentro da mesma janela). E raro com stop de 3 ATR.
+
+## 2026-11-17 - sessao 2 (3 ideias; total de ideias do agente ate agora: 18; hoje: 6 de 8) - registadas antes de correr
+Objetivo: sinais DIFERENTES das compras de quedas por RSI/IBS (a carteira precisa de trades pouco correlacionadas).
+Uma e de calendario (opcoes), uma de volatilidade e uma de reversao semanal (horizonte diferente). Parametros fixos, sem grelhas.
+Criterio oficial: run_swing.py (>= 60 trades por indice, meanR > 0 nos 3, t junto >= 3.0, CFD). Depois `--period pre` como confirmacao.
+Nota de dados: as velas diarias tem uma vela de domingo (fim de semana, precos parados). Os sinais de semana/NR7 sao
+calculados so com velas de segunda a sexta; a vela de domingo herda a posicao de sexta.
+
+### Ideia 16 - `opex-week-d`: semana de vencimento das opcoes mensais
+- Hipotese: os indices dos EUA sobem mais na semana que acaba na 3.a sexta-feira do mes (vencimento mensal de opcoes).
+  Explicacao conhecida: os market makers, longos em opcoes, recompram a cobertura a medida que o vencimento se aproxima
+  (Stivers & Sun 2013, "Returns and option activity over the option-expiration week"). Calendario, nao depende de quedas.
+- Entrada: long na abertura do 1.o dia util da semana de vencimento (sinal no fecho do dia anterior; calendario seg-sex).
+- Saida: no fecho da 3.a sexta-feira do mes. Stop 3 ATR(14) diario, sem alvo, sem max (a janela tem 5 dias).
+- Timeframe: diario. Long-only. ~12 trades por ano por indice.
+
+### Ideia 17 - `nr7-up-d`: dia mais estreito de 7 em tendencia de alta
+- Hipotese: depois de um dia de amplitude muito pequena (o mais estreito dos ultimos 7, NR7) a volatilidade volta a subir
+  (Crabel 1990); em tendencia de alta (fecho > media de 200) a expansao tende a ser para cima. Sinal de calma, nao de queda.
+- Entrada: long na abertura seguinte quando a amplitude do dia e menor que a de cada um dos 6 dias anteriores e fecho > media de 200.
+- Saida: no fecho do 5.o dia de semana depois do sinal (um novo NR7 prolonga a janela). Stop 3 ATR(14), sem alvo.
+- Timeframe: diario. Long-only.
+
+### Ideia 18 - `week-rev-d`: reversao semanal
+- Hipotese: reversao de curto prazo ao horizonte de 1 semana (Lehmann 1990, Jegadeesh 1990): depois de uma semana em
+  queda, em tendencia de alta (fecho > media de 200), a semana seguinte tende a ser positiva. Horizonte diferente do RSI(2)/IBS (diario).
+- Entrada: no fecho de sexta, se o fecho de sexta < fecho do ultimo dia da semana anterior e fecho > media de 200,
+  long na abertura seguinte. Saida no fecho da sexta seguinte (se a condicao se repetir, mantem). Stop 3 ATR(14), sem alvo.
+- Timeframe: diario. Long-only. ~15-20 trades por ano por indice.

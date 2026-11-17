@@ -53,3 +53,9 @@ Registadas em IDEAS.md antes de correr. Fasquia t >= 3.0. Correr dev e depois `-
 - [x] `python run_swing.py --idea double7-d` (e `--period pre`) -> PASSA no dev, t junto +3.07 (NQ +0.20R, S&P +0.14R, Dow +0.04R); pre tambem PASSA (t +3.46). Holdout (uma vez): positiva nos 3 mas so 78 trades, t +1.51 (ver HOLDOUT_LOG.md)
 - [x] carteira + double7-d (2012-2024, mesmas regras de risco): nos 10 indices piora (+7.3%/ano, pior queda -16.5%: double7 e negativa em FTSE/Nikkei/ASX/HSI);
   so nos EUA (onde foi validada) fica igual (+9.4%/ano, pior queda -9.7%, pior ano -1.8%). Carteira de referencia mantem-se.
+
+## Ideias do agente (2026-11-17, sessao 2)
+Registadas em IDEAS.md antes de correr. Fasquia t >= 3.0. Correr dev e depois `--period pre` (2012-2018) como confirmacao.
+- [ ] `python run_swing.py --idea opex-week-d` (e `--period pre`)
+- [ ] `python run_swing.py --idea nr7-up-d` (e `--period pre`)
+- [ ] `python run_swing.py --idea week-rev-d` (e `--period pre`)
