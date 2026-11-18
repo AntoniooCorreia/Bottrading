@@ -26,7 +26,29 @@ RF = {2018: 1.8, 2019: 2.2, 2020: 0.4, 2021: 0.1, 2022: 1.7, 2023: 5.0, 2024: 5.
 TF = {"15m": "15min", "1h": "1h", "4h": "4h", "1d": "1d"}
 
 
+CRYPTO = {"btc": "BTCUSDT", "eth": "ETHUSDT", "sol": "SOLUSDT"}
+KRAKEN_FEE = 0.0026          # taker spot da Kraken por lado (0.26%); ida-e-volta = 0.52% do preco + 0.05% slippage
+
+
+def load_crypto(key: str, period: str | None = None) -> pd.DataFrame:
+    import os
+    from .data import PERIODS
+    df = pd.read_csv(os.path.join("data", "crypto", f"{CRYPTO[key]}_1h.csv.gz"))
+    idx = pd.DatetimeIndex(pd.to_datetime(df["ts"], unit="ms", utc=True))
+    out = df[["open", "high", "low", "close"]].astype(float).set_index(idx)
+    if period:
+        a, b = PERIODS[period]
+        a = "2017-01-01" if period == "pre" else a       # crypto: 'pre' = 2017-2018 (antes nao ha dados)
+        out = out[(out.index >= pd.Timestamp(a, tz="UTC")) & (out.index < pd.Timestamp(b, tz="UTC") + pd.Timedelta(days=1))]
+    return out
+
+
 def load_tf(key: str, tf: str, period: str | None = None) -> pd.DataFrame:
+    agg = {"open": "first", "high": "max", "low": "min", "close": "last"}
+    if key in CRYPTO:
+        h1 = load_crypto(key, period)
+        return h1 if tf == "1h" else h1.resample({"4h": "4h", "1d": "1D", "15m": "15min"}[tf], label="left",
+                                                  closed="left").agg(agg).dropna()
     m5 = load_m5(key, period)
     agg = {"open": "first", "high": "max", "low": "min", "close": "last"}
     if tf == "1d":   # dia de negociacao CME (18:00 NY -> 17:00 NY)
@@ -44,7 +66,8 @@ def atr(b: pd.DataFrame, n: int = 14) -> np.ndarray:
 
 
 def run_positions(b: pd.DataFrame, pos: pd.Series, stop_atr: float, cfd_cost: float, fut_cost: float,
-                  tp_r: float = 0.0, max_hold: int = 0, min_risk_cost: float = 4.0, return_open: bool = False):
+                  tp_r: float = 0.0, max_hold: int = 0, min_risk_cost: float = 4.0,
+                  cost_pct: float = 0.0, financing: bool = True, return_open: bool = False):
     o, h, l, c = (b[k].to_numpy() for k in ("open", "high", "low", "close"))
     want = pos.reindex(b.index).fillna(0).to_numpy()
     a = atr(b)
@@ -60,9 +83,10 @@ def run_positions(b: pd.DataFrame, pos: pd.Series, stop_atr: float, cfd_cost: fl
         nights = int(len(np.unique(nyday[cur["i"]:i + 1])) - 1)
         rf = RF.get(idx[i].year, 2.0) / 100
         rate = (rf + CFD_MARKUP) if d == 1 else (CFD_MARKUP - rf)
-        fin = nights * cur["entry"] * rate / 365 / cur["risk"]
+        fin = nights * cur["entry"] * rate / 365 / cur["risk"] if financing else 0.0
+        pc = cur["entry"] * cost_pct / cur["risk"]
         trades.append({"time": cur["t"], "exit": idx[i], "dir": d, "gross_R": g,
-                       "R": g - cfd_cost / cur["risk"] - fin, "R_fut": g - fut_cost / cur["risk"],
+                       "R": g - cfd_cost / cur["risk"] - fin - pc, "R_fut": g - fut_cost / cur["risk"] - pc,
                        "risk_pts": cur["risk"], "nights": nights, "play": "swing", "level": ""})
         cur = None
 
@@ -87,7 +111,7 @@ def run_positions(b: pd.DataFrame, pos: pd.Series, stop_atr: float, cfd_cost: fl
         if cur is None and w != 0 and np.isfinite(a[i]) and a[i] > 0:
             entry = o[i + 1]
             risk = stop_atr * a[i]
-            if risk >= min_risk_cost * cfd_cost:
+            if risk >= min_risk_cost * cfd_cost and risk >= min_risk_cost * entry * cost_pct:
                 cur = {"d": w, "entry": entry, "stop": entry - w * risk, "risk": risk,
                        "tp": entry + w * tp_r * risk, "i": i + 1, "t": idx[i + 1]}
                 # a posicao so vive a partir da vela i+1: gerida na proxima iteracao
