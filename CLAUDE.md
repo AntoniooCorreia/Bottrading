@@ -8,7 +8,7 @@ Decisao do Antonio: o laboratorio de indices foi arquivado (Supabase schema `arq
   Depois `--period pre` (2017-2018, confirmacao, tem de ser >= 0) e, se passar, UMA vez `--period holdout` (2025-2026), registado em HOLDOUT_LOG.md.
 - Catalogo cripto: K1 = k-donchian20-d + k-sma100-d + k-donchian55-4h + k-sma200-4h. Dev +52%/ano mas win rate 25%, pior ano -21%,
   holdout 2025-26 JA ABERTO: -10.9% (2025), queda -40%. Reprovado como robusto; o holdout da K1 nao pode voltar a ser usado.
-  Numeracao: estrategias cripto #K1-1, #K1-2... nao; usa #100, #101, ... (estrategias) e K2, K3, ... (carteiras), sempre com data.
+  Numeracao cripto: estrategias #100, #101, ... e carteiras K2, K3, ..., sempre com data.
 - JA TESTADO EM CRIPTO (2017-2024, nao repetir igual): rsi2-dip-d, ibs-dip-d, down3-d, double7-d, pullback20-d -> win rate 56-71% mas ~0R
   depois de custos; rsi2-dip-4h negativo (-0.1R/trade). K1 com alvo fixo: 1R -> win rate 49% e +0.10R/trade; 2R -> 35%, +0.21R; sem alvo 25%, +0.91R.
 - Conta demo: Edge Function Supabase `paper-bot` (supabase/functions/paper-bot; sinais de hora a hora, stops a cada minuto com ?mode=stops)
