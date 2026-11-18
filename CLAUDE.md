@@ -12,11 +12,11 @@ Decisao do Antonio: o laboratorio de indices foi arquivado (Supabase schema `arq
 - JA TESTADO EM CRIPTO (2017-2024, nao repetir igual): rsi2-dip-d, ibs-dip-d, down3-d, double7-d, pullback20-d -> win rate 56-71% mas ~0R
   depois de custos; rsi2-dip-4h negativo (-0.1R/trade). K1 com alvo fixo: 1R -> win rate 49% e +0.10R/trade; 2R -> 35%, +0.21R; sem alvo 25%, +0.91R.
 - Conta demo: Edge Function Supabase `paper-bot` (supabase/functions/paper-bot; sinais de hora a hora, stops a cada minuto com ?mode=stops)
-  simula a K1 com precos reais da Kraken em 10 000 EUR; pagina "Conta demo" no dashboard; avisos no Telegram. Nenhuma ordem real.
+  simula a K1 com precos reais da Kraken em 100 000 EUR (pedido do Antonio: tudo como se a conta fosse de 100k); pagina "Conta demo" no dashboard; avisos no Telegram. Nenhuma ordem real.
   So troca de estrategia na demo uma variante que tenha PASSADO dev + pre + holdout, e com o OK do Antonio.
 
 ## MISSAO NOTURNA (pedido do Antonio, 2026-11-18): AUMENTAR O WIN RATE SEM MATAR O RESULTADO
-O Antonio quer win rate alto E bom resultado. Objetivo de uma carteira cripto: win rate >= 50%, positiva em 2019-2024 e em 2017-2018,
+O Antonio quer win rate alto E bom resultado, e NAO quer anos muito negativos (prioridade: pior ano o mais perto possivel de 0, nunca abaixo de -10%). Objetivo de uma carteira cripto: win rate >= 50%, positiva em 2019-2024 e em 2017-2018,
 pior ano > -10%, pior mes > -5%, e o mais % ao ano possivel com 1% de risco por trade. Estuda, testa, analisa o porque, e volta a testar
 com variantes NOVAS registadas antes de correr. Caminhos com fundamento (escolhe e justifica no IDEAS.md):
 - saidas: alvo parcial/tempo maximo/stop movido para breakeven (mede o efeito no win rate E no R por trade; reportar os dois sempre);

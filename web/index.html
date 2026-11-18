@@ -233,7 +233,7 @@ function heat(x,max){ if(!x) return ""; const a=Math.min(1,Math.abs(x)/(max||1))
 function store(k,v){try{v===undefined?0:localStorage.setItem(k,v);return localStorage.getItem(k);}catch(e){return null;}}
 
 /* ---------- estado ---------- */
-const S={data:null,pf:store("bt_pf")||"ref",acc:+(store("bt_acc")||10000),route:"inicio",
+const S={data:null,pf:store("bt_pf")||"ref",acc:+(store("bt_acc")||100000),route:"inicio",
   cal:{y:null,m:null,mode:"mes",mk:"all",idea:"all",sel:null},
   per:{y:null,view:"semanas"},
   tr:{y:"all",m:"all",mk:"all",idea:"all",res:"all",sort:"saida",dir:-1,page:0},
@@ -258,7 +258,7 @@ function renderNav(){
 }
 function setTheme(v){ if(v) document.documentElement.setAttribute("data-theme",v); else document.documentElement.removeAttribute("data-theme"); store("bt_theme",v); if(S.data) render(); }
 function setPf(v){S.pf=v;store("bt_pf",v);S.cal.y=null;S.per.y=null;S.tr.page=0;render();}
-function setAcc(v){S.acc=Math.max(100,+v||10000);store("bt_acc",S.acc);render();}
+function setAcc(v){S.acc=Math.max(100,+v||100000);store("bt_acc",S.acc);render();}
 
 /* ---------- dados da carteira ---------- */
 function portfolios(){const d=S.data; if(!d) return []; return [d.portfolio?{id:"ref",...d.portfolio,ref:true}:null,...d.extra.map(p=>({id:p.label,...p}))].filter(Boolean);}
@@ -571,7 +571,7 @@ function vPlano(){
 const CN={btc:"Bitcoin (BTC)",eth:"Ethereum (ETH)",sol:"Solana (SOL)"};
 function vDemo(){
   const D=S.demo; if(!D||!D.acc) return `<div class="card"><div class="empty">A carregar a conta demo…</div></div>`;
-  const a=D.acc||{balance:10000,start_balance:10000}, open=D.pos.filter(p=>p.status==="open"), closed=D.pos.filter(p=>p.status==="closed");
+  const a=D.acc||{balance:100000,start_balance:100000}, open=D.pos.filter(p=>p.status==="open"), closed=D.pos.filter(p=>p.status==="closed");
   const px=D.px||{}; const unreal=open.reduce((s,p)=>s+(px[p.coin]?(+p.qty)*(px[p.coin]-(+p.entry_price)):0),0);
   const eq=(+a.balance)+unreal, ret=(eq/(+a.start_balance)-1)*100;
   const wins=closed.filter(p=>+p.pnl_eur>0).length;
@@ -594,12 +594,34 @@ function vDemo(){
     ${kpi("Abertas agora",open.length,`máximo 1 por moeda · última verificação ${last}`)}</div>
     <div class="card"><h2>Preços ao vivo</h2><p class="hint">Kraken, em euros. Atualiza de 5 em 5 segundos${D.pxAt?" · "+D.pxAt.toLocaleTimeString("pt-PT"):""}. Variação desde a abertura do dia.</p>
       <div class="kpis sm" style="margin:0">${["btc","eth","sol"].map(c=>{const o=open.find(p=>p.coin===c); return `<div class="kpi"><div class="k">${CN[c]}</div><div class="v">${px[c]?nf(px[c],2)+" €":"—"}</div><div class="s"><span class="${cls((D.chg||{})[c])}">${pc((D.chg||{})[c],2)}</span>${o?` · em posição, stop ${nf(+o.stop,2)} €`:" · sem posição"}</div></div>`;}).join("")}</div></div>
+    ${sigCard(D,open)}
     <div class="card"><h2>Como funciona</h2><div class="small" style="color:var(--text-2)">
       <p style="margin-top:0">De hora a hora (quando fecha cada vela) o bot lê os <b>preços reais da Kraken</b> (BTC, ETH, SOL em euros) e aplica as estratégias de tendência <b>K1</b>: compra quando o preço rompe máximos ou fica acima da média, e vende quando a tendência acaba ou o stop é tocado (o stop é vigiado a cada minuto). <b>Nenhuma ordem real é enviada</b>: as trades são simuladas aqui, com a comissão da Kraken (0,26% por lado).</p>
       <p style="margin-bottom:0">Risco de 1% do saldo por trade, stop a 3 ATR, no máximo 1 posição por moeda e 1/3 do saldo por moeda (sem alavancagem). Cada compra e venda chega também ao Telegram.</p></div></div>
     ${chart?`<div class="card"><h2>Evolução do saldo</h2>${chart}</div>`:""}
     <div class="card"><h2>Posições abertas</h2>${open.length?`<div class="scroll"><table class="t"><thead><tr><th>Moeda</th><th>Estratégia</th><th>Entrada</th><th class="num">Preço entrada</th><th class="num">Stop</th><th class="num">Preço atual</th><th class="num">Resultado</th><th>Estado</th></tr></thead><tbody>${open.map(row).join("")}</tbody></table></div>`:`<div class="empty">Sem posições abertas. O bot está à espera de uma tendência de subida em BTC, ETH ou SOL.</div>`}</div>
     <div class="card"><h2>Trades fechadas</h2>${closed.length?`<div class="scroll"><table class="t"><thead><tr><th>Moeda</th><th>Estratégia</th><th>Entrada</th><th class="num">Preço entrada</th><th class="num">Stop</th><th class="num">Saída</th><th class="num">Resultado</th><th>Motivo</th></tr></thead><tbody>${closed.slice().reverse().map(row).join("")}</tbody></table></div>`:`<div class="empty">Ainda nenhuma trade fechada.</div>`}</div>`;
+}
+/* distancia de cada moeda ao sinal de compra das 4 estrategias da K1 (velas fechadas da Kraken, recalculado a cada 5 min) */
+function sigCard(D,open){
+  const G=D.sig; if(!G) return "";
+  const px=D.px||{};
+  const row=(c)=>{const g=G[c]; if(!g) return ""; const p=px[c]||g.c4; const o=open.find(x=>x.coin===c);
+    const item=(lab,lvl,cur)=>{const d=(lvl/cur-1)*100; const ok=cur>lvl; return `<td class="num">${ok?`<span class="badge ok">sinal ✓</span>`:`<span class="muted">falta</span> <b>${pc(d,1)}</b>`}<div class="small muted">${nf(lvl,2)} €</div></td>`;};
+    return `<tr><td><b>${CN[c]}</b>${o?`<div class="small"><span class="badge neu">em posição</span></div>`:""}</td><td class="num">${nf(p,2)} €</td>
+      ${item("max20d",g.hi20,p)}${item("sma100d",g.sma100,p)}${item("max55",g.hi55,p)}${item("sma200",g.sma200,p)}</tr>`;};
+  return `<div class="card"><h2>Quanto falta para comprar</h2><p class="hint">Cada estratégia compra quando o preço <b>fecha</b> acima do nível (vela diária ou de 4h). "Falta +12%" = o preço tem de subir 12%. Atualiza sozinho.</p>
+    <div class="scroll"><table class="t"><thead><tr><th>Moeda</th><th class="num">Preço</th><th class="num">Máx. 20 dias<div class="small muted">k-donchian20-d</div></th><th class="num">Média 100 dias<div class="small muted">k-sma100-d</div></th><th class="num">Máx. 55 velas 4h<div class="small muted">k-donchian55-4h</div></th><th class="num">Média 200 velas 4h<div class="small muted">k-sma200-4h</div></th></tr></thead>
+    <tbody>${["btc","eth","sol"].map(row).join("")}</tbody></table></div></div>`;
+}
+async function loadSig(){
+  const pairs={btc:"XBTEUR",eth:"ETHEUR",sol:"SOLEUR"}, sig={};
+  const get=async(p,i)=>{const j=await fetch(`https://api.kraken.com/0/public/OHLC?pair=${p}&interval=${i}`,{cache:"no-store"}).then(r=>r.json()); const k=Object.keys(j.result).find(x=>x!=="last"); return j.result[k].slice(0,-1).map(r=>[+r[2],+r[3],+r[4]]);};
+  try{ for(const [c,p] of Object.entries(pairs)){ const d=await get(p,1440), h=await get(p,240);
+      const avg=a=>a.reduce((s,x)=>s+x[2],0)/a.length;
+      sig[c]={hi20:Math.max(...d.slice(-20).map(x=>x[0])),sma100:avg(d.slice(-100)),hi55:Math.max(...h.slice(-55).map(x=>x[0])),sma200:avg(h.slice(-200)),c4:h[h.length-1][2]}; }
+    S.demo={...(S.demo||{}),sig}; if(S.route==="demo"&&S.demo.acc) render();
+  }catch(e){console.error(e);}
 }
 async function loadDemo(){
   try{
@@ -656,7 +678,7 @@ function load(){
   }).catch(e=>{document.getElementById("stTxt").textContent="Erro a carregar dados: "+e;});
 }
 (function(){const t=store("bt_theme"); if(t){document.documentElement.setAttribute("data-theme",t); document.getElementById("theme").value=t;}})();
-render(); load(); loadDemo(); livePx(); setInterval(()=>{load();loadDemo();},60000); setInterval(livePx,5000);
+render(); load(); loadDemo(); livePx(); setInterval(()=>{load();loadDemo();},60000); setInterval(livePx,5000); loadSig(); setInterval(loadSig,300000);
 window.loadDemo=loadDemo;
 window.load=load;
 </script>
