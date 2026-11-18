@@ -64,9 +64,16 @@ varias trades ao mesmo tempo no mesmo indice e numeros muito inflacionados. C11-
 | C8 | 2026-11-18 | C5 so no NQ (pedido do Antonio) | +3.6% | 0/14 | -1.7% / -0.9% / -3.1% | ~0.7 | muito estavel mas longe dos 14% |
 | C9 | 2026-11-18 | C5 no **holdout 2025-26** (uma vez, decisao do Antonio) | 2025 +17.2%, 2026 +34.5% | 2/2 | -3.6% / +17.2% / -7.4% | ~4.4 | **positiva -> segue para demo** (anos de subida: cautela) |
 | C10 | 2026-11-18 | C5 sem velas de domingo (como no MT5) - ainda com o erro | +12.6% | 6/14 | -5.3% / -0.4% / -8.6% | ~3.5 | inflacionada (erro) |
-| **C11** | 2026-11-18 | **C5 corrigida** (o lugar so fica livre no dia a seguir ao fecho) | **+0.9%** | 1/14 | -5.5% / -14.7% / -22.0% | ~2.4 | **REFERENCIA ATUAL** (verdade da C5) |
+| C11 | 2026-11-18 | C5 corrigida (o lugar so fica livre no dia a seguir ao fecho) | +0.9% | 1/14 | -5.5% / -14.7% / -22.0% | ~2.4 | verdade da C5 (CFD) |
 | C12 | 2026-11-18 | C11 sem velas de domingo (= o que o bot da demo faria) | +2.2% | 1/14 | -5.5% / -9.2% / -13.6% | ~2.4 | longe dos 14% |
 | C13 | 2026-11-18 | C11 so no NQ | +2.1% | 0/14 | -1.9% / -0.9% / -4.0% | ~0.6 | estavel, pequena |
+| C14 | 2026-11-18 | C11 com custos de micro-futuros | +1.8% | 1/14 | -5.4% / -13.8% / -20.0% | ~2.4 | base futuros (10 indices) |
+| C15 | 2026-11-18 | C14 so NQ (MNQ) | +2.4% | 0/14 | -1.9% / -0.7% / -3.4% | ~0.6 | estavel, pequena |
+| C16 | 2026-11-18 | C14 + #30 double7-d (refaz C3) | +2.2% | 1/14 | -6.0% / -9.4% / -19.6% | ~2.3 | pouco melhor, mais instavel |
+| C17 | 2026-11-18 | C14 + #33 week-rev-d (refaz C4) | +2.2% | 1/14 | -5.7% / -10.6% / -18.6% | ~2.3 | pouco melhor |
+| C18 | 2026-11-18 | C14 + #37 keyrev-d (refaz C6) | +1.9% | 1/14 | -5.5% / -11.4% / -19.2% | ~2.5 | igual |
+| C19 | 2026-11-18 | C14 + #38 pullback20-d (refaz C7) | +1.3% | 0/14 | -5.7% / -11.1% / -20.0% | ~2.2 | piora |
+| **C20** | 2026-11-18 | **so NQ (MNQ): rsi2-dip-d + ibs-dip-d + down3-d + ibs-bear-d + double7-d, futuros** | **+2.6%** | 0/14 | -1.7% / -1.5% / -3.0% | ~0.6 | **REFERENCIA ATUAL** (stops diarios: 1 MNQ precisa de ~120 mil USD para 1%) |
 
 Leitura honesta (10 linhas):
 1. 39 testes de estrategias (#1-#39); so 1 passou no criterio oficial (#30 double7-d). Ideias do agente: 24 (quanto mais, mais desconfianca num resultado isolado).
@@ -78,4 +85,4 @@ Leitura honesta (10 linhas):
 7. As comparacoes "carteira + ideia X piora/melhora" (C3, C4, C6, C7) foram feitas com o erro: tem de ser refeitas.
 8. Leitura: com 1 trade por indice e 3 no total, as compras de quedas dao ~1-2%/ano. O objetivo de 14%/ano esta muito longe.
 9. O bot da demo (live/c5_live.py) existe e foi verificado: toma as mesmas decisoes que o backtest corrigido, dia a dia (tests/test_live.py).
-10. Proximo passo: decisao do Antonio (ver conversa de 2026-11-18). Calendario, NR7, vender, reversoes, maximos calmos (#28, #31, #32, #34, #36, #37, #39): ~0R.
+10. Futuros (C14-C20): melhor e so NQ com 5 compras de quedas (C20): +2.6%/ano, pior queda -3%, mas stops diarios grandes. Proximo: ideias 1h/4h com stops que caibam em 1 MNQ.

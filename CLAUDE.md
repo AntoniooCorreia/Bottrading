@@ -23,10 +23,10 @@ rsi2-dip-d, da ~1.2R/ano no NQ): o caminho e juntar VARIAS estrategias validadas
 (mais trades por ano com a mesma vantagem: 4h/1h, outras formas de comprar quedas, outros sinais). O Antonio aceitou operar
 outros indices (DAX, FTSE, Nikkei, Euro Stoxx, CAC, ASX, Hang Seng) desde que o objetivo seja atingido sempre ou
 quase sempre. Uma ideia so entra na carteira se tiver passado no criterio oficial OU se for positiva nos 3 indices
-dos EUA em 2012-2018 e em 2019-2024. Carteira de referencia atual (C11, 2026-11-18): rsi2-dip-d + ibs-dip-d + down3-d + ibs-bear-d nos 10 indices com REGRAS DE RISCO
-OBRIGATORIAS (portfolio.py --max-open 3 --region-cap 1 --month-stop 3): no maximo 3 trades abertas, 1 por indice,
-1 por regiao (EUA/Europa/Asia), e no mes em que as trades fechadas perderem 3% nao se abre mais nenhuma ate ao mes
-seguinte. Resultado 2012-2025: +0.9%/ano, 1/14 anos >= 14%, pior mes -5.5%, pior ano -14.7%, pior queda -22.0%, ~126 trades/ano.
+dos EUA em 2012-2018 e em 2019-2024. Carteira de referencia atual (C20, 2026-11-18, futuros): so NQ (MNQ) com rsi2-dip-d + ibs-dip-d + down3-d + ibs-bear-d + double7-d,
+regras de risco OBRIGATORIAS (portfolio.py --max-open 3 --region-cap 1 --month-stop 3 --custos fut): no maximo 3 trades abertas,
+1 por indice, 1 por regiao, paragem mensal a -3%. Resultado 2012-2025: +2.6%/ano, 0/14 anos >= 14%, pior mes -1.7%,
+pior ano -1.5%, pior queda -3.0%, ~31 trades/ano. Com 10 indices e futuros (C14) da +1.8%/ano com pior queda -20%.
 ERRO CORRIGIDO a 2026-11-18: C1-C10 (incluindo os +12.5%/ano da C5 e o holdout C9) contavam trades sobrepostas no mesmo
 indice no mesmo dia; os numeros antigos estao inflacionados e as comparacoes "carteira + ideia" tem de ser refeitas.
 Bot da conta demo: live/c5_live.py (corre no PC do Antonio); tests/test_live.py obriga-o a decidir igual ao backtest.

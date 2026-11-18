@@ -116,11 +116,11 @@ Leitura combinada antes de ver: positiva no total e sem pior mes abaixo de -6% -
 ## Futuros e carteiras corrigidas (decisao do Antonio, 2026-11-18) - correr por ordem, mesmas regras de risco
 Base: C11 (C5 corrigida). Agora com custos de micro-futuros. Uma carteira so substitui a referencia se tiver mais % ao ano
 (compara sempre pior mes e pior ano). Ideias que mudam a carteira: so as ja aprovadas pela regra 2012-2018 + 2019-2024.
-- [ ] C14: `python portfolio.py --ideas rsi2-dip-d,ibs-dip-d,down3-d,ibs-bear-d --period tudo --max-open 3 --region-cap 1 --month-stop 3 --custos fut --label C14`
-- [ ] C15: o mesmo que C14 com `--markets nq --label C15` (so MNQ)
-- [ ] C16: C14 + double7-d (refaz C3 sem o erro) `--label C16`
-- [ ] C17: C14 + week-rev-d (refaz C4) `--label C17`
-- [ ] C18: C14 + keyrev-d (refaz C6) `--label C18`
-- [ ] C19: C14 + pullback20-d (refaz C7) `--label C19`
-- [ ] C20: so NQ com rsi2-dip-d + ibs-dip-d + down3-d + ibs-bear-d + double7-d, `--markets nq --custos fut --label C20`
+- [x] C14: `python portfolio.py --ideas rsi2-dip-d,ibs-dip-d,down3-d,ibs-bear-d --period tudo --max-open 3 --region-cap 1 --month-stop 3 --custos fut --label C14` -> +1.8%/ano, 1/14 anos >= 14%, pior mes -5.4%, pior ano -13.8%, pior queda -20.0%, 126 trades/ano
+- [x] C15: o mesmo que C14 com `--markets nq --label C15` (so MNQ) -> +2.4%/ano, pior mes -1.9%, pior ano -0.7%, pior queda -3.4%, 31 trades/ano
+- [x] C16: C14 + double7-d (refaz C3 sem o erro) `--label C16` -> +2.2%/ano, pior mes -6.0%, pior ano -9.4%, pior queda -19.6% (melhora C14 pouco, piora pior mes)
+- [x] C17: C14 + week-rev-d (refaz C4) `--label C17` -> +2.2%/ano, pior mes -5.7%, pior ano -10.6%, pior queda -18.6%
+- [x] C18: C14 + keyrev-d (refaz C6) `--label C18` -> +1.9%/ano, pior mes -5.5%, pior ano -11.4%, pior queda -19.2%
+- [x] C19: C14 + pullback20-d (refaz C7) `--label C19` -> +1.3%/ano, pior queda -20.0% (piora)
+- [x] C20: so NQ com rsi2-dip-d + ibs-dip-d + down3-d + ibs-bear-d + double7-d, `--markets nq --custos fut --label C20` -> +2.6%/ano, pior mes -1.7%, pior ano -1.5%, pior queda -3.0%, 31 trades/ano -> NOVA REFERENCIA (melhor % e muito mais estavel)
 Depois: modo ideias com o FOCO ATUAL (1h/4h, stops que caibam em MNQ).
