@@ -224,3 +224,25 @@ pela outra regra do CLAUDE.md (positiva nos 3 dos EUA em 2012-2018 e em 2019-202
   sem alvo, maximo 20 dias.
 - Timeframe: diario. Long-only. Parametros fixos (stop igual as outras ideias diarias; 10 e 20 dias sao os valores
   classicos, nao afinados).
+
+## 2026-11-18 - sessao 4 (1 ideia; total de ideias do agente ate agora: 24; hoje: 4 de 8) - registada antes de correr
+Objetivo: todas as compras da carteira entram em QUEDAS; nas subidas calmas a carteira fica parada. Esta ideia entra
+precisamente nesses dias (novo maximo de 10 dias com volatilidade baixa), por isso a sobreposicao e quase nula.
+So 1 ideia: a outra que pensei (comprar depois de um dia de choque, amplitude > 2x ATR a fechar em queda) da 51-93
+sinais mas 70-80% coincidem com dias em que a carteira ja esta comprada; nao acrescenta nada.
+Verificacao de frequencia e sobreposicao (contagem de sinais, sem olhar a resultados, dev 2019-2024): 86 (NQ), 105 (S&P),
+88 (Dow); so 2-3% dos sinais caem em dias em que rsi2-dip-d/ibs-dip-d/down3-d/ibs-bear-d estao em posicao.
+Diferente do donchian20-d (reprovado): so long, so em tendencia de alta (media de 200) e volatilidade baixa, saida por tempo.
+
+### Ideia 24 - `calmhigh-d`: comprar um novo maximo de 10 dias numa subida calma
+- Hipotese: momentum de serie temporal (Moskowitz, Ooi & Pedersen 2012) e retornos geridos pela volatilidade (Moreira &
+  Muir 2017: com volatilidade baixa o retorno por unidade de risco dos indices e maior). Um maximo novo numa subida calma
+  vem de compra continua (fundos, recompras), nao de um pico de fecho de shorts, e tende a continuar alguns dias.
+- Expectativa honesta: baixa. Nos indices o curto prazo costuma reverter (por isso as compras de quedas funcionam);
+  donchian20-d deu ~0R.
+- Entrada: no fecho do dia d (dia CME, so seg-sex), se fecho(d) > maior fecho dos 10 dias anteriores e fecho(d-1) nao o era
+  (primeiro dia do maximo novo), fecho(d) > media de 200 dias, e media do true range de 5 dias < media do true range de 50
+  dias -> long na abertura seguinte.
+- Saida: no fecho do 5.o dia de semana depois do sinal (um novo sinal prolonga a janela). Stop 3 ATR(14) diario, sem alvo.
+- Timeframe: diario. Long-only. Parametros fixos (10 dias e 5 dias iguais as ideias anteriores; 5/50 sao a medida curta/longa
+  de volatilidade mais comum; stop igual as outras ideias diarias).

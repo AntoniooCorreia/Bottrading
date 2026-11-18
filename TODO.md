@@ -94,3 +94,7 @@ Registada em IDEAS.md antes de correr. Fasquia t >= 3.0. Correr dev e depois `--
 - [x] carteira + pullback20-d (mesmas regras de risco, 10 indices): PIORA -> +9.6%/ano (era +12.5%), 5/14 anos >= 14% (era 6), pior queda -11.4% (era -9.1%),
   pior mes -5.8% (era -5.5%), pior ano -5.0% (era -4.5%), 19 meses abaixo de -3% (era 12). Trades de semanas ocupam os lugares das compras de quedas
   (161 trades/ano, era 183) e e negativa fora dos EUA (FTSE, CAC, HSI, Euro Stoxx). Carteira de referencia mantem-se
+
+## Ideias do agente (2026-11-18, sessao 4)
+Registada em IDEAS.md antes de correr. Fasquia t >= 3.0. Correr dev e depois `--period pre` (2012-2018) como confirmacao.
+- [ ] `python run_swing.py --idea calmhigh-d` (e `--period pre`)
