@@ -153,7 +153,9 @@ Registada em IDEAS.md antes de correr. Fasquia t >= 3.0 (custos de futuros). Cor
 
 ## Ideias do agente (2026-11-18, sessao 8)
 Registada em IDEAS.md antes de correr. Fasquia t >= 3.0 (custos de futuros). Correr dev e depois `--period pre` (2012-2018) como confirmacao.
-- [ ] #43: `python run_swing.py --idea rsi2-cash-1h` (e `--period pre`)
-- [ ] C23 (so se #43 for positiva nos 3 dos EUA em 2019-2024 e em 2012-2018): C22 com rsi2-cash-1h NO LUGAR do rsi2-dip-d, so NQ, futuros:
+- [x] #43: `python run_swing.py --idea rsi2-cash-1h` (e `--period pre`) -> REPROVADA (fut t junto +0.92; NQ +0.325R/109 trades,
+  S&P -0.024R/136, Dow +0.021R/144; CFD t +0.63). 2012-2018 (fut): t +2.98 (NQ +0.303R/127, S&P +0.198R/124, Dow +0.279R/99).
+  S&P negativo em 2019-24 -> nao cumpre a regra dos 3 indices nos 2 periodos. NQ forte nos dois periodos (+0.3R/trade), mas so no NQ = detetor de sorte falha
+- [x] C23 NAO CORRIDA: a condicao registada falhou (#43 negativa no S&P em 2019-24). Era: (so se #43 for positiva nos 3 dos EUA em 2019-2024 e em 2012-2018): C22 com rsi2-cash-1h NO LUGAR do rsi2-dip-d, so NQ, futuros:
   `python portfolio.py --ideas rsi2-cash-1h,ibs-cash-1h,down3-d,ibs-bear-d,double7-d --markets nq --custos fut --period tudo --max-open 3 --region-cap 1 --month-stop 3 --label C23`
   (So substitui a referencia C20 se for MELHOR: mais %/ano sem piorar muito pior mes/pior queda)

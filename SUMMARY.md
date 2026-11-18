@@ -48,6 +48,7 @@ Catalogo: cada teste tem um numero fixo. Estrategias #1, #2, ...; carteiras C1, 
 | #40 | 2026-11-18 | `fomc-holiday-1h` (1h: antes do FOMC + vespera de feriado) | +3.81 (fut) / +3.45 (CFD) | +0.85 | **PASSA no dev**; 2012-18 ~0 e holdout t +0.29: provavel sorte do periodo |
 | #41 | 2026-11-18 | `flush-1h` (1h: comprar vela de queda violenta a meio da sessao) | +0.15 (fut) | -2.95 | REPROVADA |
 | #42 | 2026-11-18 | `ibs-cash-1h` (IBS da sessao cash, compra ao fecho das 16:00, stop de 1h) | +2.80 (fut) / +2.24 (CFD) | +1.86 | REPROVADA no oficial (t < 3); positiva nos 3 nos 2 periodos (fut); NQ +0.16R por trade |
+| #43 | 2026-11-18 | `rsi2-cash-1h` (RSI(2) de Connors nos fechos das 16:00, stop de 1h) | +0.92 (fut) / +0.63 (CFD) | +2.98 | REPROVADA (S&P negativo no dev); NQ +0.3R por trade nos 2 periodos |
 
 ## Carteiras (C) - 1% por trade, % da conta por ano (2012-2025)
 
@@ -81,13 +82,13 @@ varias trades ao mesmo tempo no mesmo indice e numeros muito inflacionados. C11-
 | C22 | 2026-11-18 | C20 com #42 ibs-cash-1h no lugar do ibs-dip-d (so NQ, futuros) | +5.8% | 4/14 | -4.5% / -5.7% / -12.8% | ~0.8 | mais %/ano e 4 anos >= 14%, mas muito menos estavel (6 anos negativos). Nao virou referencia: decide o Antonio |
 
 Leitura honesta (10 linhas):
-1. 42 testes de estrategias (#1-#42); passaram no criterio oficial 2 (#30 double7-d, #40 fomc-holiday-1h). Ideias do agente: 27 (quanto mais, mais desconfianca num resultado isolado).
+1. 43 testes de estrategias (#1-#43); passaram no criterio oficial 2 (#30 double7-d, #40 fomc-holiday-1h). Ideias do agente: 28 (quanto mais, mais desconfianca num resultado isolado).
 2. #1-#21 (suporte/resistencia, intraday 1m/5m, setup do Antonio): todos negativos ou ~0R depois de custos.
 3. As compras de quedas no diario (#23, #26, #27, #35) tem uma vantagem pequena por trade (+0.05 a +0.2R), positiva em quase todos os indices.
 4. ERRO corrigido a 2026-11-18: C1-C10 contavam trades sobrepostas (C5 +12.5%/ano era na verdade +0.9%, C11). O holdout C9 nao serve de prova.
-5. Referencia continua C20 (so NQ, futuros): +2.6%/ano, pior mes -1.7%, pior queda -3.0%. Muito estavel, muito pequena.
+5. Referencia continua C20 (so NQ, futuros; reconfirmada no fim da sessao 8): +2.6%/ano, 0/14 anos >= 14%, pior mes -1.7%, pior ano -1.5%, pior queda -3.0%. Faltam ~11.4%/ano.
 6. #40 fomc-holiday-1h: forte em 2019-24, ~0 em 2012-18 e no holdout -> provavel sorte do periodo (C21 +5.6%/ano, fragil).
-7. #41 flush-1h: comprar uma hora de venda violenta nao funciona (dev ~0, 2012-18 negativo). Em 1h as quedas nao revertem sozinhas.
-8. #42 ibs-cash-1h: o mesmo efeito do ibs-dip-d mas medido na sessao cash e comprado as 16:00: NQ +0.16R/trade nos dois periodos, t 2.8 (abaixo de 3.0).
-9. C22 (C20 com #42 no lugar do ibs-dip-d): +5.8%/ano e 4/14 anos >= 14%, mas pior queda -12.8% e 6 anos negativos. Faltam ~8%/ano para os 14%.
-10. Proximo: decisao do Antonio entre C20 (estavel), C21 e C22 (mais %/ano, menos estaveis); limite da noite: 7 de 8 ideias usadas.
+7. #42 ibs-cash-1h: IBS medido na sessao cash e comprado as 16:00 com stop de 1h: NQ +0.16R/trade nos dois periodos, t 2.8 (abaixo de 3.0). C22 +5.8%/ano mas pior queda -12.8%.
+8. #43 rsi2-cash-1h: o mesmo para o RSI(2): NQ +0.3R/trade nos dois periodos (stop cabe em 1 MNQ com ~36 mil USD), mas S&P e Dow ~0 em 2019-24 -> reprovada; o NQ sozinho nao prova nada.
+9. Padrao: comprar quedas mede-se melhor nos fechos das 16:00 no NQ; nos outros indices a vantagem e fraca ou instavel. Pode ser sorte do NQ (subida forte desde 2012).
+10. Proximo: decisao do Antonio entre C20 (estavel), C21 e C22 (mais %/ano, menos estaveis). Limite da noite atingido (8 de 8 ideias).
