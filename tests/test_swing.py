@@ -7,7 +7,7 @@ from sr.swing_ideas import IDEAS
 
 
 # Ideias de calendario com datas fixas (ex.: FOMC desde 2012) precisam de velas sinteticas nesses anos e mais longas
-CAL = {"fomc-holiday-1h": ("2019-01-02", 12000), "flush-1h": ("2000-01-03", 40000)}
+CAL = {"fomc-holiday-1h": ("2019-01-02", 12000), "flush-1h": ("2000-01-03", 40000), "ibs-cash-1h": ("2000-01-03", 30000)}
 
 
 def synth_d(n=3000, seed=0, tf="1d", start="2000-01-03"):
@@ -109,3 +109,12 @@ def test_flush_window_and_hours():
     assert set(starts.hour) <= {10, 11, 12, 13, 14}
     runs = (p != p.shift()).cumsum()[p == 1]
     assert runs.value_counts().min() >= 6
+
+
+def test_ibs_cash_enters_at_1500_bar():
+    from sr.swing_ideas import ibs_cash_1h
+    b = synth_d(n=30000, seed=4, tf="1h")
+    p = ibs_cash_1h(b)
+    starts = p.index[(p == 1) & (p.shift(1, fill_value=0) == 0)]
+    assert len(starts) > 20
+    assert set(starts.hour) == {15}

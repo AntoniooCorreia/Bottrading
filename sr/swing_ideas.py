@@ -316,6 +316,35 @@ def flush_1h(b: pd.DataFrame) -> pd.Series:
     return pd.Series(on, index=b.index)
 
 
+def ibs_cash_1h(b: pd.DataFrame) -> pd.Series:
+    """1h, horas de Nova Iorque. IBS da sessao cash (velas das 09:00 as 15:00 NY, ~09:00-16:00), medido no fecho da
+    vela das 15:00 (= 16:00). Long quando IBS < 0.2 e o fecho das 16:00 esta acima da media dos ultimos 200 fechos das
+    16:00; sai no fecho das 16:00 de um dia com IBS > 0.7 ou ao fim de 115 velas (~5 dias). Stop 3 ATR de 1h (motor)."""
+    ny = b.index.tz_convert("America/New_York") if b.index.tz is not None else b.index
+    h = np.asarray(ny.hour)
+    day = np.asarray(ny.normalize().asi8)
+    cash = (h >= 9) & (h <= 15)
+    hi = b["high"].where(cash).groupby(day).cummax()
+    lo = b["low"].where(cash).groupby(day).cummin()
+    ibs = ((b["close"] - lo) / (hi - lo).replace(0, np.nan)).to_numpy()
+    last = h == 15
+    c16 = b["close"][last]
+    sma = pd.Series(np.nan, index=b.index)
+    sma[last] = c16.rolling(200).mean().to_numpy()
+    sma = sma.to_numpy()
+    c = b["close"].to_numpy()
+    pos, cur, held = np.zeros(len(b), dtype=int), 0, 0
+    for i in range(len(b)):
+        if cur == 1:
+            held += 1
+            if (last[i] and ibs[i] > 0.7) or held >= 115:
+                cur = 0
+        elif last[i] and ibs[i] < 0.2 and c[i] > sma[i]:
+            cur, held = 1, 0
+        pos[i] = cur
+    return pd.Series(pos, index=b.index)
+
+
 IDEAS = {
     "trend-sma100-d": (trend_sma100, "1d", 3.0, 0.0, 0),
     "rsi2-dip-d": (rsi2_dip, "1d", 3.0, 0.0, 10),
@@ -337,4 +366,5 @@ IDEAS = {
     "calmhigh-d": (calmhigh_d, "1d", 3.0, 0.0, 0),
     "fomc-holiday-1h": (fomc_holiday_1h, "1h", 3.0, 0.0, 0),
     "flush-1h": (flush_1h, "1h", 3.0, 0.0, 0),
+    "ibs-cash-1h": (ibs_cash_1h, "1h", 3.0, 0.0, 0),
 }
