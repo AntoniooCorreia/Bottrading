@@ -296,3 +296,24 @@ indice isso tira algumas trades a uma das duas).
 - Saida: no fecho da 6.a vela de 1h depois do sinal (um novo sinal prolonga a janela). Stop 3 ATR(14) de 1h, sem alvo.
 - Timeframe: 1h. Long-only. Parametros fixos (2x ATR = vela anormal; 0.25 = quarto inferior, como o IBS < 0.2-0.25
   classico; 6 horas = resto da sessao e inicio da noite; stop igual as outras ideias de 1h).
+
+## 2026-11-18 - sessao 7 (1 ideia; total de ideias do agente ate agora: 27; hoje: 7 de 8) - registada antes de correr
+Objetivo (FOCO ATUAL): stops que caibam em 1 MNQ a 1% sem perder a unica vantagem que temos (comprar quedas no diario).
+O IBS classico (Pagonidis 2014; estudos em SPY/QQQ) e medido na sessao CASH (09:30-16:00) e a compra e feita ao fecho
+das 16:00. O nosso ibs-dip-d (#26) usa o dia CME (18:00-17:00, inclui a noite) e entra as 18:00 com stop de 3 ATR diarios
+(1 MNQ precisa de ~120 mil USD). Aqui: o mesmo efeito, medido como na literatura, com stop de 1h.
+Verificacao de frequencia (contagem de dias de sinal, sem olhar a resultados): dev 2019-2024: 197 (NQ), 191 (S&P),
+183 (Dow); 2012-2018: 200, 204, 142. Stop mediano no NQ (dev) ~139 pontos = ~280 USD por MNQ.
+Sobreposicao: alta com ibs-dip-d (mesmo efeito); se passar, entra NO LUGAR do ibs-dip-d no NQ, nao em cima dele.
+
+### Ideia 27 - `ibs-cash-1h`: IBS da sessao cash, comprar ao fecho das 16:00, stop de 1h
+- Hipotese: reversao de curto prazo nos indices (fecho perto do minimo do dia -> subida nos dias seguintes), documentada
+  na sessao cash; ao medir na sessao cash e entrar ao fecho, o sinal fica mais limpo e o stop de 1h cabe em 1 MNQ.
+- Expectativa honesta: media. O efeito diario e real mas pequeno (+0.05 a +0.2R); com stop mais curto (3 ATR de 1h, ~1/2
+  do ATR diario) as noites com gap podem tocar o stop mais vezes e comer a vantagem.
+- Entrada: no fecho da vela de 1h das 15:00 NY (= 16:00), se IBS da sessao de hoje < 0.2 e fecho > media dos ultimos 200
+  fechos das 16:00. Sessao = velas de 1h das 09:00 as 15:00 NY (09:00-16:00; a vela das 09:00 inclui 30 min de
+  pre-abertura, aproximacao). Long na abertura da vela das 16:00.
+- Saida: no fecho da vela das 15:00 (16:00) de um dia com IBS > 0.7; ou ao fim de 115 velas de 1h (~5 dias). Stop 3 ATR(14)
+  de 1h na vela de sinal, sem alvo.
+- Timeframe: 1h. Long-only. Parametros fixos (0.2 / 0.7 / media 200 iguais ao ibs-dip-d; stop igual as outras ideias de 1h).
