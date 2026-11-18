@@ -165,3 +165,20 @@ por isso quase de certeza nao passa no criterio oficial; so pode entrar na carte
 - Entrada: long na abertura seguinte quando IBS < 0.2 e fecho < media de 200 dias.
 - Saida: quando IBS > 0.7. Stop 3 ATR(14), sem alvo, max 10 dias.
 - Timeframe: diario. Long-only. Parametros fixos (iguais ao ibs-dip-d).
+
+## 2026-11-18 - sessao 1 (1 ideia; total de ideias do agente ate agora: 21; hoje: 1 de 8) - registada antes de correr
+Objetivo: mais trades por semana com um mecanismo diferente das compras de quedas por IBS/RSI (horizonte de 1 dia,
+ancorado no dia da semana). So 1 ideia nesta sessao: as outras que pensei (IBS/RSI em 4h, quedas grandes, dias antes
+de feriados) ou repetem o que ja deu ~0R ou tem trades a menos; nao vale a pena gastar o limite.
+Verificacao de frequencia (contagem de sinais, sem olhar a resultados, dev 2019-2024): segunda-feira a fechar abaixo
+de sexta da ~115 (NQ), 120 (S&P), 131 (Dow) sinais; com filtro de media de 200 so 67-85. Regista-se SEM filtro de
+tendencia (mais trades e e nas fases de volatilidade alta que a reversao e mais forte, Nagel 2012).
+
+### Ideia 21 - `turnaround-tue-d`: comprar a terca depois de uma segunda em queda
+- Hipotese: efeito de segunda-feira / "turnaround Tuesday" (French 1980; Abraham & Ikenberry 1994: a segunda tende a
+  ser fraca e, quando cai, a terca recupera; vendas de pequenos investidores a segunda, depois revertidas).
+  Horizonte de 1 dia, ancorado no calendario: deve dar trades em semanas diferentes das do IBS/RSI(2).
+- Expectativa honesta: baixa a media. Efeitos de calendario ja testados (tom-d, opex-week-d) deram ~0R em 2019-2024.
+- Entrada: no fecho de segunda (dia CME, seg-sex), se fecho de segunda < fecho de sexta -> long na abertura seguinte.
+- Saida: no fecho de terca (posicao so durante 1 dia). Stop 3 ATR(14) diario, sem alvo.
+- Timeframe: diario. Long-only. Sem filtro de tendencia. Parametros fixos (stop igual as outras ideias diarias).

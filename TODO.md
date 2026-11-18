@@ -74,3 +74,7 @@ Registada em IDEAS.md antes de correr. Fasquia t >= 3.0. Correr dev e depois `--
 - [x] carteira + ibs-bear-d (2012-2025, mesmas regras de risco, 10 indices): MELHORA -> +12.5%/ano (era +9.5%), 6/14 anos >= 14% (era 5),
   pior queda -9.1% (era -10.7%), meses positivos 108/148 (era 102); piora pior mes -5.5% (era -5.1%) e pior ano -4.5% (era -2.5%, 2018).
   Positiva em todos os 10 indices. Ganho vem de 2020 (+7.9 -> +18.7%) e 2022 (-2.5 -> +10.4%). Nova carteira de referencia
+
+## Ideias do agente (2026-11-18)
+Registada em IDEAS.md antes de correr. Fasquia t >= 3.0. Correr dev e depois `--period pre` (2012-2018) como confirmacao.
+- [ ] `python run_swing.py --idea turnaround-tue-d` (e `--period pre`)
