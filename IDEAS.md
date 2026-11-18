@@ -202,3 +202,25 @@ em 2012-2018 e em 2019-2024) e se melhorar a carteira. Se nao, fica reprovada.
   -> long na abertura seguinte.
 - Saida: no fecho do 5.o dia de semana depois do sinal (um novo sinal prolonga a janela). Stop 3 ATR(14) diario, sem alvo.
 - Timeframe: diario. Long-only. Sem filtro de tendencia. Parametros fixos (stop igual as outras ideias diarias).
+
+## 2026-11-18 - sessao 3 (1 ideia; total de ideias do agente ate agora: 23; hoje: 3 de 8) - registada antes de correr
+Objetivo: a carteira compra quedas de 1-3 dias (RSI(2), IBS, down3). Nos anos de subida forte e calma (2017, 2021, 2023-24)
+essas quedas curtas quase nao aparecem. Esta ideia compra recuos de 1-3 SEMANAS dentro de uma tendencia forte (horizonte mais
+longo, outro momento de entrada). So 1 ideia: as outras que pensei (vender subidas em baixa no diario, dias antes de feriados,
+fim de mes por rebalanceamento de fundos) ou repetem algo que deu negativo ou tem trades a menos.
+Verificacao de frequencia (contagem de sinais, sem olhar a resultados, dev 2019-2024): fecho a cruzar abaixo da media de 20
+com medias alinhadas da 46 (NQ), 45 (S&P), 48 (Dow); a versao com a media de 50 da 37-40. Regista-se a versao da media de 20
+(mais trades). Fica abaixo de 60 trades, por isso quase de certeza nao passa no criterio oficial; so pode entrar na carteira
+pela outra regra do CLAUDE.md (positiva nos 3 dos EUA em 2012-2018 e em 2019-2024) e se melhorar a carteira. Se nao, reprovada.
+
+### Ideia 23 - `pullback20-d`: comprar o recuo a media de 20 dias numa tendencia forte
+- Hipotese: momentum de serie temporal (Moskowitz, Ooi & Pedersen 2012): tendencias fortes tendem a continuar; um recuo
+  ate a media de 20 dias com as medias alinhadas (20 > 50 > 200) e uma pausa (realizacao de lucros), nao uma inversao.
+  Comprar o recuo da melhor relacao risco/retorno do que comprar a rutura (donchian20-d deu ~0R).
+- Expectativa honesta: baixa a media. Seguir tendencias com CFDs deu Sharpe ~0 (historico); aqui so long e trades curtas.
+- Entrada: no fecho do dia d (dia CME, so seg-sex), se fecho(d) < media20(d) e fecho(d-1) >= media20(d-1) e
+  media20 > media50 > media200 -> long na abertura seguinte.
+- Saida: no primeiro fecho acima do maior fecho dos 10 dias anteriores (a tendencia retomou). Stop 3 ATR(14) diario,
+  sem alvo, maximo 20 dias.
+- Timeframe: diario. Long-only. Parametros fixos (stop igual as outras ideias diarias; 10 e 20 dias sao os valores
+  classicos, nao afinados).
