@@ -77,4 +77,5 @@ Registada em IDEAS.md antes de correr. Fasquia t >= 3.0. Correr dev e depois `--
 
 ## Ideias do agente (2026-11-18)
 Registada em IDEAS.md antes de correr. Fasquia t >= 3.0. Correr dev e depois `--period pre` (2012-2018) como confirmacao.
-- [ ] `python run_swing.py --idea turnaround-tue-d` (e `--period pre`)
+- [x] `python run_swing.py --idea turnaround-tue-d` (e `--period pre`) -> REPROVADA, t junto +0.21 (dev NQ -0.002R, S&P +0.023R, Dow -0.010R;
+  pre positiva nos 3 mas minuscula, t +0.92). ~0R: o efeito de segunda/terca nao existe depois de custos. Nao entra na carteira

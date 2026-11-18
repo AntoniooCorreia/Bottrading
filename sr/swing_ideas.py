@@ -191,6 +191,16 @@ def ibs_bear_d(b: pd.DataFrame) -> pd.Series:
     return _enter_exit((ibs < 0.2) & (b["close"] < sma200), ibs > 0.7)
 
 
+def turnaround_tue_d(b: pd.DataFrame) -> pd.Series:
+    """Diario. 'Turnaround Tuesday': no fecho de segunda (dia CME), se o fecho < fecho do dia de semana anterior
+    (sexta) -> long durante a terca (entra na abertura seguinte, sai no fecho de terca). Sem filtro de tendencia."""
+    w = _weekdays(b)
+    c = w["close"]
+    mon = pd.Series(_naive(w.index).dayofweek == 0, index=c.index)
+    sig = (mon & (c < c.shift(1))).astype(int)
+    return sig.reindex(b.index).fillna(0).astype(int)
+
+
 IDEAS = {
     "trend-sma100-d": (trend_sma100, "1d", 3.0, 0.0, 0),
     "rsi2-dip-d": (rsi2_dip, "1d", 3.0, 0.0, 10),
@@ -206,4 +216,5 @@ IDEAS = {
     "week-rev-d": (week_rev_d, "1d", 3.0, 0.0, 0),
     "rsi2-pop-short-4h": (rsi2_pop_short_4h, "4h", 3.0, 0.0, 30),
     "ibs-bear-d": (ibs_bear_d, "1d", 3.0, 0.0, 10),
+    "turnaround-tue-d": (turnaround_tue_d, "1d", 3.0, 0.0, 0),
 }
