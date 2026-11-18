@@ -145,6 +145,8 @@ Registada em IDEAS.md antes de correr. Fasquia t >= 3.0 (custos de futuros). Cor
 - [x] #42: `python run_swing.py --idea ibs-cash-1h` (e `--period pre`) -> REPROVADA no oficial (fut t junto +2.80 < 3.0; NQ +0.164R/263 trades,
   S&P +0.145R/261, Dow +0.081R/265; CFD t +2.24). 2012-2018 (fut): t +1.86 (NQ +0.221R/275, S&P +0.045R/310, Dow +0.010R/206).
   Positiva nos 3 dos EUA nos 2 periodos (futuros; em CFD o Dow 2012-18 da -0.009R) -> pode entrar na carteira pela regra
-- [ ] C22: C20 com ibs-cash-1h NO LUGAR do ibs-dip-d (como registado em IDEAS.md), so NQ, futuros:
+- [x] C22: C20 com ibs-cash-1h NO LUGAR do ibs-dip-d (como registado em IDEAS.md), so NQ, futuros:
   `python portfolio.py --ideas rsi2-dip-d,ibs-cash-1h,down3-d,ibs-bear-d,double7-d --markets nq --custos fut --period tudo --max-open 3 --region-cap 1 --month-stop 3 --label C22`
   (registado antes de correr. So substitui a referencia C20 se for MELHOR: mais %/ano sem piorar muito pior mes/pior queda)
+  -> +5.8%/ano, 4/14 anos >= 14%, pior mes -4.5%, pior ano -5.7%, pior queda -12.8%, 41 trades/ano, 6 anos negativos.
+  Mais %/ano mas pior queda 4x a da C20: NAO troquei a referencia, decide o Antonio
