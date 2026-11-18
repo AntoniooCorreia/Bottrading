@@ -45,6 +45,7 @@ Catalogo: cada teste tem um numero fixo. Estrategias #1, #2, ...; carteiras C1, 
 | #37 | 2026-11-18 | `keyrev-d` | +0.36 | +2.77 | REPROVADA; piora a carteira (C6) |
 | #38 | 2026-11-18 | `pullback20-d` | +1.15 | +3.08 | REPROVADA; piora a carteira (C7) |
 | #39 | 2026-11-18 | `calmhigh-d` | +0.32 | -0.01 | REPROVADA |
+| #40 | 2026-11-18 | `fomc-holiday-1h` (1h: antes do FOMC + vespera de feriado) | +3.81 (fut) / +3.45 (CFD) | +0.85 | **PASSA no dev**; 2012-18 ~0 e holdout t +0.29: provavel sorte do periodo |
 
 ## Carteiras (C) - 1% por trade, % da conta por ano (2012-2025)
 
@@ -74,15 +75,16 @@ varias trades ao mesmo tempo no mesmo indice e numeros muito inflacionados. C11-
 | C18 | 2026-11-18 | C14 + #37 keyrev-d (refaz C6) | +1.9% | 1/14 | -5.5% / -11.4% / -19.2% | ~2.5 | igual |
 | C19 | 2026-11-18 | C14 + #38 pullback20-d (refaz C7) | +1.3% | 0/14 | -5.7% / -11.1% / -20.0% | ~2.2 | piora |
 | **C20** | 2026-11-18 | **so NQ (MNQ): rsi2-dip-d + ibs-dip-d + down3-d + ibs-bear-d + double7-d, futuros** | **+2.6%** | 0/14 | -1.7% / -1.5% / -3.0% | ~0.6 | **REFERENCIA ATUAL** (stops diarios: 1 MNQ precisa de ~120 mil USD para 1%) |
+| C21 | 2026-11-18 | C20 + #40 fomc-holiday-1h (so NQ, futuros) | +5.6% | 1/14 | -3.9% / -0.4% / -6.4% | ~0.8 | mais %/ano mas 2012 (+16%) e quase so o #40 com sorte; 2013-25 ~+4.8%. Nao virou referencia: decide o Antonio |
 
 Leitura honesta (10 linhas):
-1. 39 testes de estrategias (#1-#39); so 1 passou no criterio oficial (#30 double7-d). Ideias do agente: 24 (quanto mais, mais desconfianca num resultado isolado).
+1. 40 testes de estrategias (#1-#40); passaram no criterio oficial 2 (#30 double7-d, #40 fomc-holiday-1h). Ideias do agente: 25 (quanto mais, mais desconfianca num resultado isolado).
 2. #1-#21 (suporte/resistencia, intraday 1m/5m, setup do Antonio): todos negativos ou ~0R depois de custos.
 3. As compras de quedas no diario (#23, #26, #27, #35) tem uma vantagem pequena por trade (+0.05 a +0.2R), positiva em quase todos os indices.
-4. ERRO ENCONTRADO a 2026-11-18 ao construir o bot da demo: a carteira C5 (+12.5%/ano) contava trades sobrepostas no mesmo indice. Corrigida (C11): +0.9%/ano.
-5. C11: 1/14 anos >= 14%, pior ano -14.7%, pior queda -22%. Sem velas de domingo (C12, como no MT5): +2.2%/ano. So NQ (C13): +2.1%/ano, pior queda -4%.
-6. O holdout C9 (+17%/+34%) tambem tinha o erro: nao serve de prova. A demo da C5 NAO deve avancar com estes numeros.
-7. As comparacoes "carteira + ideia X piora/melhora" (C3, C4, C6, C7) foram feitas com o erro: tem de ser refeitas.
-8. Leitura: com 1 trade por indice e 3 no total, as compras de quedas dao ~1-2%/ano. O objetivo de 14%/ano esta muito longe.
-9. O bot da demo (live/c5_live.py) existe e foi verificado: toma as mesmas decisoes que o backtest corrigido, dia a dia (tests/test_live.py).
-10. Futuros (C14-C20): melhor e so NQ com 5 compras de quedas (C20): +2.6%/ano, pior queda -3%, mas stops diarios grandes. Proximo: ideias 1h/4h com stops que caibam em 1 MNQ.
+4. ERRO corrigido a 2026-11-18: C1-C10 contavam trades sobrepostas (C5 +12.5%/ano era na verdade +0.9%, C11). O holdout C9 nao serve de prova.
+5. Futuros (C14-C20): a melhor e so NQ com 5 compras de quedas (C20, referencia): +2.6%/ano, pior mes -1.7%, pior queda -3%.
+6. #40 (comprar 24h antes do FOMC e na vespera de feriados, 1h): forte em 2019-2024 (t 3.8, NQ +0.2R por trade), mas ~0 em 2012-2018 e no holdout 2025-26.
+7. Isto e o padrao tipico de sorte do periodo: a deriva pre-FOMC esta publicada desde 2011 e enfraqueceu; nao confiar no t do dev sozinho.
+8. C21 (C20 + #40, so NQ): +5.6%/ano, pior mes -3.9%, pior queda -6.4%; sem 2012 (ano de sorte do #40) ~+4.8%/ano. Melhor no papel, fragil.
+9. Com 1 trade por indice e stops diarios, as compras de quedas dao ~2-3%/ano no NQ. O objetivo de 14%/ano continua muito longe (faltam ~9-11%).
+10. Proximo: decisao do Antonio sobre C21 vs C20 como referencia; mais ideias 1h/4h com stops que caibam em 1 MNQ (limite da noite: 5 de 8 usadas).
