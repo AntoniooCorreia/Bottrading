@@ -570,7 +570,7 @@ function vPlano(){
 /* ---------- conta demo (paper trading crypto) ---------- */
 const CN={btc:"Bitcoin (BTC)",eth:"Ethereum (ETH)",sol:"Solana (SOL)"};
 function vDemo(){
-  const D=S.demo; if(!D) return `<div class="card"><div class="empty">A carregar a conta demo…</div></div>`;
+  const D=S.demo; if(!D||!D.acc) return `<div class="card"><div class="empty">A carregar a conta demo…</div></div>`;
   const a=D.acc||{balance:10000,start_balance:10000}, open=D.pos.filter(p=>p.status==="open"), closed=D.pos.filter(p=>p.status==="closed");
   const px=D.px||{}; const unreal=open.reduce((s,p)=>s+(px[p.coin]?(+p.qty)*(px[p.coin]-(+p.entry_price)):0),0);
   const eq=(+a.balance)+unreal, ret=(eq/(+a.start_balance)-1)*100;
@@ -592,8 +592,10 @@ function vDemo(){
     ${kpi("Rentabilidade",pc(ret,2),"desde o início da demo",cls(ret))}
     ${kpi("Trades fechadas",closed.length,closed.length?`${wins} ganhas (${Math.round(wins/closed.length*100)}%)`:"ainda nenhuma")}
     ${kpi("Abertas agora",open.length,`máximo 1 por moeda · última verificação ${last}`)}</div>
+    <div class="card"><h2>Preços ao vivo</h2><p class="hint">Kraken, em euros. Atualiza de 5 em 5 segundos${D.pxAt?" · "+D.pxAt.toLocaleTimeString("pt-PT"):""}. Variação desde a abertura do dia.</p>
+      <div class="kpis sm" style="margin:0">${["btc","eth","sol"].map(c=>{const o=open.find(p=>p.coin===c); return `<div class="kpi"><div class="k">${CN[c]}</div><div class="v">${px[c]?nf(px[c],2)+" €":"—"}</div><div class="s"><span class="${cls((D.chg||{})[c])}">${pc((D.chg||{})[c],2)}</span>${o?` · em posição, stop ${nf(+o.stop,2)} €`:" · sem posição"}</div></div>`;}).join("")}</div></div>
     <div class="card"><h2>Como funciona</h2><div class="small" style="color:var(--text-2)">
-      <p style="margin-top:0">De hora a hora o bot lê os <b>preços reais da Kraken</b> (BTC, ETH, SOL em euros) e aplica as estratégias de tendência <b>K1</b>: compra quando o preço rompe máximos ou fica acima da média, e vende quando a tendência acaba ou o stop é tocado. <b>Nenhuma ordem real é enviada</b>: as trades são simuladas aqui, com a comissão da Kraken (0,26% por lado).</p>
+      <p style="margin-top:0">De hora a hora (quando fecha cada vela) o bot lê os <b>preços reais da Kraken</b> (BTC, ETH, SOL em euros) e aplica as estratégias de tendência <b>K1</b>: compra quando o preço rompe máximos ou fica acima da média, e vende quando a tendência acaba ou o stop é tocado (o stop é vigiado a cada minuto). <b>Nenhuma ordem real é enviada</b>: as trades são simuladas aqui, com a comissão da Kraken (0,26% por lado).</p>
       <p style="margin-bottom:0">Risco de 1% do saldo por trade, stop a 3 ATR, no máximo 1 posição por moeda e 1/3 do saldo por moeda (sem alavancagem). Cada compra e venda chega também ao Telegram.</p></div></div>
     ${chart?`<div class="card"><h2>Evolução do saldo</h2>${chart}</div>`:""}
     <div class="card"><h2>Posições abertas</h2>${open.length?`<div class="scroll"><table class="t"><thead><tr><th>Moeda</th><th>Estratégia</th><th>Entrada</th><th class="num">Preço entrada</th><th class="num">Stop</th><th class="num">Preço atual</th><th class="num">Resultado</th><th>Estado</th></tr></thead><tbody>${open.map(row).join("")}</tbody></table></div>`:`<div class="empty">Sem posições abertas. O bot está à espera de uma tendência de subida em BTC, ETH ou SOL.</div>`}</div>
@@ -602,13 +604,18 @@ function vDemo(){
 async function loadDemo(){
   try{
     const [acc,pos,eqs]=await Promise.all([q("paper_account?select=*"),q("paper_positions?select=*&order=id.asc"),q("paper_equity?select=at,equity&order=at.asc&limit=5000")]);
-    const px={}; const pairs={btc:"XBTEUR",eth:"ETHEUR",sol:"SOLEUR"};
-    try{const r=await fetch("https://api.kraken.com/0/public/Ticker?pair="+Object.values(pairs).join(",")).then(r=>r.json());
-      for(const [k,v] of Object.entries(r.result||{})){const c=Object.keys(pairs).find(c=>k.includes(pairs[c].slice(0,3)==="XBT"?"XBT":pairs[c].slice(0,3))); if(c) px[c]=+v.c[0];}}catch(e){}
-    S.demo={acc:acc[0],pos,eq:eqs,px}; if(S.route==="demo") render();
+    S.demo={...(S.demo||{}),acc:acc[0],pos,eq:eqs}; if(S.route==="demo") render();
   }catch(e){console.error(e);}
 }
-
+/* precos ao vivo da Kraken de 5 em 5 segundos (so no browser; o bot vigia os stops de minuto a minuto) */
+async function livePx(){
+  if(document.hidden) return;
+  try{const r=await fetch("https://api.kraken.com/0/public/Ticker?pair=XBTEUR,ETHEUR,SOLEUR",{cache:"no-store"}).then(r=>r.json());
+    const px={},chg={};
+    for(const [k,v] of Object.entries(r.result||{})){const c=k.includes("XBT")?"btc":k.includes("ETH")?"eth":k.includes("SOL")?"sol":null; if(c){px[c]=+v.c[0]; chg[c]=(+v.c[0]/(+v.o)-1)*100;}}
+    S.demo={...(S.demo||{}),px,chg,pxAt:new Date()}; if(S.route==="demo"&&S.demo.acc) render();
+  }catch(e){}
+}
 /* ---------- render ---------- */
 const VIEWS={demo:vDemo,inicio:vInicio,calendario:vCalendario,periodos:vPeriodos,trades:vTrades,indices:vIndices,testes:vTestes,diario:vDiario,plano:vPlano};
 const SUBS={demo:"Bot em paper trading na Kraken (crypto): trades simuladas com preços reais",inicio:"Resumo da carteira escolhida",calendario:"Resultado de cada dia, semana e mês",periodos:"Todos os meses e todas as semanas",trades:"Lista completa, com filtros",indices:"De onde vem o resultado",testes:"Catálogo numerado de todas as estratégias testadas",diario:"O que o agente fez",plano:"Conclusões, plano e ideias"};
@@ -649,7 +656,7 @@ function load(){
   }).catch(e=>{document.getElementById("stTxt").textContent="Erro a carregar dados: "+e;});
 }
 (function(){const t=store("bt_theme"); if(t){document.documentElement.setAttribute("data-theme",t); document.getElementById("theme").value=t;}})();
-render(); load(); loadDemo(); setInterval(()=>{load();loadDemo();},60000);
+render(); load(); loadDemo(); livePx(); setInterval(()=>{load();loadDemo();},60000); setInterval(livePx,5000);
 window.loadDemo=loadDemo;
 window.load=load;
 </script>
