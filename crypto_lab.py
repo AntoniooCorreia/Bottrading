@@ -24,7 +24,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--ideas", required=True)
     ap.add_argument("--coins", default=",".join(CRYPTO))
-    ap.add_argument("--period", default="tudo", choices=["dev", "pre", "tudo", "holdout"])
+    ap.add_argument("--period", default="tudo", choices=["dev", "pre", "tudo", "holdout", "completo"])
     ap.add_argument("--label", default="")
     ap.add_argument("--push", action="store_true")
     a = ap.parse_args()
@@ -32,7 +32,7 @@ def main():
     for name in a.ideas.split(","):
         fn, tf, st, tp, mh = IDEAS[name]
         for k in a.coins.split(","):
-            b = load_tf(k, tf, a.period)
+            b = load_tf(k, tf, None if a.period == "completo" else a.period)
             tr = run_positions(b, fn(b), st, 0.0, 0.0, tp, mh, cost_pct=COST_PCT, financing=False)
             if not len(tr):
                 continue
@@ -62,6 +62,12 @@ def main():
     monthly = pd.Series([float(mg.get((q.year, q.month), 0.0)) for q in rng], index=[str(q) for q in rng])
     eq = p["R"].cumsum().to_numpy()
     dd = float((eq - np.maximum.accumulate(np.maximum(eq, 0))).min())
+    comp = 10000.0
+    for x in p["R"]:
+        comp *= 1 + x / 100
+    print(f"\nCom juros compostos: 10 000 EUR -> {comp:,.0f} EUR")
+    print("\nPor moeda (depois da regra de 1 posicao por moeda):")
+    print(p.groupby("mk")["R"].agg(["count", "sum", "mean"]).round(2).to_string())
     print("\nCarteira por ano (% da conta, 1% por trade):")
     print(yearly.round(1).to_string())
     print(f"Media {yearly.mean():+.1f}%/ano | anos >= 14%: {(yearly >= 14).sum()}/{len(yearly)} | pior mes {monthly.min():.1f}% "
@@ -75,7 +81,10 @@ def main():
                "meses_pos": int((monthly > 0).sum()), "meses": int(len(monthly)),
                "por_ano": {str(k): round(float(v), 2) for k, v in yearly.items()},
                "por_mes": {k: round(v, 2) for k, v in monthly.items()},
-               "por_indice": per.rename(columns={"moeda": "indice"}).to_dict(orient="records")}
+               "por_indice": per.rename(columns={"moeda": "indice"}).to_dict(orient="records"),
+               "markets": sorted(p["mk"].unique().tolist()), "anos_neg": int((yearly < 0).sum()),
+               "trades": [[r.t0.strftime("%Y-%m-%d"), r.t.strftime("%Y-%m-%d"), r.mk, r.idea, round(float(r.R), 3)]
+                          for r in p.sort_values("t0").itertuples()]}
         print("dashboard:", supa.set_state("portfolio", doc))
 
 

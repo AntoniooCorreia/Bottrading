@@ -221,7 +221,7 @@ const cls=x=>x>0?"pos":x<0?"neg":"muted";
 const MES=["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
 const MS=["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
 const DS=["seg","ter","qua","qui","sex","sáb","dom"];
-const NM={nq:"NQ · US100",es:"S&P · US500",dow:"Dow · US30",dax:"DAX · GER40",ftse:"FTSE · UK100",nikkei:"Nikkei · JP225",estx:"Euro Stoxx · EU50",cac:"CAC · FRA40",asx:"ASX · AUS200",hsi:"Hang Seng · HK50"};
+const NM={btc:"Bitcoin (BTC)",eth:"Ethereum (ETH)",sol:"Solana (SOL)",nq:"NQ · US100",es:"S&P · US500",dow:"Dow · US30",dax:"DAX · GER40",ftse:"FTSE · UK100",nikkei:"Nikkei · JP225",estx:"Euro Stoxx · EU50",cac:"CAC · FRA40",asx:"ASX · AUS200",hsi:"Hang Seng · HK50"};
 const nm=k=>NM[k]||k;
 const pad=n=>String(n).padStart(2,"0");
 const ymd=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
