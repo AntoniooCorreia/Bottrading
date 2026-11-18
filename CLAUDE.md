@@ -18,10 +18,11 @@ rsi2-dip-d, da ~1.2R/ano no NQ): o caminho e juntar VARIAS estrategias validadas
 (mais trades por ano com a mesma vantagem: 4h/1h, outras formas de comprar quedas, outros sinais). O Antonio aceitou operar
 outros indices (DAX, FTSE, Nikkei, Euro Stoxx, CAC, ASX, Hang Seng) desde que o objetivo seja atingido sempre ou
 quase sempre. Uma ideia so entra na carteira se tiver passado no criterio oficial OU se for positiva nos 3 indices
-dos EUA em 2012-2018 e em 2019-2024. Carteira de referencia atual (2026-11-17): rsi2-dip-d + ibs-dip-d + down3-d nos 10 indices com REGRAS DE RISCO
+dos EUA em 2012-2018 e em 2019-2024. Carteira de referencia atual (2026-11-17, sessao 4): rsi2-dip-d + ibs-dip-d + down3-d + ibs-bear-d nos 10 indices com REGRAS DE RISCO
 OBRIGATORIAS (portfolio.py --max-open 3 --region-cap 1 --month-stop 3): no maximo 3 trades abertas, 1 por indice,
 1 por regiao (EUA/Europa/Asia), e no mes em que as trades fechadas perderem 3% nao se abre mais nenhuma ate ao mes
-seguinte. Resultado 2012-2024: +9.5%/ano, pior mes -5.1%, pior ano -2.5%, pior queda -10.7%, 102/148 meses positivos.
+seguinte. Resultado 2012-2025: +12.5%/ano, 6/14 anos >= 14%, pior mes -5.5%, pior ano -4.5%, pior queda -9.1%, 108/148 meses positivos,
+~183 trades/ano. (Antes do ibs-bear-d: +9.5%/ano, pior mes -5.1%, pior ano -2.5%, pior queda -10.7%.)
 O Antonio quer CONSISTENCIA (meses sem quedas grandes) tanto como os 14%/ano: compara sempre pior mes e pior ano.
 So substituis o estado "portfolio" do dashboard por uma carteira MELHOR (mais % ao ano ou mais anos >= 14%);
 nunca o apagues nem o troques por uma carteira vazia. No fim de cada sessao corre portfolio.py com as ideias aceites e diz no
@@ -49,6 +50,8 @@ o trabalho e confirmar ou desmentir com honestidade, nao "encontrar" algo.
 - `python portfolio.py --ideas a,b,c [--markets nq,dax,...] [--period tudo]` - carteira de ideias em varios indices,
   1% por trade: media % ao ano, anos acima de 14%, pior queda. Envia para o dashboard. E A METRICA DO OBJETIVO.
   Indices disponiveis: nq es dow (confirmacao) + dax ftse nikkei estx cac asx hsi (carteira; ver sr/data.py)
+  Testes de carteira levam numero do catalogo: `--label C9` envia para o dashboard como carteira extra (nao toca na referencia);
+  `--label C9 --ref` substitui a carteira de referencia (so se for MELHOR). O doc inclui a lista de trades (calendario do dashboard).
 - `python run.py --play bounce|break|fake --levels pdhl|pwhl|swing1h|round [--tp 2 --stop-atr 0.5 --fake-atr 0.3 --session rth|all]`
   regista sozinho uma linha em `results/RESULTS.md`
 
@@ -104,5 +107,8 @@ numeros concretos. Usa `python sync.py --log <tipo> "titulo" -b "ponto" -b "pont
 4. Pega nos itens `[ ]` por ordem. ANTES de cada um: `--log estado "A correr <variante>"`; depois corre-o, marca `[x]`
    com o veredicto e regista um `--log teste` com pontos (ver Diario). Ideias novas: `--log ideia` com pontos antes de as testar;
    mudancas ao motor ou ao projeto: `--log mudanca` com pontos.
-5. Atualiza `SUMMARY.md`: tabela curta do que passou/reprovou e a tua leitura honesta, em 10 linhas.
+5. Atualiza `SUMMARY.md`: catalogo numerado do que passou/reprovou e a tua leitura honesta, em 10 linhas.
+   CATALOGO (pedido do Antonio, 2026-11-18): cada teste de estrategia recebe o numero seguinte (#40, #41, ...) e cada
+   teste de carteira o seguinte C (C9, C10, ...), sempre com a data. Os numeros nunca mudam. Usa o numero no titulo do
+   `--log teste` (ex.: "#40 nome: REPROVADA, t junto +0.5"), no TODO e no commit.
 6. Commit + push para `research`; se nao houver PR aberto de research -> main, abre um.

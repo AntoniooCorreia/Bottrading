@@ -23,6 +23,15 @@ parametros tambem for positiva (nao um pico isolado).
 ## Fase 3 - holdout
 So variantes com PASSA no dev e vizinhanca positiva. Uma vez cada. Ver CLAUDE.md.
 
+## Ideias do agente (2026-11-16)
+Registadas em IDEAS.md antes de correr. Fasquia t >= 3.0.
+- [x] `python run.py --play gapfill --levels pdc` -> REPROVADA, t junto -1.34 (NQ -0.08R, ES +0.01R, Dow -0.01R)
+- [x] `python run.py --play fake --levels onhl` -> REPROVADA, t junto -4.62 (negativa nos 3)
+- [x] `python run.py --play break --levels nr4` -> REPROVADA, t junto -1.12 (so NQ positivo, +0.07R)
+- [x] `python run.py --play break --levels lunchhl` -> REPROVADA, t junto -3.41 (negativa nos 3)
+- [x] `python run.py --play gapgo --levels pdc` -> REPROVADA (t < 3), t junto +2.34 (positiva nos 3: NQ +0.05R, ES +0.13R, Dow +0.10R)
+- [x] `python run.py --play break --levels monhl` -> REPROVADA, t junto +0.15 (Dow negativo)
+
 ## Setup do Antonio (pre-registado por ele em 2026-11-16) - prioridade maxima
 Regras em sr/antonio.py (niveis S/R de 15m/30m/1h + dia/semana/Asia/Londres, displacement + IFVG de 1m,
 stop no extremo do sweep, Asia+Londres+NY, max 3 trades/dia). Precisa de data/m1gz (se faltar, regista erro
@@ -36,3 +45,57 @@ stop no extremo do sweep, Asia+Londres+NY, max 3 trades/dia). Precisa de data/m1
 - [x] `python run_swing.py --idea ibs-dip-d` (e `--period pre`) -> NQ e S&P positivos nos dois periodos, Dow ligeiramente negativo
 - [x] `python run_swing.py --idea down3-d` (e `--period pre`) -> pre positiva nos 3 (t 3.7), dev Dow negativo
 - [x] carteira rsi2+ibs+down3, max 3 abertas: +8.7%/ano, 5/13 anos >= 14%, pior queda -21.6%, ~3.4 trades/semana
+
+## Ideias do agente (2026-11-17)
+Registadas em IDEAS.md antes de correr. Fasquia t >= 3.0. Correr dev e depois `--period pre` (2012-2018) como confirmacao.
+- [x] `python run_swing.py --idea tom-d` (e `--period pre`) -> REPROVADA, t junto +1.30 (dev positiva nos 3 mas pequena: NQ +0.06R; pre negativa nos 3, t -0.47)
+- [x] `python run_swing.py --idea overnight-us-1h` (e `--period pre`) -> REPROVADA, t junto -1.60 (dev NQ -0.005R, S&P -0.02R, Dow -0.05R; pre negativa nos 3, t -5.44). Nota: os dados tem velas paradas ao fim de semana, por isso a trade de sexta sai no sabado e volta a entrar (custo a dobrar ~1 vez/semana); com futuros o NQ dava +0.04R mas S&P/Dow ~0 ou negativos, nao muda a conclusao
+- [x] `python run_swing.py --idea double7-d` (e `--period pre`) -> PASSA no dev, t junto +3.07 (NQ +0.20R, S&P +0.14R, Dow +0.04R); pre tambem PASSA (t +3.46). Holdout (uma vez): positiva nos 3 mas so 78 trades, t +1.51 (ver HOLDOUT_LOG.md)
+- [x] carteira + double7-d (2012-2024, mesmas regras de risco): nos 10 indices piora (+7.3%/ano, pior queda -16.5%: double7 e negativa em FTSE/Nikkei/ASX/HSI);
+  so nos EUA (onde foi validada) fica igual (+9.4%/ano, pior queda -9.7%, pior ano -1.8%). Carteira de referencia mantem-se.
+
+## Ideias do agente (2026-11-17, sessao 2)
+Registadas em IDEAS.md antes de correr. Fasquia t >= 3.0. Correr dev e depois `--period pre` (2012-2018) como confirmacao.
+- [x] `python run_swing.py --idea opex-week-d` (e `--period pre`) -> REPROVADA, t junto -0.98 (dev negativa nos 3: NQ -0.01R, S&P -0.06R, Dow -0.04R). Em 2012-2018 passava (t +3.38): o efeito parece ter desaparecido
+- [x] `python run_swing.py --idea nr7-up-d` (e `--period pre`) -> REPROVADA, t junto -0.77 (dev negativa nos 3; pre t +1.86, so NQ claramente positivo)
+- [x] `python run_swing.py --idea week-rev-d` (e `--period pre`) -> REPROVADA (t < 3), t junto +1.83 (dev NQ +0.15R, S&P +0.11R, Dow +0.04R; ~11 trades/ano por indice).
+  Positiva nos 3 dos EUA tambem em 2012-2018 (t +2.71, Dow com 57 trades) -> pode ir a carteira pela regra do CLAUDE.md
+- [x] carteira + week-rev-d (2012-2024, mesmas regras de risco): nos 10 indices piora (+5.8%/ano, pior queda -13.8%); so nos EUA
+  tambem piora (+8.9%/ano, pior queda -14.5%, 19 meses abaixo de -3%). Carteira de referencia mantem-se (+9.5%/ano)
+
+## Ideias do agente (2026-11-17, sessao 3)
+Registada em IDEAS.md antes de correr. Fasquia t >= 3.0. Correr dev e depois `--period pre` (2012-2018) como confirmacao.
+- [x] `python run_swing.py --idea rsi2-pop-short-4h` (e `--period pre`) -> REPROVADA, t junto -2.46 (dev negativa nos 3: NQ -0.01R, S&P -0.08R, Dow -0.08R; pre tambem negativa nos 3, t -2.09). Vender subidas em tendencia de baixa perde dinheiro: nao entra na carteira
+
+## Ideias do agente (2026-11-17, sessao 4)
+Registada em IDEAS.md antes de correr. Fasquia t >= 3.0. Correr dev e depois `--period pre` (2012-2018) como confirmacao.
+- [x] `python run_swing.py --idea ibs-bear-d` (e `--period pre`) -> REPROVADA no criterio oficial (poucas trades: NQ 51 < 60), t junto +1.62
+  (dev NQ +0.056R, S&P +0.043R, Dow +0.048R; pre positiva nos 3, t +1.02) -> positiva nos 3 dos EUA nos dois periodos: pode ir a carteira
+- [x] carteira + ibs-bear-d (2012-2025, mesmas regras de risco, 10 indices): MELHORA -> +12.5%/ano (era +9.5%), 6/14 anos >= 14% (era 5),
+  pior queda -9.1% (era -10.7%), meses positivos 108/148 (era 102); piora pior mes -5.5% (era -5.1%) e pior ano -4.5% (era -2.5%, 2018).
+  Positiva em todos os 10 indices. Ganho vem de 2020 (+7.9 -> +18.7%) e 2022 (-2.5 -> +10.4%). Nova carteira de referencia
+
+## Ideias do agente (2026-11-18)
+Registada em IDEAS.md antes de correr. Fasquia t >= 3.0. Correr dev e depois `--period pre` (2012-2018) como confirmacao.
+- [x] `python run_swing.py --idea turnaround-tue-d` (e `--period pre`) -> REPROVADA, t junto +0.21 (dev NQ -0.002R, S&P +0.023R, Dow -0.010R;
+  pre positiva nos 3 mas minuscula, t +0.92). ~0R: o efeito de segunda/terca nao existe depois de custos. Nao entra na carteira
+
+## Ideias do agente (2026-11-18, sessao 2)
+Registada em IDEAS.md antes de correr. Fasquia t >= 3.0. Correr dev e depois `--period pre` (2012-2018) como confirmacao.
+- [x] `python run_swing.py --idea keyrev-d` (e `--period pre`) -> REPROVADA no criterio oficial (poucas trades: NQ 45 < 60), t junto +0.36
+  (dev NQ +0.035R, S&P +0.022R, Dow +0.004R, ~0R; pre positiva nos 3, t +2.77) -> positiva nos 3 dos EUA nos dois periodos: testada na carteira
+- [x] carteira + keyrev-d (mesmas regras de risco, 10 indices): PIORA -> +11.6%/ano (era +12.5%), 4/14 anos >= 14% (era 6), pior queda -12.2% (era -9.1%),
+  17 meses abaixo de -3% (era 12); so melhora pior ano (-0.4%, era -4.5%) e pior mes (-4.9%, era -5.5%). Rouba lugares as outras ideias. Carteira de referencia mantem-se
+
+## Ideias do agente (2026-11-18, sessao 3)
+Registada em IDEAS.md antes de correr. Fasquia t >= 3.0. Correr dev e depois `--period pre` (2012-2018) como confirmacao.
+- [x] `python run_swing.py --idea pullback20-d` (e `--period pre`) -> REPROVADA no criterio oficial (poucas trades: NQ 49 < 60), t junto +1.15
+  (dev NQ +0.106R, S&P +0.169R, Dow +0.007R; pre positiva nos 3, t +3.08) -> positiva nos 3 dos EUA nos dois periodos: testada na carteira
+- [x] carteira + pullback20-d (mesmas regras de risco, 10 indices): PIORA -> +9.6%/ano (era +12.5%), 5/14 anos >= 14% (era 6), pior queda -11.4% (era -9.1%),
+  pior mes -5.8% (era -5.5%), pior ano -5.0% (era -4.5%), 19 meses abaixo de -3% (era 12). Trades de semanas ocupam os lugares das compras de quedas
+  (161 trades/ano, era 183) e e negativa fora dos EUA (FTSE, CAC, HSI, Euro Stoxx). Carteira de referencia mantem-se
+
+## Ideias do agente (2026-11-18, sessao 4)
+Registada em IDEAS.md antes de correr. Fasquia t >= 3.0. Correr dev e depois `--period pre` (2012-2018) como confirmacao.
+- [x] `python run_swing.py --idea calmhigh-d` (e `--period pre`) -> REPROVADA, t junto +0.32 (dev NQ +0.124R/55 trades, S&P -0.059R, Dow -0.003R;
+  pre t -0.01, NQ -0.040R). Nao e positiva nos 3 em nenhum dos periodos: nao vai a carteira. Comprar maximos em subidas calmas ~0R

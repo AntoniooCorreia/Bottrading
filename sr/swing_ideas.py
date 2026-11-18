@@ -98,7 +98,144 @@ def down3_d(b: pd.DataFrame) -> pd.Series:
     return _enter_exit(dn3 & (c > c.rolling(200).mean()), c > b["high"].shift(1))
 
 
+def tom_d(b: pd.DataFrame) -> pd.Series:
+    """Diario. Viragem do mes: long do ultimo dia util do mes ate ao fecho do 3.o dia util do mes seguinte.
+    Usa so o calendario de dias uteis (seg-sex), conhecido com antecedencia: no fecho do dia d o sinal e 1 se o
+    proximo dia util for o ultimo do mes ou um dos 3 primeiros do mes."""
+    from pandas.tseries.offsets import BDay
+    idx = b.index.tz_localize(None) if b.index.tz is not None else b.index
+    nxt = idx.normalize() + BDay(1)
+    last = (nxt + BDay(1)).month != nxt.month
+    first = nxt.to_period("M").to_timestamp()
+    nfirst = np.array([len(pd.bdate_range(f, x)) for f, x in zip(first, nxt)])
+    return pd.Series(np.where(last | (nfirst <= 3), 1, 0), index=b.index)
+
+
+def overnight_us_1h(b: pd.DataFrame) -> pd.Series:
+    """1h, horas de Nova Iorque. Long na vela das 16:00 (sinal no fecho da vela das 15:00) e sai no fecho da vela
+    das 08:00 (09:00 NY, antes da abertura do cash). So para NQ/S&P/Dow."""
+    h = b.index.tz_convert("America/New_York").hour if b.index.tz is not None else b.index.hour
+    return pd.Series(np.where((h >= 15) | (h < 8), 1, 0), index=b.index)
+
+
+def double7_d(b: pd.DataFrame) -> pd.Series:
+    """Diario. Connors 'Double 7s': long quando o fecho e o mais baixo dos ultimos 7 fechos e esta acima da media de
+    200 dias; sai quando o fecho e o mais alto dos ultimos 7 fechos."""
+    c = b["close"]
+    lo7, hi7 = c.rolling(7).min(), c.rolling(7).max()
+    return _enter_exit((c <= lo7) & (c > c.rolling(200).mean()), c >= hi7)
+
+
+def _naive(idx: pd.DatetimeIndex) -> pd.DatetimeIndex:
+    return idx.tz_localize(None) if idx.tz is not None else idx
+
+
+def opex_week_d(b: pd.DataFrame) -> pd.Series:
+    """Diario. Semana de vencimento das opcoes mensais (3.a sexta-feira): no fecho do dia d o sinal e 1 se o proximo
+    dia util (seg-sex, calendario conhecido com antecedencia) estiver entre a segunda e a 3.a sexta dessa semana."""
+    from pandas.tseries.offsets import BDay
+    nxt = _naive(b.index).normalize() + BDay(1)
+    # 3.a sexta do mes do proximo dia util: primeira sexta + 14 dias
+    first = nxt.to_period("M").to_timestamp()
+    fri3 = first + pd.to_timedelta((4 - first.dayofweek) % 7 + 14, unit="D")
+    inwk = (nxt <= fri3) & (nxt >= fri3 - pd.Timedelta(days=4))
+    return pd.Series(np.where(inwk, 1, 0), index=b.index)
+
+
+def _weekdays(b: pd.DataFrame) -> pd.DataFrame:
+    """So velas de segunda a sexta (a vela de domingo tem precos parados do fim de semana)."""
+    return b[_naive(b.index).dayofweek < 5]
+
+
+def nr7_up_d(b: pd.DataFrame) -> pd.Series:
+    """Diario. NR7 (amplitude menor que a de cada um dos 6 dias anteriores) com fecho > media de 200 -> long durante
+    os 5 dias de semana seguintes (sai no fecho do 5.o). Um novo NR7 prolonga a janela."""
+    w = _weekdays(b)
+    rng = w["high"] - w["low"]
+    nr7 = rng < rng.shift(1).rolling(6).min()
+    sig = (nr7 & (w["close"] > w["close"].rolling(200).mean())).astype(int)
+    pos = sig.rolling(5, min_periods=1).max()      # dia do sinal + 4 dias seguintes em posicao no fecho
+    return pos.reindex(b.index).ffill().fillna(0).astype(int)
+
+
+def week_rev_d(b: pd.DataFrame) -> pd.Series:
+    """Diario. No fecho de sexta: se o fecho < fecho do ultimo dia da semana anterior e fecho > media de 200 -> long
+    ate ao fecho da sexta seguinte (reavaliado a cada sexta)."""
+    w = _weekdays(b)
+    c = w["close"]
+    d = _naive(w.index)
+    wk = d.to_period("W-FRI")
+    last = c.groupby(wk).transform("last")
+    prev_last = pd.Series(last.groupby(wk).first().shift(1).reindex(wk).to_numpy(), index=c.index)
+    fri = pd.Series(d.dayofweek == 4, index=c.index)
+    sig = ((c < prev_last) & (c > c.rolling(200).mean())).astype(float)
+    pos = sig.where(fri).ffill().fillna(0)
+    return pos.reindex(b.index).ffill().fillna(0).astype(int)
+
+
 # nome -> (funcao, timeframe, stop_atr, tp_r, max_hold)
+def rsi2_pop_short_4h(b: pd.DataFrame) -> pd.Series:
+    """4h. Espelho do rsi2-dip-4h do lado vendedor: short quando RSI(2) > 90 e fecho abaixo da media de 200 velas
+    (tendencia de baixa); sai quando fecha abaixo da media de 5 velas. Short-only."""
+    c = b["close"]
+    r, sma200, sma5 = _rsi(c, 2), c.rolling(200).mean(), c.rolling(5).mean()
+    return -_enter_exit((r > 90) & (c < sma200), c < sma5)
+
+
+def ibs_bear_d(b: pd.DataFrame) -> pd.Series:
+    """Diario. Espelho de regime do ibs-dip-d: long quando IBS < 0.2 e fecho ABAIXO da media de 200 dias
+    (reversao de curto prazo com volatilidade alta, Nagel 2012); sai quando IBS > 0.7."""
+    rng = (b["high"] - b["low"]).replace(0, np.nan)
+    ibs = (b["close"] - b["low"]) / rng
+    sma200 = b["close"].rolling(200).mean()
+    return _enter_exit((ibs < 0.2) & (b["close"] < sma200), ibs > 0.7)
+
+
+def turnaround_tue_d(b: pd.DataFrame) -> pd.Series:
+    """Diario. 'Turnaround Tuesday': no fecho de segunda (dia CME), se o fecho < fecho do dia de semana anterior
+    (sexta) -> long durante a terca (entra na abertura seguinte, sai no fecho de terca). Sem filtro de tendencia."""
+    w = _weekdays(b)
+    c = w["close"]
+    mon = pd.Series(_naive(w.index).dayofweek == 0, index=c.index)
+    sig = (mon & (c < c.shift(1))).astype(int)
+    return sig.reindex(b.index).fillna(0).astype(int)
+
+
+def keyrev_d(b: pd.DataFrame) -> pd.Series:
+    """Diario. Dia de reversao: minimo do dia abaixo do minimo dos 10 dias de semana anteriores e fecho acima do fecho
+    anterior -> long durante os 5 dias de semana seguintes (sai no fecho do 5.o). Um novo sinal prolonga a janela."""
+    w = _weekdays(b)
+    c = w["close"]
+    sig = ((w["low"] < w["low"].shift(1).rolling(10).min()) & (c > c.shift(1))).astype(int)
+    pos = sig.rolling(5, min_periods=1).max()      # dia do sinal + 4 dias seguintes em posicao no fecho
+    return pos.reindex(b.index).ffill().fillna(0).astype(int)
+
+
+def pullback20_d(b: pd.DataFrame) -> pd.Series:
+    """Diario. Recuo numa tendencia forte: fecho cruza abaixo da media de 20 dias com medias alinhadas
+    (20 > 50 > 200) -> long; sai no primeiro fecho acima do maior fecho dos 10 dias anteriores."""
+    w = _weekdays(b)
+    c = w["close"]
+    s20, s50, s200 = c.rolling(20).mean(), c.rolling(50).mean(), c.rolling(200).mean()
+    enter = (c < s20) & (c.shift(1) >= s20.shift(1)) & (s20 > s50) & (s50 > s200)
+    pos = _enter_exit(enter, c > c.shift(1).rolling(10).max())
+    return pos.reindex(b.index).ffill().fillna(0).astype(int)
+
+
+def calmhigh_d(b: pd.DataFrame) -> pd.Series:
+    """Diario. Maximo novo numa subida calma: primeiro fecho acima do maior fecho dos 10 dias anteriores, fecho acima
+    da media de 200 e media do true range de 5 dias < media de 50 -> long durante os 5 dias de semana seguintes
+    (sai no fecho do 5.o). Um novo sinal prolonga a janela."""
+    w = _weekdays(b)
+    h, l, c = w["high"], w["low"], w["close"]
+    tr = pd.concat([h - l, (h - c.shift()).abs(), (l - c.shift()).abs()], axis=1).max(axis=1)
+    newhi = c > c.shift(1).rolling(10).max()
+    sig = (newhi & ~newhi.shift(1, fill_value=False) & (c > c.rolling(200).mean())
+           & (tr.rolling(5).mean() < tr.rolling(50).mean())).astype(int)
+    pos = sig.rolling(5, min_periods=1).max()      # dia do sinal + 4 dias seguintes em posicao no fecho
+    return pos.reindex(b.index).ffill().fillna(0).astype(int)
+
+
 IDEAS = {
     "trend-sma100-d": (trend_sma100, "1d", 3.0, 0.0, 0),
     "rsi2-dip-d": (rsi2_dip, "1d", 3.0, 0.0, 10),
@@ -106,4 +243,16 @@ IDEAS = {
     "rsi2-dip-4h": (rsi2_dip_4h, "4h", 3.0, 0.0, 30),
     "ibs-dip-d": (ibs_dip_d, "1d", 3.0, 0.0, 10),
     "down3-d": (down3_d, "1d", 3.0, 0.0, 10),
+    "tom-d": (tom_d, "1d", 3.0, 0.0, 6),
+    "overnight-us-1h": (overnight_us_1h, "1h", 3.0, 0.0, 24),
+    "double7-d": (double7_d, "1d", 3.0, 0.0, 10),
+    "opex-week-d": (opex_week_d, "1d", 3.0, 0.0, 0),
+    "nr7-up-d": (nr7_up_d, "1d", 3.0, 0.0, 0),
+    "week-rev-d": (week_rev_d, "1d", 3.0, 0.0, 0),
+    "rsi2-pop-short-4h": (rsi2_pop_short_4h, "4h", 3.0, 0.0, 30),
+    "ibs-bear-d": (ibs_bear_d, "1d", 3.0, 0.0, 10),
+    "turnaround-tue-d": (turnaround_tue_d, "1d", 3.0, 0.0, 0),
+    "keyrev-d": (keyrev_d, "1d", 3.0, 0.0, 0),
+    "pullback20-d": (pullback20_d, "1d", 3.0, 0.0, 20),
+    "calmhigh-d": (calmhigh_d, "1d", 3.0, 0.0, 0),
 }

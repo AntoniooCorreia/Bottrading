@@ -3,492 +3,620 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Bottrading · Laboratório</title>
+<title>Bottrading · Painel</title>
 <style>
-.viz-root{
+:root{
   color-scheme:light;
-  --bg:#f4f3f0; --surface-1:#fcfcfb; --border:#e3e2dd; --grid:#ecebe7;
-  --text-primary:#0b0b0b; --text-secondary:#52514e; --text-muted:#7a7974;
-  --series-1:#2a78d6; --series-2:#eb6834; --series-3:#1baf7a;
-  --good:#0ca30c; --critical:#d03b3b; --warning:#fab219;
-  --accent:#2a78d6;
+  --bg:#f5f5f3; --surface:#ffffff; --surface-2:#f0efec; --border:#e4e3df; --grid:#eeede9;
+  --text:#121211; --text-2:#55544f; --text-3:#85847d;
+  --accent:#2563eb; --accent-soft:#e8effd;
+  --pos:#14915a; --neg:#d23f3f; --warn:#d9930d;
+  --c1:#2563eb; --c2:#e0702b; --c3:#14915a; --c4:#8b5cf6;
+  --shadow:0 1px 2px rgba(0,0,0,.04),0 2px 8px rgba(0,0,0,.04);
 }
 @media (prefers-color-scheme: dark){
-  :root:where(:not([data-theme="light"])) .viz-root{
+  :root:not([data-theme="light"]){
     color-scheme:dark;
-    --bg:#111110; --surface-1:#1a1a19; --border:#2c2c2a; --grid:#262624;
-    --text-primary:#f0efec; --text-secondary:#c3c2b7; --text-muted:#8f8e86;
-    --series-1:#3987e5; --series-2:#d95926; --series-3:#199e70; --accent:#3987e5;
+    --bg:#0f0f0e; --surface:#181817; --surface-2:#20201e; --border:#2b2b29; --grid:#232321;
+    --text:#f1f0ec; --text-2:#c2c1b9; --text-3:#8d8c84;
+    --accent:#5b8def; --accent-soft:#1d2840;
+    --pos:#2fb878; --neg:#e5585a; --warn:#e7a52c;
+    --c1:#5b8def; --c2:#e8844a; --c3:#2fb878; --c4:#a07cf7;
+    --shadow:none;
   }
 }
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0f0f0e; --surface:#181817; --surface-2:#20201e; --border:#2b2b29; --grid:#232321;
+  --text:#f1f0ec; --text-2:#c2c1b9; --text-3:#8d8c84;
+  --accent:#5b8def; --accent-soft:#1d2840;
+  --pos:#2fb878; --neg:#e5585a; --warn:#e7a52c;
+  --c1:#5b8def; --c2:#e8844a; --c3:#2fb878; --c4:#a07cf7;
+  --shadow:none;
+}
 *{box-sizing:border-box}
-body{margin:0}
-.viz-root{background:var(--bg);color:var(--text-primary);min-height:100vh;
-  font:15px/1.45 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:20px 16px 48px}
-.wrap{max-width:1040px;margin:0 auto}
-header h1{font-size:22px;margin:0 0 2px;letter-spacing:-.01em}
-header p{margin:0;color:var(--text-secondary);font-size:13px}
-.tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:18px 0}
-@media(min-width:720px){.tiles{grid-template-columns:repeat(4,1fr)}}
-.tile{background:var(--surface-1);border:1px solid var(--border);border-radius:12px;padding:12px 14px}
-.tile .k{font-size:12px;color:var(--text-secondary)}
-.tile .v{font-size:28px;font-weight:650;font-variant-numeric:tabular-nums;margin-top:2px}
-.tile .s{font-size:12px;color:var(--text-muted)}
-section{background:var(--surface-1);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:12px 0}
-section h2{font-size:15px;margin:0 0 10px}
-.muted{color:var(--text-muted)}
-.summary{font-size:14px;color:var(--text-secondary)}
-.runs{width:100%;border-collapse:collapse;font-size:13px}
-.runs th{text-align:left;font-weight:500;color:var(--text-secondary);border-bottom:1px solid var(--border);padding:6px 6px}
-.runs td{padding:8px 6px;border-bottom:1px solid var(--grid);vertical-align:top;font-variant-numeric:tabular-nums}
-.runs tr.row{cursor:pointer}
-.runs tr.row:hover td,.runs tr.sel td{background:var(--grid)}
+html,body{margin:0;background:var(--bg)}
+body{color:var(--text);font:14px/1.45 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+button,select,input{font:inherit;color:inherit}
+.app{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+aside{position:sticky;top:0;height:100vh;border-right:1px solid var(--border);background:var(--surface);padding:18px 12px;display:flex;flex-direction:column;gap:4px}
+.brand{font-weight:700;font-size:16px;letter-spacing:-.01em;padding:0 10px 14px;display:flex;align-items:center;gap:8px}
+.brand .logo{width:24px;height:24px;border-radius:7px;background:var(--accent);display:grid;place-items:center;color:#fff;font-size:13px}
+nav a{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;color:var(--text-2);text-decoration:none;font-size:14px}
+nav a:hover{background:var(--surface-2);color:var(--text)}
+nav a.on{background:var(--accent-soft);color:var(--accent);font-weight:600}
+nav a svg{width:17px;height:17px;flex:none}
+.side-foot{margin-top:auto;font-size:12px;color:var(--text-3);padding:0 10px;display:flex;flex-direction:column;gap:8px}
+main{min-width:0;padding:22px 28px 60px}
+.top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.top h1{font-size:22px;margin:0;letter-spacing:-.015em;flex:1;min-width:180px}
+.top .sub{font-size:13px;color:var(--text-3);font-weight:400;display:block;margin-top:2px;letter-spacing:0}
+.ctl{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-2)}
+select,input[type=number]{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:6px 8px;font-size:13px;max-width:100%}
+input[type=number]{width:96px}
+.status{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 14px;font-size:13px;margin-bottom:16px;box-shadow:var(--shadow)}
+.dot{width:9px;height:9px;border-radius:50%;flex:none;background:var(--text-3)}
+.dot.live{background:var(--pos);animation:pulse 1.6s infinite}
+.dot.err{background:var(--neg)}
+@keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--pos) 55%,transparent)}70%{box-shadow:0 0 0 8px transparent}100%{box-shadow:0 0 0 0 transparent}}
+.status .rt{margin-left:auto;font-size:11px;color:var(--text-3);white-space:nowrap}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:14px;box-shadow:var(--shadow);min-width:0}
+.card h2{font-size:15px;margin:0 0 4px;letter-spacing:-.005em}
+.card .hint{font-size:12px;color:var(--text-3);margin:0 0 12px}
+.card-head{display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.card-head>div:first-child{flex:1;min-width:180px}
+.card-head .hint{margin:0}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow);min-width:0}
+.kpi .k{font-size:12px;color:var(--text-2)}
+.kpi .v{font-size:24px;font-weight:650;font-variant-numeric:tabular-nums;margin-top:2px;letter-spacing:-.01em;white-space:nowrap}
+.kpi .s{font-size:12px;color:var(--text-3);margin-top:1px}
+.kpis.sm .kpi{padding:9px 12px}.kpis.sm .v{font-size:18px}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+.grid32{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:14px}
+.pos{color:var(--pos)}.neg{color:var(--neg)}.muted{color:var(--text-3)}.small{font-size:12px}
+table.t{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+table.t th{text-align:left;font-weight:500;color:var(--text-2);border-bottom:1px solid var(--border);padding:7px 8px;white-space:nowrap;font-size:12px}
+table.t th.s{cursor:pointer;user-select:none}
+table.t th.s:hover{color:var(--text)}
+table.t td{padding:7px 8px;border-bottom:1px solid var(--grid);vertical-align:top}
+table.t tr.click{cursor:pointer}
+table.t tr.click:hover td{background:var(--surface-2)}
+table.t tr.sel td{background:var(--accent-soft)}
 .num{text-align:right}
+.scroll{overflow-x:auto}
+main a{color:var(--accent);text-decoration:none}
 code{font:12px ui-monospace,SFMono-Regular,Menlo,monospace}
-.badge{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;white-space:nowrap}
-.badge i{font-style:normal;display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;color:#fff;font-size:11px}
-.badge.ok i{background:var(--good)} .badge.bad i{background:var(--critical)}
-.badge .lbl{color:var(--text-primary)}
-.hide-sm{display:none}
-@media(min-width:720px){.hide-sm{display:table-cell}}
+.seg{display:inline-flex;background:var(--surface-2);border-radius:9px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{border:0;background:transparent;color:var(--text-2);font-size:13px;padding:5px 11px;border-radius:7px;cursor:pointer}
+.seg button.on{background:var(--surface);color:var(--text);font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.btn{border:1px solid var(--border);background:var(--surface);border-radius:8px;padding:6px 11px;cursor:pointer;font-size:13px;color:var(--text-2)}
+.btn:hover{color:var(--text);background:var(--surface-2)}
+.btn.icon{padding:6px 9px;line-height:1}
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.badge.ok{background:color-mix(in srgb,var(--pos) 14%,transparent);color:var(--pos)}
+.badge.bad{background:color-mix(in srgb,var(--neg) 12%,transparent);color:var(--neg)}
+.badge.mid{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn)}
+.badge.neu{background:var(--surface-2);color:var(--text-2)}
+/* calendario */
+.cal-nav{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cal-title{font-size:17px;font-weight:650;min-width:150px;text-transform:capitalize}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr)) minmax(0,1.1fr);gap:5px;margin-top:12px}
+.cal .h{font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.04em;padding:0 4px 2px}
+.day{border:1px solid var(--grid);border-radius:9px;min-height:78px;padding:6px 7px;display:flex;flex-direction:column;gap:2px;background:var(--surface);position:relative;min-width:0}
+.day.out{opacity:.35}
+.day.has{cursor:pointer}
+.day.has:hover{outline:2px solid var(--accent);outline-offset:-1px}
+.day.sel{outline:2px solid var(--accent);outline-offset:-1px}
+.day .dn{font-size:11px;color:var(--text-3);font-weight:600}
+.day .dv{font-size:15px;font-weight:650;font-variant-numeric:tabular-nums;margin-top:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.day .dv.short{display:none}
+.day .dt{font-size:11px;color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.day.wk{background:var(--surface-2);border-color:transparent}
+.day.wk .dn{text-transform:uppercase;letter-spacing:.03em}
+.day.we{background:transparent;border-style:dashed}
+.year-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:12px}
+.mini{border:1px solid var(--grid);border-radius:10px;padding:10px;cursor:pointer;min-width:0}
+.mini:hover{border-color:var(--accent)}
+.mini .mh{display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:6px;text-transform:capitalize}
+.mini .mg{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.mini .c{aspect-ratio:1;border-radius:3px;background:var(--grid)}
+.mini .c.e{background:transparent}
+.legend{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-3);margin-top:10px;flex-wrap:wrap}
+.legend .sw{width:14px;height:10px;border-radius:2px}
+/* heatmap */
+.hm td.c{text-align:center;font-size:12px;border-radius:0;min-width:52px;cursor:pointer}
+.hm td.c:hover{outline:2px solid var(--accent);outline-offset:-2px}
+/* graficos */
 .chart{position:relative}
 .chart svg{display:block;width:100%;height:auto;overflow:visible}
-.legend{display:flex;gap:14px;font-size:12px;color:var(--text-secondary);margin:4px 0 6px;flex-wrap:wrap}
-.legend span::before{content:"";display:inline-block;width:12px;height:3px;border-radius:2px;background:var(--c);vertical-align:middle;margin-right:5px}
-.tip{position:absolute;pointer-events:none;background:var(--surface-1);border:1px solid var(--border);border-radius:8px;
-  padding:6px 8px;font-size:12px;box-shadow:0 4px 14px rgba(0,0,0,.12);display:none;white-space:nowrap;font-variant-numeric:tabular-nums}
-.tip b{font-weight:600}
-.tip .sw{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px;background:var(--c)}
-.grid2{display:grid;gap:12px}
-@media(min-width:860px){.grid2{grid-template-columns:1fr 1fr}}
+.tip{position:absolute;pointer-events:none;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:6px 9px;font-size:12px;box-shadow:0 6px 18px rgba(0,0,0,.14);display:none;white-space:nowrap;font-variant-numeric:tabular-nums;z-index:5}
+.lg{display:flex;gap:14px;font-size:12px;color:var(--text-2);margin:0 0 6px;flex-wrap:wrap}
+.lg span::before{content:"";display:inline-block;width:12px;height:3px;border-radius:2px;background:var(--c);vertical-align:middle;margin-right:5px}
+/* diario */
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.chips button{border:1px solid var(--border);background:var(--surface);color:var(--text-2);border-radius:999px;padding:4px 11px;font-size:12px;cursor:pointer}
+.chips button.on{background:var(--text);color:var(--surface);border-color:var(--text)}
+.jday{margin:14px 0 4px;font-size:12px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.04em}
+.ji{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--grid)}
+.jic{flex:none;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font-size:14px;background:var(--surface-2)}
+.jb{min-width:0;flex:1}
+.jh{display:flex;gap:8px;align-items:baseline}
+.jk{font-size:11px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.04em}
+.jt{font-size:11px;color:var(--text-3);margin-left:auto}
+.jm{font-size:14px;margin-top:1px;overflow-wrap:anywhere}
+.jb ul{margin:4px 0 0;padding-left:18px;font-size:13px;color:var(--text-2)}
+.jb li{margin:2px 0;overflow-wrap:anywhere}
+.md p{margin:6px 0;color:var(--text-2)} .md .mh{font-weight:650;margin:12px 0 6px;font-size:14px}
 .todo{list-style:none;margin:0;padding:0;font-size:13px}
-.todo li{padding:5px 0;border-bottom:1px solid var(--grid);display:flex;gap:8px}
-.todo li.done{color:var(--text-muted)}
-.todo .sec{font-weight:600;color:var(--text-secondary);border:0;padding-top:10px}
-.box{display:inline-grid;place-items:center;width:16px;height:16px;border:1.5px solid var(--text-muted);border-radius:4px;flex:none;font-size:11px;margin-top:1px}
-li.done .box{background:var(--text-muted);color:var(--surface-1);border-color:var(--text-muted)}
-.empty{padding:22px 4px;text-align:center;color:var(--text-secondary)}
-.small{font-size:12px}
-.seg{display:inline-flex;background:var(--grid);border-radius:8px;padding:2px;gap:2px;flex-wrap:wrap}
-.seg button{border:0;background:transparent;color:var(--text-secondary);font:inherit;font-size:13px;padding:5px 10px;border-radius:6px;cursor:pointer}
-.seg button.on{background:var(--surface-1);color:var(--text-primary);font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.08)}
-.ctrls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0 10px}
-.ctrls label{font-size:12px;color:var(--text-secondary);display:inline-flex;align-items:center;gap:6px}
-.ctrls input{width:72px;font:inherit;font-size:13px;padding:4px 6px;border:1px solid var(--border);border-radius:6px;background:var(--surface-1);color:var(--text-primary)}
-.ptiles{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px}
-@media(min-width:720px){.ptiles{grid-template-columns:repeat(6,1fr)}}
-.ptiles .tile{padding:8px 10px}.ptiles .tile .v{font-size:19px}
-.pos{color:var(--text-primary)} .more{margin-top:8px;border:1px solid var(--border);background:var(--surface-1);color:var(--text-secondary);border-radius:8px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer}
-.now{display:flex;align-items:center;gap:10px;background:var(--surface-1);border:1px solid var(--border);border-radius:12px;padding:10px 14px;margin-top:14px;font-size:14px}
-.dot{width:10px;height:10px;border-radius:50%;flex:none;background:var(--text-muted)}
-.dot.live{background:var(--good);box-shadow:0 0 0 0 rgba(12,163,12,.6);animation:pulse 1.6s infinite}
-.dot.err{background:var(--critical)}
-@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(12,163,12,.55)}70%{box-shadow:0 0 0 9px rgba(12,163,12,0)}100%{box-shadow:0 0 0 0 rgba(12,163,12,0)}}
-.now .rt{margin-left:auto;font-size:11px;color:var(--text-muted);white-space:nowrap}
-.journal{list-style:none;margin:0;padding:0}
-.jsess{margin:12px 0 4px;font-size:12px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.04em}
-.jitem{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--grid)}
-.jicon{flex:none;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font-size:15px;background:var(--grid)}
-.jbody{min-width:0;flex:1}
-.jhead{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
-.jkind{font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.04em}
-.jtime{font-size:11px;color:var(--text-muted);margin-left:auto}
-.jtitle{font-size:14px;color:var(--text-primary);margin-top:1px;overflow-wrap:anywhere}
-.jbody ul{margin:4px 0 0;padding-left:18px;font-size:13px;color:var(--text-secondary)}
-.jbody li{margin:2px 0;overflow-wrap:anywhere}
-.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
-.chips button{border:1px solid var(--border);background:var(--surface-1);color:var(--text-secondary);border-radius:999px;padding:4px 10px;font:inherit;font-size:12px;cursor:pointer}
-.chips button.on{background:var(--text-primary);color:var(--surface-1);border-color:var(--text-primary)}
-.why{list-style:none;margin:6px 0 4px;padding:0;font-size:13px}
-.why li{display:flex;gap:8px;padding:3px 0;align-items:flex-start}
-.why .ck{flex:none;width:18px;height:18px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:11px;margin-top:1px}
-.why .ok{background:var(--good)} .why .no{background:var(--critical)}
-.whybox{background:var(--grid);border-radius:10px;padding:8px 12px;margin:8px 0}
-details summary{cursor:pointer;color:var(--text-secondary);font-size:13px}
+.todo li{padding:6px 0;border-bottom:1px solid var(--grid);display:flex;gap:8px}
+.todo li.done{color:var(--text-2)}
+.todo .sec{font-weight:650;color:var(--text);border:0;padding-top:14px}
+.box{display:inline-grid;place-items:center;width:16px;height:16px;border:1.5px solid var(--text-3);border-radius:4px;flex:none;font-size:10px;margin-top:2px}
+li.done .box{background:var(--pos);color:#fff;border-color:var(--pos)}
+.empty{padding:28px 8px;text-align:center;color:var(--text-3)}
+.pager{display:flex;align-items:center;gap:8px;justify-content:flex-end;margin-top:10px;font-size:12px;color:var(--text-2)}
+.split{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.bar-in{height:6px;border-radius:3px;background:var(--grid);overflow:hidden;min-width:60px}
+.bar-in>div{height:100%;border-radius:3px}
+.mob-nav{display:none}
+@media(max-width:1100px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.year-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:900px){
+  .app{grid-template-columns:1fr}
+  aside{display:none}
+  .mob-nav{display:flex;position:sticky;top:0;z-index:10;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;gap:2px;padding:8px 10px;scrollbar-width:none}
+  .mob-nav a{white-space:nowrap;padding:7px 11px;border-radius:8px;color:var(--text-2);text-decoration:none;font-size:13px}
+  .mob-nav a.on{background:var(--accent-soft);color:var(--accent);font-weight:600}
+  main{padding:16px 16px 50px}
+  .grid2,.grid32{grid-template-columns:1fr}
+  .year-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:620px){
+  .cal{grid-template-columns:repeat(7,minmax(0,1fr));gap:3px}
+  .cal .wkc{display:none}
+  .day{min-height:54px;padding:4px;border-radius:6px}
+  .day .dv{font-size:11px}.day .dt{display:none}.day .dv.full{display:none}.day .dv.short{display:block}
+  .kpi .v{font-size:20px}
+  .hide-sm{display:none}
+}
 </style>
 </head>
 <body>
-<div class="viz-root"><div class="wrap">
-  <header>
-    <h1>Bottrading · Laboratório</h1>
-    <p id="sub">A carregar…</p>
-  </header>
-  <div class="now" id="now"><span class="dot" id="nowDot"></span><span id="nowTxt">A verificar o estado do agente…</span><span class="rt" id="rt"></span></div>
-  <div class="tiles" id="tiles"></div>
-  <section><h2>Diário do agente <span class="muted small">· o que pensou, testou e mudou</span></h2>
-    <div class="chips" id="jchips"></div><div id="journal" style="max-height:620px;overflow:auto"></div></section>
-  <section id="sumSec" hidden><h2>Leitura do agente</h2><div class="summary" id="summary"></div></section>
-  <section id="ideasSec" hidden><details><summary style="font-size:15px;font-weight:600;color:var(--text-primary)">Ideias do agente</summary><div class="summary" id="ideas" style="margin-top:8px"></div></details></section>
-  <section>
-    <h2>Variantes testadas <span class="muted small">· toca numa linha para ver a curva</span></h2>
-    <div id="runsBox"></div>
-  </section>
-  <section id="detail" hidden></section>
-  <div class="grid2">
-    <section><h2>Plano de testes</h2><ul class="todo" id="todo"></ul></section>
-    <section>
-      <h2>Como ler isto</h2>
-      <div class="small" style="color:var(--text-secondary)">
-        <p style="margin-top:0"><b>R</b> = quanto arriscas por trade. +2R = ganhaste 2× o risco; −1R = levaste o stop. Já com spread e slippage de CFD.</p>
-        <p><b>Dev (2019–2024)</b> serve para escolher. <b>Holdout (2025–2026)</b> fica fechado e só se abre uma vez por variante que passe no dev.</p>
-        <p style="margin-bottom:0"><b>Para passar:</b> ≥100 trades em cada índice, média positiva no NQ, no S&amp;P e no Dow, e t-stat conjunto ≥ 2,5. Uma variante que só funcione num índice é sorte.</p>
+<div class="app">
+  <aside>
+    <div class="brand"><span class="logo">B</span>Bottrading</div>
+    <nav id="nav"></nav>
+    <div class="side-foot">
+      <label class="ctl" style="justify-content:space-between">Tema
+        <select id="theme" onchange="setTheme(this.value)"><option value="">Automático</option><option value="light">Claro</option><option value="dark">Escuro</option></select></label>
+      <span id="rt">a ligar…</span>
+    </div>
+  </aside>
+  <div style="min-width:0">
+    <div class="mob-nav" id="mnav"></div>
+    <main>
+      <div class="top">
+        <h1 id="ttl">Visão geral<span class="sub" id="ttlSub"></span></h1>
+        <label class="ctl" id="pfCtl">Carteira <select id="pfSel" onchange="setPf(this.value)"></select></label>
+        <label class="ctl">Conta <input type="number" id="acc" min="100" step="500" onchange="setAcc(this.value)"> €</label>
       </div>
-      <details style="margin-top:10px" id="holdBox" hidden><summary>Registo do holdout</summary><pre class="small" id="hold" style="white-space:pre-wrap"></pre></details>
-    </section>
+      <div class="status"><span class="dot" id="dot"></span><span id="stTxt">A carregar…</span></div>
+      <div id="view"></div>
+    </main>
   </div>
-</div></div>
+</div>
+<div class="tip" id="tip"></div>
 
 <script>
-const MK = {nq:"NQ (Nasdaq)", es:"S&P 500", dow:"Dow"};
-const MK_SHORT = {nq:"NQ", es:"ES", dow:"Dow"};
-const SER = {nq:"var(--series-1)", es:"var(--series-2)", dow:"var(--series-3)"};
-const fmt = (x, d=2) => (x>0?"+":x<0?"−":"") + Math.abs(x).toFixed(d).replace(".", ",");
-const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-
-function badge(v){
-  const ok = v.startsWith("PASSA");
-  const why = ok ? "" : (v.match(/\((.*)\)/)||[,""])[1];
-  return `<span class="badge ${ok?"ok":"bad"}"><i>${ok?"✓":"✕"}</i><span class="lbl">${ok?"Passa":"Reprovada"}</span></span>`
-    + (why ? `<div class="small muted">${esc(why)}</div>` : "");
-}
-
-
-const ORIG=new Set(["bounce","break","fake"].flatMap(p=>["pdhl","pwhl","swing1h","round"].map(l=>p+"|"+l)).concat(["antonio|all"]));
-function why(run){
-  const minT=ORIG.has(run.params.play+"|"+run.params.levels)||run.params.play==="antonio"?2.5:3.0;
-  const ks=["nq","es","dow"].filter(k=>run.markets[k]);
-  const m=k=>run.markets[k], nm=k=>MK_SHORT[k];
-  const minN=run.params.play==="swing"?60:100;
-  const c1=ks.every(k=>m(k).n>=minN), c2=ks.every(k=>m(k).meanR>0), c3=run.pooled.t>=minT;
-  const items=[
-    [c1, `Trades suficientes (≥${minN} em cada índice): `+ks.map(k=>`${nm(k)} ${m(k).n}`).join(" · ")],
-    [c2, `Ganha dinheiro em todos os índices (média por trade > 0): `+ks.map(k=>`${nm(k)} ${fmt(m(k).meanR,3)}R`).join(" · ")],
-    [c3, `Resultado forte o suficiente para não ser sorte (t junto ${fmt(run.pooled.t)} vs mínimo ${String(minT).replace(".",",")})`],
-  ];
-  let plain;
-  if(c1&&c2&&c3) plain="Passou: dá lucro nos três índices, com trades suficientes e um resultado demasiado forte para ser só sorte.";
-  else { const bad=ks.filter(k=>m(k).meanR<=0).map(nm), good=ks.filter(k=>m(k).meanR>0).map(nm);
-    if(!c2 && !good.length) plain="Reprovou: perde dinheiro em todos os índices depois de custos.";
-    else if(!c2) plain=`Reprovou: dá lucro em ${good.join(" e ")} mas perde em ${bad.join(" e ")}. Um edge real devia aparecer em todos, por isso o lucro onde aparece é provavelmente sorte.`;
-    else if(!c1) plain="Reprovou: não há trades suficientes para tirar conclusões.";
-    else plain=`Reprovou: dá lucro nos três índices, mas o resultado ainda é fraco demais (t ${fmt(run.pooled.t)}) para excluir a sorte.`; }
-  if(run.fut&&run.fut.markets){const f=run.fut.markets; plain+=` Com micro-futuros (sem financiamento, custos mais baixos): `+["nq","es","dow"].filter(k=>f[k]).map(k=>`${MK_SHORT[k]} ${fmt(f[k].meanR,3)}R`).join(" · ")+` → ${run.fut.verdict.startsWith("PASSA")?"passaria":"também não passa"}.`;}
-  return `<div class="whybox"><b>Porquê?</b> ${esc(plain)}<ul class="why">${items.map(([ok,t])=>`<li><span class="ck ${ok?"ok":"no"}">${ok?"✓":"✕"}</span><span>${esc(t)}</span></li>`).join("")}</ul></div>`;
-}
-function whyShort(run){
-  const ks=["nq","es","dow"].filter(k=>run.markets[k]); const m=k=>run.markets[k];
-  if(run.verdict.startsWith("PASSA")) return "lucro nos 3 índices e t forte";
-  const good=ks.filter(k=>m(k).meanR>0).map(k=>MK_SHORT[k]);
-  if(!good.length) return "perde nos 3 índices";
-  if(good.length<ks.length) return "lucro só em "+good.join(" e ");
-  if(ks.some(k=>m(k).n<(run.params.play==="swing"?60:100))) return "poucas trades";
-  return "lucro nos 3, mas fraco (t "+fmt(run.pooled.t)+")";
-}
-
-function goalTile(d){
-  const P=d.portfolio; const v=P?P.media:0, pc=Math.max(0,Math.min(100,v/14*100));
-  const yrs=P?Object.entries(P.por_ano).filter(([y])=>+y>=2013&&+y<=2024):[];
-  const bars=yrs.map(([y,x])=>`<div title="${y}: ${x>0?"+":""}${x}%" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="height:46px;width:100%;display:flex;align-items:flex-end;justify-content:center"><div style="width:70%;height:${Math.min(46,Math.abs(x)/14*46)}px;min-height:2px;border-radius:2px;background:${x>=14?"var(--good)":x>=0?"var(--series-1)":"var(--series-2)"}"></div></div><span style="font-size:9px;color:var(--text-muted)">${y.slice(2)}</span></div>`).join("");
-  return `<div class="tile" style="grid-column:1/-1"><div class="k">Objetivo: +14% ao ano · carteira com 1% de risco por trade</div>
-    <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap"><div class="v">${v>0?"+":""}${v.toFixed(1).replace(".",",")}%</div><div class="s">${P?`média por ano · ${P.anos_ok} de ${P.anos} anos acima de 14% · pior queda ${P.dd.toFixed(1).replace(".",",")}%${P.pior_mes!=null?` · pior mês ${P.pior_mes.toFixed(1).replace(".",",")}% · pior ano ${P.pior_ano.toFixed(1).replace(".",",")}% · ${P.meses_pos}/${P.meses} meses positivos`:""} · ${(P.trades_ano/52).toFixed(1).replace(".",",")} trades/semana (objetivo 2–3) · ${esc(P.ideas.join(", "))}`:"ainda sem carteira"}</div></div>
-    <div style="height:8px;background:var(--grid);border-radius:4px;margin-top:6px;overflow:hidden"><div style="height:100%;width:${pc}%;background:var(--series-1);border-radius:4px"></div></div>
-    ${bars?`<div style="display:flex;gap:2px;margin-top:8px">${bars}</div><div class="s">% por ano (verde = acima de 14%)</div>`:""}</div>`;
-}
-function tiles(d){
-  const dev = d.runs.filter(r=>r.period==="dev"), hold = d.runs.filter(r=>r.period==="holdout");
-  const pass = dev.filter(r=>r.verdict.startsWith("PASSA")).length;
-  const open = d.todo.filter(t=>!t.done).length;
-  const best = dev.slice().sort((a,b)=>b.pooled.t-a.pooled.t)[0];
-  const T = (k,v,s="") => `<div class="tile"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${s}</div></div>`;
-  document.getElementById("tiles").innerHTML =
-    T("Variantes testadas (dev)", dev.length, `de ${d.todo.length} no plano`) +
-    T("Passaram no dev", pass, pass ? "candidatas ao holdout" : "nenhuma até agora") +
-    T("Holdout aberto", hold.length, hold.filter(r=>r.verdict.startsWith("PASSA")).length + " passaram") +
-    T("Melhor t conjunto", best ? fmt(best.pooled.t) : "—", best ? esc(best.variant) : "ainda sem testes") +
-    goalTile(d);
-}
-
-let LASTD=null;
-function portfolioRow(P){
-  return `<tr class="row" data-pf="1"><td><code>Carteira: ${esc(P.ideas.join(" + "))}</code><div class="small muted">${P.por_indice.length} índices · 2012–2024 · 1% por trade</div></td>
-    <td><span class="badge ${P.anos_ok>=P.anos-1?"ok":"bad"}"><i>${P.anos_ok>=P.anos-1?"✓":"✕"}</i><span class="lbl">${P.media>=14?"Objetivo atingido":"Abaixo dos 14%"}</span></span><div class="small muted">${P.media>0?"+":""}${P.media.toFixed(1).replace(".",",")}% ao ano · ${P.anos_ok}/${P.anos} anos ≥14%</div></td>
-    <td class="num">—</td><td class="num hide-sm" colspan="3">pior queda ${P.dd.toFixed(1).replace(".",",")}% · ${(P.trades_ano/52).toFixed(1).replace(".",",")} trades/semana</td></tr>`;
-}
-function portfolioDetail(P){
-  const el=document.getElementById("detail"); el.hidden=false; PV.run=null;
-  const yrs=Object.entries(P.por_ano).filter(([y])=>+y>=2012&&+y<=2024);
-  const idx=P.por_indice.slice().sort((a,b)=>b["%/ano"]-a["%/ano"]);
-  const NM={nq:"NQ (US100)",es:"S&P (US500)",dow:"Dow (US30)",dax:"DAX (GER40)",ftse:"FTSE (UK100)",nikkei:"Nikkei (JP225)",estx:"Euro Stoxx (EU50)",cac:"CAC (FRA40)",asx:"ASX (AUS200)",hsi:"Hang Seng (HK50)"};
-  el.innerHTML=`<h2>Carteira: ${esc(P.ideas.join(" + "))} <span class="muted small">· 2012–2024 · 1% por trade</span></h2>
-    ${P.regras?`<div class="whybox"><b>Regras de risco:</b> máximo ${P.regras.max_open} trades abertas${P.regras.region_cap?`, ${P.regras.region_cap} por região (EUA / Europa / Ásia)`:""}, 1 por índice${P.regras.month_stop?`, e se o mês já perdeu ${P.regras.month_stop}% não abre mais trades até ao mês seguinte`:""}. Pior mês ${P.pior_mes.toFixed(1).replace(".",",")}%, pior ano ${P.pior_ano.toFixed(1).replace(".",",")}%, ${P.meses_pos} de ${P.meses} meses positivos.</div>`:""}
-    <div class="whybox"><b>Resumo:</b> média de <b>${P.media>0?"+":""}${P.media.toFixed(1).replace(".",",")}% ao ano</b>, ${P.anos_ok} de ${P.anos} anos acima de 14%, pior queda ${P.dd.toFixed(1).replace(".",",")}%, ${Math.round(P.trades_ano)} trades por ano. ${P.media>=14?"Atinge o objetivo.":`Faltam ${(14-P.media).toFixed(1).replace(".",",")}% por ano para o objetivo.`}</div>
-    <div class="grid2"><div style="overflow-x:auto"><table class="runs"><thead><tr><th>Ano</th><th class="num">Resultado</th><th class="num">€ (conta ${eurFmt(ACC)})</th></tr></thead><tbody>
-      ${yrs.map(([y,x])=>`<tr><td>${y}</td><td class="num"><b>${x>0?"+":""}${(+x).toFixed(1).replace(".",",")}%</b>${x>=14?" ✓":""}</td><td class="num">${eurFmt(x/100*ACC)}</td></tr>`).join("")}
-    </tbody></table></div>
-    <div style="overflow-x:auto"><table class="runs"><thead><tr><th>Índice</th><th>Estratégia</th><th class="num">Trades</th><th class="num">Por trade</th><th class="num">% / ano</th></tr></thead><tbody>
-      ${idx.map(r=>`<tr><td>${NM[r.indice]||r.indice}</td><td><code>${esc(r.ideia)}</code></td><td class="num">${r.trades}</td><td class="num">${fmt(r["R/trade"],3)}R</td><td class="num">${r["%/ano"]>0?"+":""}${(+r["%/ano"]).toFixed(2).replace(".",",")}%</td></tr>`).join("")}
-    </tbody></table></div></div>`;
-  el.scrollIntoView({behavior:"smooth",block:"start"});
-}
-function runsTable(d){
-  LASTD=d;
-  const box = document.getElementById("runsBox");
-  if(!d.runs.length){
-    box.innerHTML = `<div class="empty">Ainda não há resultados.<br><span class="small">O agente corre os testes do plano à noite. Os resultados aparecem aqui sozinhos.</span></div>`;
-    return;
-  }
-  const runs = d.runs.slice().sort((a,b)=> (a.period===b.period?0:a.period==="holdout"?-1:1) || b.pooled.t-a.pooled.t);
-  const cell = m => m && m.n ? `${fmt(m.meanR,3)}R<div class="small muted">n ${m.n} · t ${fmt(m.t)}</div>` : `<span class="muted">—</span>`;
-  box.innerHTML = `<div style="overflow-x:auto"><table class="runs"><thead><tr>
-    <th>Variante</th><th>Veredicto</th><th class="num">t junto</th>
-    <th class="num hide-sm">NQ (o teu)</th><th class="num hide-sm">S&amp;P</th><th class="num hide-sm">Dow</th></tr></thead><tbody>
-    ${runs.map((r,i)=>`<tr class="row" data-i="${i}"><td><code>${esc(r.variant)}</code><div class="small muted">${r.period==="dev"?"dev 2019–24":r.period==="pre"?"às cegas 2012–18":"HOLDOUT 2025–26"} · ${esc(r.date.replace("T"," "))}</div></td>
-      <td>${badge(r.verdict).replace(/<div class="small muted">.*<\/div>/,"")}<div class="small muted">${esc(whyShort(r))}</div></td><td class="num">${fmt(r.pooled.t)}</td>
-      <td class="num hide-sm">${cell(r.markets.nq)}</td><td class="num hide-sm">${cell(r.markets.es)}</td><td class="num hide-sm">${cell(r.markets.dow)}</td></tr>`).join("")}
-    </tbody></table></div>`;
-  if(d.portfolio){ const tb=box.querySelector("tbody"); tb.insertAdjacentHTML("afterbegin", portfolioRow(d.portfolio)); }
-  box.querySelectorAll("tr.row").forEach(tr=>tr.addEventListener("click",()=>{
-    box.querySelectorAll("tr.sel").forEach(x=>x.classList.remove("sel"));
-    tr.classList.add("sel"); if(tr.dataset.pf) portfolioDetail(d.portfolio); else detail(runs[+tr.dataset.i]);
-  }));
-}
-
-function chart(run){
-  const keys = Object.keys(run.equity).filter(k=>run.equity[k].length);
-  if(!keys.length) return `<div class="empty small">Sem trades nesta variante.</div>`;
-  const W=Math.max(340,Math.min(760,(document.getElementById("detail").clientWidth||760)-32)),H=W<500?240:300,L=40,R=64,T=10,B=26;
-  const pts = keys.flatMap(k=>run.equity[k].map(p=>({k,t:Date.parse(p[0]),v:p[1],d:p[0]})));
-  const t0=Math.min(...pts.map(p=>p.t)), t1=Math.max(...pts.map(p=>p.t));
-  let v0=Math.min(0,...pts.map(p=>p.v)), v1=Math.max(0,...pts.map(p=>p.v));
-  const pad=(v1-v0)*0.08||1; v0-=pad; v1+=pad;
-  const x=t=>L+(t-t0)/Math.max(t1-t0,1)*(W-L-R), y=v=>T+(v1-v)/(v1-v0)*(H-T-B);
-  const step = niceStep((v1-v0)/5); let ticks=[];
-  for(let v=Math.ceil(v0/step)*step; v<=v1; v+=step) ticks.push(v);
-  const y0=new Date(t0).getFullYear(), y1=new Date(t1).getFullYear(); const yrs=[];
-  for(let yy=y0+1; yy<=y1; yy++) yrs.push(yy);
-  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="R acumulado por índice">`;
-  ticks.forEach(v=>{ s+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--grid)"/>
-    <text x="${L-6}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="var(--text-muted)">${Math.round(v)}R</text>`; });
-  s+=`<line x1="${L}" x2="${W-R}" y1="${y(0)}" y2="${y(0)}" stroke="var(--text-muted)" stroke-dasharray="3 3"/>`;
-  yrs.forEach(yy=>{const xx=x(Date.parse(yy+"-01-01")); s+=`<text x="${xx}" y="${H-6}" text-anchor="middle" font-size="11" fill="var(--text-muted)">${yy}</text>`;});
-  const ends=[];
-  keys.forEach(k=>{
-    const e=run.equity[k];
-    s+=`<polyline fill="none" stroke="${SER[k]}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="${e.map(p=>x(Date.parse(p[0])).toFixed(1)+","+y(p[1]).toFixed(1)).join(" ")}"/>`;
-    const last=e[e.length-1]; ends.push({k,y:y(last[1]),v:last[1]});
-  });
-  ends.sort((a,b)=>a.y-b.y); for(let i=1;i<ends.length;i++) if(ends[i].y-ends[i-1].y<14) ends[i].y=ends[i-1].y+14;
-  ends.forEach(e=>{ s+=`<text x="${W-R+6}" y="${e.y+4}" font-size="11" fill="var(--text-secondary)">${MK_SHORT[e.k]} ${fmt(e.v,1)}R</text>`; });
-  s+=`<line id="xh" y1="${T}" y2="${H-B}" stroke="var(--text-muted)" stroke-width="1" visibility="hidden"/>`;
-  keys.forEach(k=>{ s+=`<circle id="dot-${k}" r="4.5" fill="${SER[k]}" stroke="var(--surface-1)" stroke-width="2" visibility="hidden"/>`; });
-  s+=`<rect id="hit" x="${L}" y="${T}" width="${W-L-R}" height="${H-T-B}" fill="transparent"/></svg>`;
-  chart._ctx={run,keys,x,y,t0,t1,W,L,R};
-  return `<div class="legend">${keys.map(k=>`<span style="--c:${SER[k]}">${MK[k]}</span>`).join("")}</div>
-    <div class="chart" id="chartBox">${s}<div class="tip" id="tip"></div></div>`;
-}
-function niceStep(r){const p=Math.pow(10,Math.floor(Math.log10(r||1)));const n=r/p;return (n<1.5?1:n<3?2:n<7?5:10)*p;}
-
-function hookHover(){
-  const c=chart._ctx; if(!c) return;
-  const box=document.getElementById("chartBox"), svg=box.querySelector("svg"), tip=document.getElementById("tip");
-  const move=ev=>{
-    const r=svg.getBoundingClientRect(), sx=(ev.touches?ev.touches[0].clientX:ev.clientX)-r.left;
-    const vx=sx/r.width*c.W; const t=c.t0+(vx-c.L)/(c.W-c.L-c.R)*(c.t1-c.t0);
-    let rows=[], date="";
-    c.keys.forEach(k=>{
-      const e=c.run.equity[k]; let best=e[0], bd=Infinity;
-      for(const p of e){const d=Math.abs(Date.parse(p[0])-t); if(d<bd){bd=d;best=p;}}
-      const dot=svg.querySelector("#dot-"+k); dot.setAttribute("cx",c.x(Date.parse(best[0]))); dot.setAttribute("cy",c.y(best[1])); dot.setAttribute("visibility","visible");
-      rows.push(`<div><span class="sw" style="--c:${SER[k]}"></span>${MK_SHORT[k]} <b>${fmt(best[1],1)}R</b></div>`); date=best[0];
-    });
-    const xh=svg.querySelector("#xh"); const xx=c.x(t); xh.setAttribute("x1",xx); xh.setAttribute("x2",xx); xh.setAttribute("visibility","visible");
-    tip.innerHTML=`<div class="muted">${date}</div>`+rows.join(""); tip.style.display="block";
-    const px=xx/c.W*r.width; tip.style.left=Math.min(Math.max(px+10,0), r.width-tip.offsetWidth)+"px"; tip.style.top="8px";
-  };
-  const leave=()=>{tip.style.display="none"; svg.querySelectorAll("circle,#xh").forEach(n=>n.setAttribute("visibility","hidden"));};
-  const hit=svg.querySelector("#hit");
-  hit.addEventListener("mousemove",move); hit.addEventListener("touchmove",move,{passive:true}); hit.addEventListener("touchstart",move,{passive:true});
-  hit.addEventListener("mouseleave",leave); hit.addEventListener("touchend",leave);
-}
-
-function detail(run){
-  const el=document.getElementById("detail"); el.hidden=false;
-  const mk=Object.keys(run.markets);
-  const years=[...new Set(mk.flatMap(k=>Object.keys(run.yearly[k]||{})))].sort();
-  el.innerHTML=`<h2><code>${esc(run.variant)}</code> <span class="muted small">· ${run.period==="dev"?"dev 2019–2024":run.period==="pre"?"teste às cegas 2012–2018":"holdout 2025–2026"}</span></h2>
-    <div style="margin-bottom:6px">${badge(run.verdict).replace(/<div class="small muted">.*<\/div>/,"")}</div>
-    ${why(run)}
-    <div class="small muted" style="margin:6px 0 2px">R acumulado por índice (depois de custos)</div>
-    ${chart(run)}
-    <div class="grid2" style="margin-top:10px">
-      <div style="overflow-x:auto"><table class="runs"><thead><tr><th>Índice</th><th class="num">Trades</th><th class="num">Média R</th><th class="num">t</th><th class="num">Acerto</th><th class="num">R/mês</th><th class="num">Pior DD</th></tr></thead><tbody>
-      ${mk.map(k=>{const m=run.markets[k];return `<tr><td>${MK[k]}</td><td class="num">${m.n}</td><td class="num">${fmt(m.meanR,3)}</td><td class="num">${fmt(m.t)}</td><td class="num">${String(m["win%"]).replace(".",",")}%</td><td class="num">${fmt(m["R/mes"])}</td><td class="num">${fmt(m.maxDD_R,1)}R</td></tr>`}).join("")}
-      </tbody></table></div>
-      <div style="overflow-x:auto"><table class="runs"><thead><tr><th>Ano</th>${mk.map(k=>`<th class="num">${MK_SHORT[k]}</th>`).join("")}</tr></thead><tbody>
-      ${years.map(yy=>`<tr><td>${yy}</td>${mk.map(k=>{const v=(run.yearly[k]||{})[yy];return `<td class="num">${v==null?"—":fmt(v,1)+"R"}</td>`}).join("")}</tr>`).join("")}
-      </tbody></table></div>
-    </div>
-    <h2 style="margin-top:18px">Resultados por período</h2>
-    <div class="small muted" style="margin-top:-6px">Abre no NQ, que é o que operas. O S&amp;P e o Dow servem só para confirmar que não é sorte.</div>
-    <div id="pview"></div>
-    <div class="small muted" style="margin-top:8px">Parâmetros: ${esc(Object.entries(run.params).map(([k,v])=>k+"="+v).join(" · "))}</div>`;
-  hookHover();
-  PV.run=run; renderPeriods();
-  el.scrollIntoView({behavior:"smooth",block:"start"});
-}
-
-function todoList(d){
-  let html="", sec=null;
-  d.todo.forEach(t=>{ if(t.section!==sec){sec=t.section; html+=`<li class="sec">${esc(sec)}</li>`;}
-    html+=`<li class="${t.done?"done":""}"><span class="box">${t.done?"✓":""}</span><span>${esc(t.text.replace(/^python run\.py\s*/,""))}</span></li>`; });
-  document.getElementById("todo").innerHTML = html || `<li class="muted">Sem itens.</li>`;
-}
-
-
-let ACC=10000, RISK=1; try{ACC=+localStorage.getItem("bt_acc")||10000;}catch(e){}
-const PV={run:null,gran:"month",mk:"nq",get eur(){return ACC*RISK/100;},shown:40};
-const pct=x=>(x>0?"+":x<0?"−":"")+Math.abs(x*RISK).toFixed(1).replace(".",",")+"%";
-const GRAN={day:"Dia",week:"Semana",month:"Mês",year:"Ano"};
-const GRANP={day:"Dias",week:"Semanas",month:"Meses",year:"Anos"};
-function md(t){ // markdown simples: titulos, tabelas, negrito
-  const out=[]; const L=t.split("\n"); let i=0;
-  const inl=x=>esc(x).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/`(.+?)`/g,"<code>$1</code>");
-  while(i<L.length){ const l=L[i];
-    if(/^\s*\|/.test(l)){ const rows=[]; while(i<L.length&&/^\s*\|/.test(L[i])){ if(!/^\s*\|[\s|:-]+\|\s*$/.test(L[i])) rows.push(L[i].trim().replace(/^\||\|$/g,"").split("|").map(c=>c.trim())); i++; }
-      out.push(`<div style="overflow-x:auto"><table class="runs">${rows.map((r,j)=>`<tr>${r.map(c=>j?`<td>${inl(c)}</td>`:`<th>${inl(c)}</th>`).join("")}</tr>`).join("")}</table></div>`); continue; }
-    if(/^#+\s/.test(l)) out.push(`<div style="font-weight:600;color:var(--text-primary);margin:4px 0">${inl(l.replace(/^#+\s/,""))}</div>`);
-    else if(l.trim()) out.push(`<p style="margin:6px 0">${inl(l)}</p>`);
-    i++; }
-  return out.join("");
-}
-const MKSEL={nq:"NQ (o teu)",es:"S&P",dow:"Dow",all:"Todos"};
-const eurFmt=x=>(x<0?"−":"")+Math.abs(x).toLocaleString("pt-PT",{maximumFractionDigits:0})+" €";
-function plabel(g,k){ if(g==="week"){const d=new Date(k+"T00:00:00");const e=new Date(d.getTime()+4*864e5);return `${k.slice(8,10)}/${k.slice(5,7)} – ${String(e.getDate()).padStart(2,"0")}/${String(e.getMonth()+1).padStart(2,"0")}/${e.getFullYear()}`;}
-  if(g==="month"){const m=["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];return m[+k.slice(5,7)-1]+" "+k.slice(0,4);}
-  if(g==="day") return k.slice(8,10)+"/"+k.slice(5,7)+"/"+k.slice(0,4); return k;}
-function renderPeriods(){
-  const box=document.getElementById("pview"); if(!box) return;
-  const P=(PV.run.periods||{})[PV.mk]; const rows=P&&P[PV.gran]||[];
-  const seg=(obj,cur,fn)=>`<div class="seg">${Object.entries(obj).map(([k,v])=>`<button class="${k===cur?"on":""}" onclick="${fn}('${k}')">${v}</button>`).join("")}</div>`;
-  let h=`<div class="ctrls">${seg(GRAN,PV.gran,"setGran")}${seg(MKSEL,PV.mk,"setMk")}
-    <label>Conta € <input type="number" min="100" step="500" value="${ACC}" onchange="setAcc(this.value)" style="width:86px"></label>
-    <span class="small muted">risco 1% por trade = ${eurFmt(PV.eur)}</span></div>`;
-  if(!rows.length){ box.innerHTML=h+`<div class="empty small">Sem dados por período para este teste${PV.run.periods&&Object.keys(PV.run.periods).length?"":" (foi corrido antes desta funcionalidade; volta a aparecer na próxima corrida)"}.</div>`; return; }
-  const totR=rows.reduce((a,r)=>a+r[1],0), n=rows.reduce((a,r)=>a+r[2],0), w=rows.reduce((a,r)=>a+r[3],0);
-  const posP=rows.filter(r=>r[1]>0).length, best=rows.reduce((a,r)=>r[1]>a[1]?r:a), worst=rows.reduce((a,r)=>r[1]<a[1]?r:a);
-  const T=(k,v,s="")=>`<div class="tile"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${s}</div></div>`;
-  h+=`<div class="ptiles">
-    ${T("Total",pct(totR),fmt(totR,1)+"R · "+eurFmt(totR*PV.eur))}
-    ${T("Win rate",(n?w/n*100:0).toFixed(1).replace(".",",")+"%",`${w} de ${n} trades`)}
-    ${T("Média / "+GRAN[PV.gran].toLowerCase(),pct(totR/rows.length),fmt(totR/rows.length,2)+"R · "+eurFmt(totR/rows.length*PV.eur))}
-    ${T(GRANP[PV.gran]+" com lucro",Math.round(posP/rows.length*100)+"%",`${posP} de ${rows.length}`)}
-    ${T("Melhor",pct(best[1]),plabel(PV.gran,best[0]))}
-    ${T("Pior",pct(worst[1]),plabel(PV.gran,worst[0]))}</div>`;
-  h+=barChart(rows);
-  const rev=rows.slice().reverse(), vis=rev.slice(0,PV.shown);
-  h+=`<div style="overflow-x:auto"><table class="runs"><thead><tr><th>${GRAN[PV.gran]}</th><th class="num">Trades</th><th class="num">Win rate</th><th class="num">Conta</th><th class="num">R</th><th class="num">€</th></tr></thead><tbody>
-    ${vis.map(r=>`<tr><td>${plabel(PV.gran,r[0])}</td><td class="num">${r[2]}</td><td class="num">${(r[3]/r[2]*100).toFixed(0)}%</td><td class="num"><b>${pct(r[1])}</b></td><td class="num">${fmt(r[1],2)}</td><td class="num">${eurFmt(r[1]*PV.eur)}</td></tr>`).join("")}
-    </tbody></table></div>${rev.length>vis.length?`<button class="more" onclick="PV.shown+=60;renderPeriods()">Mostrar mais (${rev.length-vis.length} restantes)</button>`:""}`;
-  box.innerHTML=h; hookBars(rows);
-}
-function setGran(g){PV.gran=g;PV.shown=40;renderPeriods();}
-function setMk(m){PV.mk=m;PV.shown=40;renderPeriods();}
-function setAcc(v){ACC=Math.max(100,+v||10000); try{localStorage.setItem("bt_acc",ACC);}catch(e){} renderPeriods();}
-function barChart(rows){
-  const W=Math.max(340,Math.min(760,(document.getElementById("detail").clientWidth||760)-32)),H=200,L=40,R=8,T=8,B=20;
-  const vals=rows.map(r=>r[1]); let v0=Math.min(0,...vals), v1=Math.max(0,...vals); const pad=(v1-v0)*0.06||1; v0-=pad; v1+=pad;
-  const y=v=>T+(v1-v)/(v1-v0)*(H-T-B), bw=(W-L-R)/rows.length, gap=bw>4?2:0;
-  let s=`<svg viewBox="0 0 ${W} ${H}" id="bars">`;
-  const step=niceStep((v1-v0)/4); for(let v=Math.ceil(v0/step)*step; v<=v1; v+=step) s+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--grid)"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end" font-size="10" fill="var(--text-muted)">${Math.round(v*10)/10}R</text>`;
-  rows.forEach((r,i)=>{const x=L+i*bw, y0=y(0), y1=y(r[1]); s+=`<rect x="${(x+gap/2).toFixed(1)}" y="${Math.min(y0,y1).toFixed(1)}" width="${Math.max(bw-gap,0.6).toFixed(1)}" height="${Math.max(Math.abs(y1-y0),0.6).toFixed(1)}" rx="${bw>8?2:0}" fill="${r[1]>=0?"var(--series-1)":"var(--series-2)"}"/>`;});
-  s+=`<line x1="${L}" x2="${W-R}" y1="${y(0)}" y2="${y(0)}" stroke="var(--text-muted)"/>`;
-  const yrs=[...new Set(rows.map(r=>r[0].slice(0,4)))]; if(PV.gran!=="year") yrs.forEach(yy=>{const i=rows.findIndex(r=>r[0].startsWith(yy)); s+=`<text x="${L+i*bw+2}" y="${H-5}" font-size="10" fill="var(--text-muted)">${yy}</text>`;});
-  else rows.forEach((r,i)=>{s+=`<text x="${L+i*bw+bw/2}" y="${H-5}" font-size="10" text-anchor="middle" fill="var(--text-muted)">${r[0]}</text>`;});
-  s+=`<rect id="bhit" x="${L}" y="${T}" width="${W-L-R}" height="${H-T-B}" fill="transparent"/></svg>`;
-  barChart._c={W,L,R,bw};
-  return `<div class="small muted" style="margin:2px 0">R por ${GRAN[PV.gran].toLowerCase()} · <span style="color:var(--series-1)">■</span> positivo <span style="color:var(--series-2)">■</span> negativo</div><div class="chart" id="barBox">${s}<div class="tip" id="btip"></div></div>`;
-}
-function hookBars(rows){
-  const c=barChart._c, box=document.getElementById("barBox"); if(!box) return; const svg=box.querySelector("svg"), tip=document.getElementById("btip");
-  const mv=ev=>{const r=svg.getBoundingClientRect(); const sx=((ev.touches?ev.touches[0].clientX:ev.clientX)-r.left)/r.width*c.W;
-    const i=Math.min(rows.length-1,Math.max(0,Math.floor((sx-c.L)/c.bw))); const p=rows[i];
-    tip.innerHTML=`<div class="muted">${plabel(PV.gran,p[0])}</div><b>${pct(p[1])}</b> da conta · ${fmt(p[1],2)}R · ${eurFmt(p[1]*PV.eur)}<div class="muted">${p[2]} trades · WR ${(p[3]/p[2]*100).toFixed(0)}%</div>`;
-    tip.style.display="block"; const px=(c.L+(i+.5)*c.bw)/c.W*r.width; tip.style.left=Math.min(Math.max(px+8,0),r.width-tip.offsetWidth)+"px"; tip.style.top="4px";};
-  const hit=svg.querySelector("#bhit"); hit.addEventListener("mousemove",mv); hit.addEventListener("touchstart",mv,{passive:true}); hit.addEventListener("touchmove",mv,{passive:true});
-  hit.addEventListener("mouseleave",()=>tip.style.display="none"); hit.addEventListener("touchend",()=>tip.style.display="none");
-}
-
-
-function nextRun(){ // corridas de hora a hora das 19h as 3h (hora de Lisboa)
-  const now=new Date(); const lis=new Date(now.toLocaleString("en-US",{timeZone:"Europe/Lisbon"}));
-  for(let k=1;k<=24;k++){const t=new Date(lis.getTime()+k*36e5); const h=t.getHours(); if(h>=19||h<=3) return String(h).padStart(2,"0")+":00";}
-  return "19:00";
-}
-function nowStatus(log){
-  const dot=document.getElementById("nowDot"), txt=document.getElementById("nowTxt");
-  const last=log[0]; const ago=last?(Date.now()-Date.parse(last.at))/6e4:1e9;
-  const started=log.find(e=>e.kind==="inicio"), ended=log.find(e=>e.kind==="fim"||e.kind==="erro");
-  const running=started && (!ended || Date.parse(started.at)>Date.parse(ended.at)) && ago<45;
-  if(running){ dot.className="dot live"; txt.innerHTML=`<b>A trabalhar agora</b> · ${esc(last.kind==="estado"?last.message:(last.kind==="teste"?"último: "+last.message:last.message))}`; }
-  else if(last && last.kind==="erro" && ago<720){ dot.className="dot err"; txt.innerHTML=`<b>Parou com erro</b> · ${esc(last.message)} · próxima corrida às ${nextRun()}`; }
-  else { dot.className="dot"; txt.innerHTML=`<b>Em pausa</b> · próxima corrida às ${nextRun()}`+(last?` · última atividade ${new Date(last.at).toLocaleString("pt-PT",{dateStyle:"short",timeStyle:"short"})}`:""); }
-}
-
+/* ---------- utilitarios ---------- */
 const SB="https://ctyndeyumrvcwlxzdgnz.supabase.co/rest/v1/", KEY="sb_publishable_hMd_xtAGBa1zcJY30QRNIA_LupFPdfp";
 const q=p=>fetch(SB+p,{headers:{apikey:KEY,Authorization:"Bearer "+KEY},cache:"no-store"}).then(r=>{if(!r.ok)throw new Error(r.status);return r.json();});
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const nf=(x,d=1)=>(+x).toLocaleString("pt-PT",{minimumFractionDigits:d,maximumFractionDigits:d});
+const pc=(x,d=1)=>x==null||isNaN(x)?"—":(x>0?"+":x<0?"−":"")+nf(Math.abs(x),d)+"%";
+const rr=(x,d=2)=>x==null||isNaN(x)?"—":(x>0?"+":x<0?"−":"")+nf(Math.abs(x),d)+"R";
+const eur=x=>(x<0?"−":x>0?"+":"")+Math.abs(x).toLocaleString("pt-PT",{maximumFractionDigits:0})+" €";
+const cls=x=>x>0?"pos":x<0?"neg":"muted";
+const MES=["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+const MS=["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
+const DS=["seg","ter","qua","qui","sex","sáb","dom"];
+const NM={nq:"NQ · US100",es:"S&P · US500",dow:"Dow · US30",dax:"DAX · GER40",ftse:"FTSE · UK100",nikkei:"Nikkei · JP225",estx:"Euro Stoxx · EU50",cac:"CAC · FRA40",asx:"ASX · AUS200",hsi:"Hang Seng · HK50"};
+const nm=k=>NM[k]||k;
+const pad=n=>String(n).padStart(2,"0");
+const ymd=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const pd=s=>{const [y,m,d]=s.slice(0,10).split("-").map(Number);return new Date(y,m-1,d);};
+const fdate=s=>s.slice(8,10)+"/"+s.slice(5,7)+"/"+s.slice(0,4);
+function monday(s){const d=pd(s);const w=(d.getDay()+6)%7;d.setDate(d.getDate()-w);return ymd(d);}
+function isoWeek(s){const d=pd(s);d.setDate(d.getDate()+3-((d.getDay()+6)%7));const y=d.getFullYear();const j=new Date(y,0,4);return [y,1+Math.round(((d-j)/864e5-3+((j.getDay()+6)%7))/7)];}
+function heat(x,max){ if(!x) return ""; const a=Math.min(1,Math.abs(x)/(max||1)); const p=Math.round(12+a*58); return `background:color-mix(in srgb,var(${x>0?"--pos":"--neg"}) ${p}%,var(--surface));${p>45?"color:#fff":""}`; }
+function store(k,v){try{v===undefined?0:localStorage.setItem(k,v);return localStorage.getItem(k);}catch(e){return null;}}
 
+/* ---------- estado ---------- */
+const S={data:null,pf:store("bt_pf")||"ref",acc:+(store("bt_acc")||10000),route:"inicio",
+  cal:{y:null,m:null,mode:"mes",mk:"all",idea:"all",sel:null},
+  per:{y:null,view:"semanas"},
+  tr:{y:"all",m:"all",mk:"all",idea:"all",res:"all",sort:"saida",dir:-1,page:0},
+  tests:{f:"all",sel:null,mk:"nq",cal:{y:null,m:null,mode:"mes",sel:null}},
+  j:"all"};
+
+const ROUTES=[
+  ["inicio","Visão geral",'<path d="M3 12l9-8 9 8M5 10v10h14V10"/>'],
+  ["calendario","Calendário",'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>'],
+  ["periodos","Meses e semanas",'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'],
+  ["trades","Trades",'<path d="M4 6h16M4 12h16M4 18h10"/>'],
+  ["indices","Índices e estratégias",'<circle cx="12" cy="12" r="9"/><path d="M12 3v9l6 5"/>'],
+  ["testes","Testes",'<path d="M9 3h6M10 3v6l-5 9a2 2 0 002 3h10a2 2 0 002-3l-5-9V3"/>'],
+  ["diario","Diário do agente",'<path d="M5 4h11a3 3 0 013 3v13H8a3 3 0 01-3-3z"/><path d="M9 9h6M9 13h6"/>'],
+  ["plano","Plano e ideias",'<path d="M9 6h11M9 12h11M9 18h11M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"/>'],
+];
+function renderNav(){
+  const ic=p=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+  document.getElementById("nav").innerHTML=ROUTES.map(([k,l,p])=>`<a href="#${k}" class="${S.route===k?"on":""}">${ic(p)}${l}</a>`).join("");
+  document.getElementById("mnav").innerHTML=ROUTES.map(([k,l])=>`<a href="#${k}" class="${S.route===k?"on":""}">${l}</a>`).join("");
+}
+function setTheme(v){ if(v) document.documentElement.setAttribute("data-theme",v); else document.documentElement.removeAttribute("data-theme"); store("bt_theme",v); if(S.data) render(); }
+function setPf(v){S.pf=v;store("bt_pf",v);S.cal.y=null;S.per.y=null;S.tr.page=0;render();}
+function setAcc(v){S.acc=Math.max(100,+v||10000);store("bt_acc",S.acc);render();}
+
+/* ---------- dados da carteira ---------- */
+function portfolios(){const d=S.data; if(!d) return []; return [d.portfolio?{id:"ref",...d.portfolio,ref:true}:null,...d.extra.map(p=>({id:p.label,...p}))].filter(Boolean);}
+function curPf(){const L=portfolios(); return L.find(p=>p.id===S.pf)||L[0]||null;}
+function pfName(P){return (P.label?P.label+" · ":"")+(P.ref?"Referência":"Carteira")+" ("+(P.markets&&P.markets.length?P.markets.length:new Set(P.por_indice.map(r=>r.indice)).size)+" índices)";}
+/* agrega trades por dia de saida: {date:{r,n,w,list}} */
+function dayMap(trades){const m={}; for(const t of trades){const k=t[1]; const o=m[k]||(m[k]={r:0,n:0,w:0,list:[]}); o.r+=t[4]; o.n++; if(t[4]>0)o.w++; o.list.push(t);} return m;}
+function filtTrades(P,mk,idea){return (P.trades||[]).filter(t=>(mk==="all"||t[2]===mk)&&(idea==="all"||t[3]===idea));}
+function group(dm,fn){const g={}; for(const [k,v] of Object.entries(dm)){const kk=fn(k); const o=g[kk]||(g[kk]={r:0,n:0,w:0,days:0,pd:0}); o.r+=v.r;o.n+=v.n;o.w+=v.w;o.days++; if(v.r>0)o.pd++;} return g;}
+function stats(trades){const n=trades.length, w=trades.filter(t=>t[4]>0).length, r=trades.reduce((a,t)=>a+t[4],0);
+  const gw=trades.filter(t=>t[4]>0).reduce((a,t)=>a+t[4],0), gl=-trades.filter(t=>t[4]<0).reduce((a,t)=>a+t[4],0);
+  return {n,w,r,wr:n?w/n*100:0,avg:n?r/n:0,pf:gl?gw/gl:null,best:n?Math.max(...trades.map(t=>t[4])):0,worst:n?Math.min(...trades.map(t=>t[4])):0};}
+
+/* ---------- componentes ---------- */
+const kpi=(k,v,s="",c="")=>`<div class="kpi"><div class="k">${k}</div><div class="v ${c}">${v}</div><div class="s">${s}</div></div>`;
+function seg(opts,cur,fn){return `<div class="seg">${opts.map(([k,l])=>`<button class="${k===cur?"on":""}" onclick="${fn}('${k}')">${l}</button>`).join("")}</div>`;}
+function sel(id,opts,cur,fn){return `<select id="${id}" onchange="${fn}(this.value)">${opts.map(([k,l])=>`<option value="${esc(k)}" ${String(k)===String(cur)?"selected":""}>${esc(l)}</option>`).join("")}</select>`;}
+function niceStep(r){const p=Math.pow(10,Math.floor(Math.log10(r||1)));const n=r/p;return (n<1.5?1:n<3?2:n<7?5:10)*p;}
+const CH={};
+/* linhas: series=[{name,color,pts:[[label,value]]}] */
+function lineChart(id,series,o={}){
+  const W=o.w||820,H=o.h||260,L=46,R=14,T=10,B=26; const all=series.flatMap(s=>s.pts); if(!all.length) return `<div class="empty">Sem dados</div>`;
+  const xs=[...new Set(all.map(p=>p[0]))].sort(); const xt=xs.map(x=>pd(x).getTime()); const xi=Object.fromEntries(xs.map((x,i)=>[x,i]));
+  let lo=Math.min(0,...all.map(p=>p[1])),hi=Math.max(0,...all.map(p=>p[1])); if(hi===lo)hi=lo+1; const st=niceStep((hi-lo)/5); lo=lo>-0.1*st?0:Math.floor(lo/st)*st; hi=Math.ceil(hi/st)*st;
+  const t0=xt[0],t1=xt[xt.length-1]||t0+1; const X=i=>L+(t1===t0?0:(xt[i]-t0)/(t1-t0))*(W-L-R), Y=v=>T+(hi-v)/(hi-lo)*(H-T-B);
+  let g=""; for(let v=lo;v<=hi+1e-9;v+=st) g+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--grid)"/><text x="${L-6}" y="${Y(v)+4}" text-anchor="end" font-size="11" fill="var(--text-3)">${nf(v,st<1?1:0)}${o.unit||""}</text>`;
+  g+=`<line x1="${L}" x2="${W-R}" y1="${Y(0)}" y2="${Y(0)}" stroke="var(--text-3)" stroke-width=".8"/>`;
+  const yrs=[...new Set(xs.map(x=>x.slice(0,4)))]; const every=Math.ceil(yrs.length/10);
+  yrs.forEach((y,j)=>{ if(j%every) return; const tx=new Date(+y,0,1).getTime(); if(tx<t0) return; const x=L+(tx-t0)/(t1-t0)*(W-L-R); g+=`<line x1="${x}" x2="${x}" y1="${H-B}" y2="${H-B+4}" stroke="var(--text-3)"/><text x="${x}" y="${H-6}" font-size="11" fill="var(--text-3)" text-anchor="middle">${y}</text>`; });
+  const paths=series.map(s=>{ const d=s.pts.map((p,j)=>(j?"L":"M")+X(xi[p[0]]).toFixed(1)+","+Y(p[1]).toFixed(1)).join(""); return `<path d="${d}" fill="none" stroke="${s.color}" stroke-width="2" stroke-linejoin="round"/>`; }).join("");
+  CH[id]={series,xs,xt,xi,X,Y,W,H,L,R,t0,t1,unit:o.unit||"",fmt:o.fmt};
+  const lg=series.length>1?`<div class="lg">${series.map(s=>`<span style="--c:${s.color}">${esc(s.name)}</span>`).join("")}</div>`:"";
+  return lg+`<div class="chart" id="${id}"><svg viewBox="0 0 ${W} ${H}" onmousemove="lineHover(event,'${id}')" onmouseleave="hideTip('${id}')">${g}${paths}<line class="hv" x1="0" x2="0" y1="${T}" y2="${H-B}" stroke="var(--text-3)" stroke-dasharray="3 3" style="display:none"/></svg></div>`;
+}
+function lineHover(e,id){const c=CH[id]; const sv=e.currentTarget; const r=sv.getBoundingClientRect(); const x=(e.clientX-r.left)/r.width*c.W;
+  const tt=c.t0+(x-c.L)/(c.W-c.L-c.R)*(c.t1-c.t0); let i=0; while(i<c.xt.length-1&&c.xt[i+1]<=tt) i++; const lab=c.xs[i];
+  const ln=sv.querySelector(".hv"); ln.style.display=""; ln.setAttribute("x1",c.X(i)); ln.setAttribute("x2",c.X(i));
+  const rows=c.series.map(s=>{let v=null; for(const p of s.pts){ if(p[0]<=lab) v=p[1]; else break;} return v==null?"":`<div><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${s.color};margin-right:5px"></span>${esc(s.name)}: <b>${c.fmt?c.fmt(v):nf(v,1)+c.unit}</b></div>`;}).join("");
+  showTip(e,`<div class="muted">${fdate(lab)}</div>${rows}`);}
+/* barras: items=[{label,v,sub}] */
+function barChart(id,items,o={}){
+  const W=o.w||820,H=o.h||220,L=46,R=10,T=10,B=26; if(!items.length) return `<div class="empty">Sem dados</div>`;
+  let lo=Math.min(0,...items.map(i=>i.v)),hi=Math.max(0,o.goal||0,...items.map(i=>i.v)); if(hi===lo)hi=1; const st=niceStep((hi-lo)/5); lo=Math.floor(lo/st)*st; hi=Math.ceil(hi/st)*st;
+  const Y=v=>T+(hi-v)/(hi-lo)*(H-T-B), bw=(W-L-R)/items.length;
+  let g=""; for(let v=lo;v<=hi+1e-9;v+=st) g+=`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--grid)"/><text x="${L-6}" y="${Y(v)+4}" text-anchor="end" font-size="11" fill="var(--text-3)">${nf(v,st<1?1:0)}${o.unit||""}</text>`;
+  if(o.goal) g+=`<line x1="${L}" x2="${W-R}" y1="${Y(o.goal)}" y2="${Y(o.goal)}" stroke="var(--warn)" stroke-dasharray="5 4"/><text x="${W-R}" y="${Y(o.goal)-4}" text-anchor="end" font-size="11" fill="var(--warn)">objetivo ${o.goal}${o.unit||""}</text>`;
+  const every=Math.ceil(items.length/(o.maxLabels||16));
+  g+=items.map((it,i)=>{const x=L+i*bw+bw*.15,w=Math.max(1,bw*.7),y=Y(Math.max(0,it.v)),h=Math.abs(Y(it.v)-Y(0));
+    const col=o.goal&&it.v>=o.goal?"var(--pos)":it.v>=0?"var(--c1)":"var(--neg)";
+    return `<rect x="${x}" y="${y}" width="${w}" height="${Math.max(1,h)}" rx="2" fill="${col}" data-i="${i}" ${o.click?`style="cursor:pointer" onclick="${o.click}(${i})"`:""}/>`+(i%every?"":`<text x="${x+w/2}" y="${H-6}" font-size="11" fill="var(--text-3)" text-anchor="middle">${esc(it.label)}</text>`);}).join("");
+  CH[id]={items,unit:o.unit||""};
+  return `<div class="chart" id="${id}"><svg viewBox="0 0 ${W} ${H}" onmousemove="barHover(event,'${id}')" onmouseleave="hideTip('${id}')">${g}<line x1="${L}" x2="${W-R}" y1="${Y(0)}" y2="${Y(0)}" stroke="var(--text-3)" stroke-width=".8"/></svg></div>`;
+}
+function barHover(e,id){const i=e.target.dataset&&e.target.dataset.i; if(i==null){hideTip();return;} const it=CH[id].items[+i]; showTip(e,`<div class="muted">${esc(it.full||it.label)}</div><b class="${cls(it.v)}">${nf(it.v,2)}${CH[id].unit}</b>${it.sub?`<div class="muted">${it.sub}</div>`:""}`);}
+function showTip(e,h){const t=document.getElementById("tip"); t.innerHTML=h; t.style.display="block"; const w=t.offsetWidth; let x=e.pageX+14; if(x+w>window.scrollX+innerWidth-8) x=e.pageX-w-14; t.style.left=x+"px"; t.style.top=(e.pageY+12)+"px";}
+function hideTip(id){document.getElementById("tip").style.display="none"; if(id){const l=document.querySelector("#"+id+" .hv"); if(l) l.style.display="none";}}
+
+/* ---------- calendario generico ---------- */
+/* dm = {date:{r,n,w,list?}}, st = estado {y,m,mode,sel}, ns = nome do estado global (para callbacks), unit "%" ou "R" */
+function calendar(dm,st,ns,unit){
+  const keys=Object.keys(dm).sort(); if(!keys.length) return `<div class="empty">Sem trades com estes filtros.</div>`;
+  if(st.y==null){ const cnt={}; for(const k of keys){const mm=k.slice(0,7); cnt[mm]=(cnt[mm]||0)+dm[k].n;}
+    const ms=Object.keys(cnt).sort(); const l=[...ms].reverse().find(mm=>cnt[mm]>=10)||ms[ms.length-1]; st.y=+l.slice(0,4); st.m=+l.slice(5,7)-1;}
+  const years=[...new Set(keys.map(k=>+k.slice(0,4)))];
+  const f=v=>unit==="%"?pc(v,2):rr(v,2);
+  const maxAbs=Math.max(...Object.values(dm).map(v=>Math.abs(v.r)))*0.6||1;
+  const nav=`<div class="cal-nav">
+    <button class="btn icon" onclick="calMove('${ns}',-1)" aria-label="Anterior">‹</button>
+    <div class="cal-title">${st.mode==="mes"?MES[st.m]+" "+st.y:st.y}</div>
+    <button class="btn icon" onclick="calMove('${ns}',1)" aria-label="Seguinte">›</button>
+    ${sel(ns+"Y",years.map(y=>[y,y]),st.y,`(v=>calSet('${ns}','y',+v))`)}
+    ${st.mode==="mes"?sel(ns+"M",MES.map((m,i)=>[i,m]),st.m,`(v=>calSet('${ns}','m',+v))`):""}
+    <span style="flex:1"></span>${seg([["mes","Mês"],["ano","Ano"]],st.mode,`(v=>calSet('${ns}','mode',v))`)}</div>`;
+  if(st.mode==="ano"){
+    let h=`<div class="year-grid">`; let yr=0,yn=0;
+    for(let m=0;m<12;m++){ const first=new Date(st.y,m,1), off=(first.getDay()+6)%7, nd=new Date(st.y,m+1,0).getDate(); let tot=0,n=0,cells="";
+      for(let i=0;i<off;i++) cells+=`<div class="c e"></div>`;
+      for(let d=1;d<=nd;d++){const k=st.y+"-"+pad(m+1)+"-"+pad(d); const v=dm[k]; if(v){tot+=v.r;n+=v.n;} cells+=`<div class="c" style="${v?heat(v.r,maxAbs):""}" title="${fdate(k)}${v?": "+f(v.r)+" · "+v.n+" trades":""}"></div>`;}
+      yr+=tot; yn+=n;
+      h+=`<div class="mini" onclick="calSet('${ns}','m',${m});calSet('${ns}','mode','mes')"><div class="mh"><span>${MES[m]}</span><span class="${cls(tot)}">${n?f(tot):"—"}</span></div><div class="mg">${cells}</div><div class="small muted" style="margin-top:6px">${n} trades</div></div>`;}
+    h+=`</div>`;
+    return nav+`<div class="small" style="margin-top:8px">Total do ano: <b class="${cls(yr)}">${f(yr)}</b>${unit==="%"?` · <b class="${cls(yr)}">${eur(yr/100*S.acc)}</b>`:""} · ${yn} trades</div>`+h+legend(maxAbs,f);
+  }
+  const first=new Date(st.y,st.m,1), off=(first.getDay()+6)%7, start=new Date(st.y,st.m,1-off);
+  let h=`<div class="cal">${DS.map(d=>`<div class="h">${d}</div>`).join("")}<div class="h wkc">semana</div>`;
+  let mt=0,mn=0,mw=0,days=0,pdays=0,best=null,worst=null;
+  const nweeks=Math.ceil((off+new Date(st.y,st.m+1,0).getDate())/7);
+  for(let w=0;w<nweeks;w++){ let wt=0,wn=0; const wd0=new Date(start); wd0.setDate(start.getDate()+w*7);
+    for(let d=0;d<7;d++){ const dt=new Date(start); dt.setDate(start.getDate()+w*7+d); const k=ymd(dt), v=dm[k], out=dt.getMonth()!==st.m;
+      if(v){wt+=v.r;wn+=v.n; if(!out){mt+=v.r;mn+=v.n;mw+=v.w;days++; if(v.r>0)pdays++; if(!best||v.r>best[1])best=[k,v.r]; if(!worst||v.r<worst[1])worst=[k,v.r];}}
+      h+=`<div class="day ${out?"out":""} ${d>4?"we":""} ${v?"has":""} ${st.sel===k?"sel":""}" ${v?`onclick="calSet('${ns}','sel','${k}')"`:""} style="${v&&!out?heat(v.r,maxAbs):""}">
+        <span class="dn">${dt.getDate()}</span>${v?`<span class="dv full">${f(v.r)}</span><span class="dv short">${(v.r>0?"+":v.r<0?"−":"")+nf(Math.abs(v.r),1)}</span><span class="dt">${v.n} trade${v.n>1?"s":""}${unit==="%"?" · "+eur(v.r/100*S.acc):""}</span>`:""}</div>`;}
+    const [iy,iw]=isoWeek(ymd(wd0));
+    h+=`<div class="day wk wkc"><span class="dn">S${iw}</span>${wn?`<span class="dv ${cls(wt)}">${f(wt)}</span><span class="dt">${wn} trade${wn>1?"s":""}</span>`:`<span class="dt muted">sem trades</span>`}</div>`;
+  }
+  h+=`</div>`;
+  const tiles=`<div class="kpis sm" style="margin-top:14px">${kpi("Resultado do mês",f(mt),unit==="%"?eur(mt/100*S.acc):"",cls(mt))}${kpi("Trades",mn,mn?`${nf(mw/mn*100,0)}% ganhas`:"")}${kpi("Dias com trades",days,days?`${pdays} positivos · ${days-pdays} negativos`:"")}${kpi("Melhor / pior dia",best?`<span class="${cls(best[1])}">${f(best[1])}</span>`:"—",worst?`pior <span class="${cls(worst[1])}">${f(worst[1])}</span> (${fdate(worst[0]).slice(0,5)})`:"")}</div>`;
+  return nav+tiles+h+legend(maxAbs,f);
+}
+function legend(maxAbs,f){return `<div class="legend">Perda<span class="sw" style="${heat(-maxAbs,maxAbs)}"></span><span class="sw" style="${heat(-maxAbs/3,maxAbs)}"></span><span class="sw" style="background:var(--grid)"></span><span class="sw" style="${heat(maxAbs/3,maxAbs)}"></span><span class="sw" style="${heat(maxAbs,maxAbs)}"></span>Ganho · cor mais forte = dia maior (até ${f(maxAbs)})</div>`;}
+function nsState(ns){return ns==="cal"?S.cal:S.tests.cal;}
+function calSet(ns,k,v){const st=nsState(ns); st[k]=v; if(k!=="sel") st.sel=null; render();}
+function calMove(ns,d){const st=nsState(ns); if(st.mode==="ano") st.y+=d; else {st.m+=d; if(st.m<0){st.m=11;st.y--;} if(st.m>11){st.m=0;st.y++;}} st.sel=null; render();}
+
+function tradeTable(list,unit="%"){
+  if(!list.length) return `<div class="empty">Sem trades.</div>`;
+  return `<div class="scroll"><table class="t"><thead><tr><th>Entrada</th><th>Saída</th><th>Índice</th><th>Estratégia</th><th class="num">Dias</th><th class="num">Resultado</th>${unit==="%"?`<th class="num">€</th>`:""}</tr></thead><tbody>
+    ${list.map(t=>`<tr><td>${fdate(t[0])}</td><td>${fdate(t[1])}</td><td>${esc(nm(t[2]))}</td><td><code>${esc(t[3])}</code></td><td class="num">${Math.round((pd(t[1])-pd(t[0]))/864e5)}</td><td class="num"><b class="${cls(t[4])}">${unit==="%"?pc(t[4],2):rr(t[4],2)}</b></td>${unit==="%"?`<td class="num ${cls(t[4])}">${eur(t[4]/100*S.acc)}</td>`:""}</tr>`).join("")}
+  </tbody></table></div>`;
+}
+
+/* ---------- vistas ---------- */
+function noPf(){return `<div class="card"><div class="empty">Ainda não há carteira com lista de trades. Corre <code>python portfolio.py ... --label C5 --ref</code>.</div></div>`;}
+
+function vInicio(){
+  const P=curPf(); if(!P) return noPf();
+  const T=P.trades||[]; const s=stats(T);
+  const yrs=Object.entries(P.por_ano||{});
+  let cum=0; const eq=[]; const dm=dayMap(T); Object.keys(dm).sort().forEach(k=>{cum+=dm[k].r; eq.push([k,+cum.toFixed(2)]);});
+  let peak=0; const dd=eq.map(([k,v])=>{peak=Math.max(peak,v); return [k,+(v-peak).toFixed(2)];});
+  const L=portfolios();
+  const last=(S.data.log||[]).filter(e=>["teste","fim","mudanca","ideia"].includes(e.kind)).slice(0,5);
+  return `<div class="kpis">
+    ${kpi("Média por ano",pc(P.media),`objetivo +14% · ${P.media>=14?"atingido":"faltam "+nf(14-P.media,1)+"%"}`,cls(P.media))}
+    ${kpi("Anos acima de 14%",`${P.anos_ok}/${P.anos}`,`${P.anos_neg??"—"} anos negativos`)}
+    ${kpi("Pior mês / pior ano",`<span class="neg">${pc(P.pior_mes)}</span>`,`pior ano ${pc(P.pior_ano)} · ${P.meses_pos}/${P.meses} meses positivos`)}
+    ${kpi("Pior queda",`<span class="neg">${pc(P.dd)}</span>`,`${eur(P.dd/100*S.acc)} numa conta de ${S.acc.toLocaleString("pt-PT")} €`)}
+    ${kpi("Trades por semana",nf(P.trades_ano/52,1),`${Math.round(P.trades_ano)} por ano · objetivo 2–3/semana`)}
+    ${kpi("Trades ganhas",s.n?nf(s.wr,0)+"%":"—",`${s.w} de ${s.n}`)}
+    ${kpi("Média por trade",s.n?pc(s.avg,3):"—",`= ${rr(s.avg,3)} com 1% de risco`,cls(s.avg))}
+    ${kpi("Total acumulado",pc(s.r,0),s.n?`${eur(s.r/100*S.acc)} (sem juros compostos)`:"",cls(s.r))}
+  </div>
+  <div class="card"><div class="card-head"><div><h2>Evolução da conta</h2><p class="hint">% da conta acumulada, 1% de risco por trade, sem juros compostos. A linha de baixo é a distância ao máximo anterior (queda).</p></div></div>
+    ${lineChart("eq",[{name:"Acumulado",color:"var(--c1)",pts:eq}],{unit:"%",fmt:v=>pc(v)})}
+    <div style="height:8px"></div>${lineChart("dd",[{name:"Queda",color:"var(--neg)",pts:dd}],{unit:"%",h:130,fmt:v=>pc(v)})}</div>
+  <div class="grid32">
+    <div class="card"><h2>Resultado por ano</h2><p class="hint">Verde = acima do objetivo de 14%. Toca numa barra para abrir esse ano no calendário.</p>
+      ${barChart("yb",yrs.map(([y,v])=>({label:y,v:+v,full:"Ano "+y,sub:eur(v/100*S.acc)})),{unit:"%",goal:14,h:230,click:"openYear"})}</div>
+    <div class="card"><h2>Últimas novidades</h2><p class="hint">Do diário do agente.</p>
+      ${last.map(e=>`<div class="ji"><div class="jic">${(JK[e.kind]||["•"])[0]}</div><div class="jb"><div class="jh"><span class="jk">${(JK[e.kind]||["",e.kind])[1]}</span><span class="jt">${new Date(e.at).toLocaleString("pt-PT",{dateStyle:"short",timeStyle:"short"})}</span></div><div class="jm">${esc(e.message)}</div></div></div>`).join("")||`<div class="empty">Sem registos.</div>`}
+      <div style="margin-top:10px"><a class="btn" href="#diario" style="text-decoration:none">Ver o diário todo</a></div></div>
+  </div>
+  <div class="card"><h2>Comparar carteiras</h2><p class="hint">Cada teste de carteira tem um número (C1, C2…). Toca numa linha para a escolher em todo o painel.</p>
+    <div class="scroll"><table class="t"><thead><tr><th>Carteira</th><th>Estratégias</th><th class="num">% ao ano</th><th class="num">Anos ≥14%</th><th class="num">Pior mês</th><th class="num">Pior ano</th><th class="num">Pior queda</th><th class="num">Trades/semana</th></tr></thead><tbody>
+    ${L.map(p=>`<tr class="click ${p.id===P.id?"sel":""}" onclick="setPf('${p.id}')"><td><b>${esc(pfName(p))}</b></td><td class="small">${esc(p.ideas.join(", "))}</td><td class="num ${cls(p.media)}"><b>${pc(p.media)}</b></td><td class="num">${p.anos_ok}/${p.anos}</td><td class="num neg">${pc(p.pior_mes)}</td><td class="num ${cls(p.pior_ano)}">${pc(p.pior_ano)}</td><td class="num neg">${pc(p.dd)}</td><td class="num">${nf(p.trades_ano/52,1)}</td></tr>`).join("")}
+    </tbody></table></div></div>`;
+}
+function openYear(i){const P=curPf(); const y=+Object.keys(P.por_ano)[i]; S.cal.y=y; S.cal.mode="ano"; location.hash="#calendario";}
+
+function vCalendario(){
+  const P=curPf(); if(!P) return noPf();
+  const T=filtTrades(P,S.cal.mk,S.cal.idea); const dm=dayMap(T);
+  const mks=[...new Set((P.trades||[]).map(t=>t[2]))], ids=[...new Set((P.trades||[]).map(t=>t[3]))];
+  let det="";
+  if(S.cal.sel && dm[S.cal.sel]){ const v=dm[S.cal.sel]; const opened=T.filter(t=>t[0]===S.cal.sel);
+    det=`<div class="card"><div class="card-head"><div><h2>${pd(S.cal.sel).toLocaleDateString("pt-PT",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}</h2>
+      <p class="hint">Resultado das trades que fecharam neste dia: <b class="${cls(v.r)}">${pc(v.r,2)}</b> · <b class="${cls(v.r)}">${eur(v.r/100*S.acc)}</b> · ${v.w} de ${v.n} ganhas${opened.length?` · ${opened.length} trade(s) aberta(s) neste dia`:""}</p></div>
+      <button class="btn" onclick="calSet('cal','sel',null)">Fechar</button></div>${tradeTable(v.list)}</div>`;}
+  return `<div class="card"><div class="filters">
+      <label class="ctl">Índice ${sel("cMk",[["all","Todos"],...mks.map(k=>[k,nm(k)])],S.cal.mk,"(v=>{S.cal.mk=v;S.cal.sel=null;render()})")}</label>
+      <label class="ctl">Estratégia ${sel("cId",[["all","Todas"],...ids.map(k=>[k,k])],S.cal.idea,"(v=>{S.cal.idea=v;S.cal.sel=null;render()})")}</label>
+      <span class="small muted">Cada dia mostra o resultado das trades que <b>fecharam</b> nesse dia (% da conta e €). Toca num dia para ver as trades.</span></div>
+    ${calendar(dm,S.cal,"cal","%")}</div>${det}`;
+}
+
+function vPeriodos(){
+  const P=curPf(); if(!P) return noPf();
+  const T=P.trades||[]; const dm=dayMap(T);
+  const mon=group(dm,k=>k.slice(0,7)); const years=[...new Set(Object.keys(mon).map(k=>k.slice(0,4)))].sort();
+  if(S.per.y==null){ const yn=y=>Object.entries(mon).filter(([k])=>k.startsWith(y)).reduce((a,[,v])=>a+v.n,0); S.per.y=[...years].reverse().find(y=>yn(y)>=20)||years[years.length-1]; }
+  const maxM=Math.max(...Object.values(mon).map(v=>Math.abs(v.r)))*0.7||1;
+  const hm=`<div class="scroll"><table class="t hm"><thead><tr><th>Ano</th>${MS.map(m=>`<th class="num">${m}</th>`).join("")}<th class="num">Total</th><th class="num hide-sm">€</th><th class="num hide-sm">Trades</th></tr></thead><tbody>
+    ${years.map(y=>{let tot=0,n=0; const cells=MS.map((_,i)=>{const v=mon[y+"-"+pad(i+1)]; if(v){tot+=v.r;n+=v.n;} return `<td class="c" style="${v?heat(v.r,maxM):""}" onclick="S.cal.y=${y};S.cal.m=${i};S.cal.mode='mes';location.hash='#calendario'" title="${MES[i]} ${y}${v?": "+pc(v.r,2)+" · "+v.n+" trades":""}">${v?nf(v.r,1):""}</td>`;}).join("");
+      return `<tr class="${y===S.per.y?"sel":""}"><td><a href="#periodos" onclick="S.per.y='${y}';render();return false"><b>${y}</b></a></td>${cells}<td class="num"><b class="${tot>=14?"pos":cls(tot)}">${pc(tot)}</b>${tot>=14?" ✓":""}</td><td class="num hide-sm ${cls(tot)}">${eur(tot/100*S.acc)}</td><td class="num hide-sm">${n}</td></tr>`;}).join("")}
+    </tbody></table></div>`;
+  const wk=group(Object.fromEntries(Object.entries(dm).filter(([k])=>k.startsWith(S.per.y))),k=>monday(k));
+  const wks=Object.keys(wk).sort(); let cum=0;
+  const wrows=wks.map(k=>{const v=wk[k]; cum+=v.r; const e=pd(k); e.setDate(e.getDate()+6); const [,iw]=isoWeek(k); return {k,iw,end:ymd(e),...v,cum};});
+  const mrows=MS.map((_,i)=>{const v=mon[S.per.y+"-"+pad(i+1)]; return {i,...(v||{r:0,n:0,w:0,days:0,pd:0}),has:!!v};});
+  return `<div class="card"><h2>Mapa mensal</h2><p class="hint">% da conta por mês, todos os anos. Toca num mês para o abrir no calendário, ou num ano para ver as semanas.</p>${hm}</div>
+  <div class="card"><div class="card-head"><div><h2>${S.per.y}: semana a semana</h2><p class="hint">Cada barra é uma semana (seg–dom). Total do ano: <b class="${cls(cum)}">${pc(cum)}</b> · ${eur(cum/100*S.acc)}</p></div>
+    <label class="ctl">Ano ${sel("pY",years.map(y=>[y,y]),S.per.y,"(v=>{S.per.y=v;render()})")}</label>${seg([["semanas","Semanas"],["meses","Meses"]],S.per.view,"(v=>{S.per.view=v;render()})")}</div>
+    ${S.per.view==="semanas"?barChart("wb",wrows.map(r=>({label:"S"+r.iw,v:r.r,full:`Semana ${r.iw} · ${fdate(r.k).slice(0,5)} a ${fdate(r.end).slice(0,5)}`,sub:`${r.n} trades · ${eur(r.r/100*S.acc)}`})),{unit:"%",h:200,maxLabels:13}):barChart("mb",mrows.map(r=>({label:MS[r.i],v:r.r,full:MES[r.i]+" "+S.per.y,sub:`${r.n} trades · ${eur(r.r/100*S.acc)}`})),{unit:"%",h:200})}
+    <div class="scroll" style="margin-top:10px">${S.per.view==="semanas"?`<table class="t"><thead><tr><th>Semana</th><th>Datas</th><th class="num">Trades</th><th class="num">Ganhas</th><th class="num">Resultado</th><th class="num">€</th><th class="num">Acumulado no ano</th></tr></thead><tbody>
+      ${wrows.map(r=>`<tr class="click" onclick="S.cal.y=${+r.k.slice(0,4)};S.cal.m=${+r.k.slice(5,7)-1};S.cal.mode='mes';location.hash='#calendario'"><td>S${r.iw}</td><td>${fdate(r.k).slice(0,5)} – ${fdate(r.end).slice(0,5)}</td><td class="num">${r.n}</td><td class="num">${nf(r.w/r.n*100,0)}%</td><td class="num"><b class="${cls(r.r)}">${pc(r.r,2)}</b></td><td class="num ${cls(r.r)}">${eur(r.r/100*S.acc)}</td><td class="num ${cls(r.cum)}">${pc(r.cum,1)}</td></tr>`).join("")}</tbody></table>`
+    :`<table class="t"><thead><tr><th>Mês</th><th class="num">Trades</th><th class="num">Ganhas</th><th class="num">Dias +/−</th><th class="num">Resultado</th><th class="num">€</th></tr></thead><tbody>
+      ${mrows.map(r=>`<tr class="click" onclick="S.cal.y=${+S.per.y};S.cal.m=${r.i};S.cal.mode='mes';location.hash='#calendario'"><td style="text-transform:capitalize">${MES[r.i]}</td><td class="num">${r.n}</td><td class="num">${r.n?nf(r.w/r.n*100,0)+"%":"—"}</td><td class="num">${r.has?r.pd+" / "+(r.days-r.pd):"—"}</td><td class="num"><b class="${cls(r.r)}">${r.has?pc(r.r,2):"—"}</b></td><td class="num ${cls(r.r)}">${r.has?eur(r.r/100*S.acc):""}</td></tr>`).join("")}</tbody></table>`}</div></div>`;
+}
+
+function vTrades(){
+  const P=curPf(); if(!P) return noPf();
+  const all=P.trades||[]; const F=S.tr;
+  const yrs=[...new Set(all.map(t=>t[1].slice(0,4)))].sort(), mks=[...new Set(all.map(t=>t[2]))], ids=[...new Set(all.map(t=>t[3]))];
+  let L=all.filter(t=>(F.y==="all"||t[1].startsWith(F.y))&&(F.m==="all"||+t[1].slice(5,7)-1===+F.m)&&(F.mk==="all"||t[2]===F.mk)&&(F.idea==="all"||t[3]===F.idea)&&(F.res==="all"||(F.res==="g"?t[4]>0:t[4]<=0)));
+  const col={entrada:0,saida:1,indice:2,estrategia:3,resultado:4,dias:-1};
+  L=L.slice().sort((a,b)=>{const c=col[F.sort]; const va=c<0?pd(a[1])-pd(a[0]):a[c], vb=c<0?pd(b[1])-pd(b[0]):b[c]; return (va>vb?1:va<vb?-1:0)*F.dir;});
+  const s=stats(L); const per=50, pages=Math.max(1,Math.ceil(L.length/per)); F.page=Math.min(F.page,pages-1);
+  const vis=L.slice(F.page*per,F.page*per+per);
+  const th=(k,l,n)=>`<th class="s ${n?"num":""}" onclick="trSort('${k}')">${l}${F.sort===k?(F.dir>0?" ↑":" ↓"):""}</th>`;
+  const set=k=>`(v=>{S.tr.${k}=v;S.tr.page=0;render()})`;
+  return `<div class="card"><div class="filters">
+    <label class="ctl">Ano ${sel("fY",[["all","Todos"],...yrs.map(y=>[y,y])],F.y,set("y"))}</label>
+    <label class="ctl">Mês ${sel("fM",[["all","Todos"],...MES.map((m,i)=>[i,m])],F.m,set("m"))}</label>
+    <label class="ctl">Índice ${sel("fK",[["all","Todos"],...mks.map(k=>[k,nm(k)])],F.mk,set("mk"))}</label>
+    <label class="ctl">Estratégia ${sel("fI",[["all","Todas"],...ids.map(k=>[k,k])],F.idea,set("idea"))}</label>
+    <label class="ctl">Resultado ${sel("fR",[["all","Todas"],["g","Ganhas"],["p","Perdidas"]],F.res,set("res"))}</label>
+    <button class="btn" onclick="S.tr={y:'all',m:'all',mk:'all',idea:'all',res:'all',sort:'saida',dir:-1,page:0};render()">Limpar filtros</button></div>
+    <div class="kpis sm">${kpi("Trades",s.n,`${s.w} ganhas · ${s.n-s.w} perdidas`)}${kpi("Resultado",pc(s.r,1),eur(s.r/100*S.acc),cls(s.r))}${kpi("Ganhas",s.n?nf(s.wr,0)+"%":"—",s.pf?`fator de lucro ${nf(s.pf,2)}`:"")}${kpi("Média por trade",pc(s.avg,3),`melhor ${pc(s.best,2)} · pior ${pc(s.worst,2)}`,cls(s.avg))}</div>
+    <div class="scroll"><table class="t"><thead><tr>${th("entrada","Entrada")}${th("saida","Saída")}${th("indice","Índice")}${th("estrategia","Estratégia")}${th("dias","Dias",1)}${th("resultado","Resultado",1)}<th class="num">€</th></tr></thead><tbody>
+      ${vis.map(t=>`<tr class="click" onclick="S.cal.y=${+t[1].slice(0,4)};S.cal.m=${+t[1].slice(5,7)-1};S.cal.mode='mes';S.cal.sel='${t[1]}';location.hash='#calendario'"><td>${fdate(t[0])}</td><td>${fdate(t[1])}</td><td>${esc(nm(t[2]))}</td><td><code>${esc(t[3])}</code></td><td class="num">${Math.round((pd(t[1])-pd(t[0]))/864e5)}</td><td class="num"><b class="${cls(t[4])}">${pc(t[4],2)}</b></td><td class="num ${cls(t[4])}">${eur(t[4]/100*S.acc)}</td></tr>`).join("")||`<tr><td colspan="7"><div class="empty">Sem trades com estes filtros.</div></td></tr>`}
+    </tbody></table></div>
+    <div class="pager"><span>${L.length?F.page*per+1:0}–${Math.min(L.length,F.page*per+per)} de ${L.length}</span><button class="btn icon" ${F.page?"":"disabled"} onclick="S.tr.page--;render()">‹</button><span>página ${F.page+1} de ${pages}</span><button class="btn icon" ${F.page<pages-1?"":"disabled"} onclick="S.tr.page++;render()">›</button></div></div>`;
+}
+function trSort(k){ if(S.tr.sort===k) S.tr.dir*=-1; else {S.tr.sort=k;S.tr.dir=-1;} render(); }
+
+function vIndices(){
+  const P=curPf(); if(!P) return noPf();
+  const T=P.trades||[]; const nyears=P.anos||1;
+  const by=(f)=>{const g={}; for(const t of T){const k=f(t); (g[k]=g[k]||[]).push(t);} return Object.entries(g).map(([k,l])=>({k,...stats(l),ano:l.reduce((a,t)=>a+t[4],0)/nyears})).sort((a,b)=>b.ano-a.ano);};
+  const mk=by(t=>t[2]), id=by(t=>t[3]), both=by(t=>t[2]+"|"+t[3]);
+  const maxA=Math.max(...both.map(r=>Math.abs(r.ano)))||1;
+  const tbl=(rows,lab)=>`<div class="scroll"><table class="t"><thead><tr><th>${lab}</th><th class="num">Trades</th><th class="num">Ganhas</th><th class="num">Por trade</th><th class="num">% por ano</th><th class="num hide-sm">€ por ano</th></tr></thead><tbody>
+    ${rows.map(r=>`<tr><td>${lab==="Estratégia"?`<code>${esc(r.k)}</code>`:esc(nm(r.k))}</td><td class="num">${r.n}</td><td class="num">${nf(r.wr,0)}%</td><td class="num ${cls(r.avg)}">${pc(r.avg,3)}</td><td class="num"><b class="${cls(r.ano)}">${pc(r.ano,2)}</b></td><td class="num hide-sm ${cls(r.ano)}">${eur(r.ano/100*S.acc)}</td></tr>`).join("")}</tbody></table></div>`;
+  return `<div class="grid2"><div class="card"><h2>Por índice</h2><p class="hint">Quanto cada índice deu à carteira, depois das regras de risco.</p>${tbl(mk,"Índice")}</div>
+    <div class="card"><h2>Por estratégia</h2><p class="hint">Quanto cada estratégia deu, somando todos os índices.</p>${tbl(id,"Estratégia")}</div></div>
+    <div class="card"><h2>Cada índice com cada estratégia</h2><p class="hint">% da conta por ano. Combinações a vermelho perderam dinheiro neste período.</p>
+    <div class="scroll"><table class="t"><thead><tr><th>Índice</th><th>Estratégia</th><th class="num">Trades</th><th class="num">Por trade</th><th class="num">% por ano</th><th style="width:30%" class="hide-sm"></th></tr></thead><tbody>
+    ${both.map(r=>{const [m,i]=r.k.split("|"); return `<tr><td>${esc(nm(m))}</td><td><code>${esc(i)}</code></td><td class="num">${r.n}</td><td class="num ${cls(r.avg)}">${pc(r.avg,3)}</td><td class="num"><b class="${cls(r.ano)}">${pc(r.ano,2)}</b></td><td class="hide-sm"><div class="bar-in"><div style="width:${Math.abs(r.ano)/maxA*100}%;background:var(${r.ano>=0?"--c1":"--neg"})"></div></div></td></tr>`;}).join("")}</tbody></table></div></div>`;
+}
+
+/* testes de estrategias */
+function catalog(){const m={}; for(const l of (S.data.summary||"").split("\n")){const x=l.match(/^\|\s*#(\d+)\s*\|\s*([\d-]+)\s*\|\s*`([^`]+)`/); if(x) m[x[3]]={n:+x[1],date:x[2]};} return m;}
+const PER={dev:"2019–2024",pre:"2012–2018 (às cegas)",holdout:"Holdout 2025–26"};
+function vTestes(){
+  const cat=catalog(); const runs=S.data.runs;
+  const by={}; for(const r of runs){(by[r.variant]=by[r.variant]||{})[r.period]=r;}
+  let vars=Object.keys(by).map(v=>({v,c:cat[v.replace(/ \(.*\)$/,"")],...by[v]})).sort((a,b)=>(b.c?.n||0)-(a.c?.n||0));
+  const f=S.tests.f;
+  if(f==="pass") vars=vars.filter(x=>x.dev&&x.dev.verdict.startsWith("PASSA"));
+  if(f==="port") vars=vars.filter(x=>/rsi2-dip-d|ibs-dip-d|down3-d|ibs-bear-d/.test(x.v));
+  const npass=Object.values(by).filter(x=>x.dev&&x.dev.verdict.startsWith("PASSA")).length;
+  const vb=r=>!r?`<span class="muted">—</span>`:`<span class="badge ${r.verdict.startsWith("PASSA")?"ok":r.pooled.t>0?"mid":"bad"}">${r.verdict.startsWith("PASSA")?"Passa":"Reprovada"}</span>`;
+  const mc=m=>m&&m.n?`<span class="${cls(m.meanR)}">${rr(m.meanR,3)}</span><div class="small muted">${m.n} trades</div>`:`<span class="muted">—</span>`;
+  let det="";
+  const X=S.tests.sel&&by[S.tests.sel];
+  if(X){ const r=(S.tests.per&&X[S.tests.per])||X.dev||X.pre||X.holdout; const mkk=S.tests.mk;
+    const pers=["dev","pre","holdout"].filter(p=>X[p]);
+    const mm=r.markets[mkk]||{};
+    const days=(r.periods&&r.periods[mkk]&&r.periods[mkk].day)||[];
+    const dm=Object.fromEntries(days.map(d=>[d[0],{r:d[1],n:d[2],w:d[3]}]));
+    const CC={nq:"var(--c1)",es:"var(--c2)",dow:"var(--c3)"}; const ser=["nq","es","dow"].filter(k=>r.equity&&r.equity[k]&&r.equity[k].length).map(k=>({name:nm(k),color:CC[k],pts:r.equity[k]}));
+    det=`<div class="card" id="tdet"><div class="card-head"><div><h2>${cat[S.tests.sel.replace(/ \(.*\)$/,"")]?"#"+cat[S.tests.sel.replace(/ \(.*\)$/,"")].n+" · ":""}<code style="font-size:14px">${esc(S.tests.sel)}</code></h2>
+      <p class="hint">Período mostrado: ${PER[r.period]}. Resultados em R (1R = 1% da conta), já com custos de CFD.</p></div>
+      ${seg(pers.map(p=>[p,PER[p].split(" ")[0]]),r.period,"(v=>{S.tests.per=v;S.tests.cal.y=null;render()})")}<button class="btn" onclick="S.tests.sel=null;render()">Fechar</button></div>
+      <div class="kpis sm">${["nq","es","dow"].map(k=>{const m=r.markets[k]||{}; return kpi(nm(k)+(k==="nq"?" (o teu)":""),m.n?rr(m.meanR,3):"—",m.n?`${m.n} trades · ${nf(m["win%"],0)}% ganhas · t ${nf(m.t,2)} · ${rr(m["R/mes"],2)}/mês`:"",cls(m.meanR));}).join("")}${kpi("Juntos",nf(r.pooled.t,2),"t-stat conjunto · fasquia 3,0")}</div>
+      <h2 style="margin-top:6px">Curva acumulada</h2>${lineChart("teq",ser,{unit:"R",h:230,fmt:v=>rr(v,1)})}
+      <div class="card-head" style="margin-top:16px"><div><h2>Calendário diário</h2><p class="hint">R por dia em que fecharam trades.</p></div>${seg([["nq","NQ"],["es","S&P"],["dow","Dow"]],mkk,"(v=>{S.tests.mk=v;S.tests.cal.y=null;render()})")}</div>
+      ${calendar(dm,S.tests.cal,"tcal","R")}</div>`;
+  }
+  return `<div class="kpis">${kpi("Variantes testadas",Object.keys(by).length,"estratégias com número no catálogo")}${kpi("Passaram",npass,"no critério oficial (2019–2024)",npass?"pos":"")}${kpi("Na carteira",4,"rsi2-dip-d, ibs-dip-d, down3-d, ibs-bear-d")}${kpi("Melhor t",nf(Math.max(...runs.filter(r=>r.period==="dev").map(r=>r.pooled.t)),2),"fasquia 3,0")}</div>
+  ${det}
+  <div class="card"><div class="card-head"><div><h2>Catálogo de testes</h2><p class="hint">Toca numa linha para ver curva e calendário. NQ primeiro; S&P e Dow servem de confirmação.</p></div>${seg([["all","Todos"],["pass","Passaram"],["port","Na carteira"]],f,"(v=>{S.tests.f=v;render()})")}</div>
+  <div class="scroll"><table class="t"><thead><tr><th>#</th><th>Data</th><th>Variante</th><th>2019–24</th><th class="num">t</th><th class="num">NQ</th><th class="num hide-sm">S&amp;P</th><th class="num hide-sm">Dow</th><th>2012–18</th><th class="hide-sm">Holdout</th></tr></thead><tbody>
+  ${vars.map(x=>{const r=x.dev||x.pre; return `<tr class="click ${S.tests.sel===x.v?"sel":""}" onclick="S.tests.sel='${esc(x.v)}';S.tests.per=null;S.tests.cal={y:null,m:null,mode:'mes',sel:null};render();setTimeout(()=>document.getElementById('tdet')?.scrollIntoView({behavior:'smooth'}),30)"><td class="muted">${x.c?"#"+x.c.n:""}</td><td class="small">${x.c?fdate(x.c.date):esc((r.date||"").slice(0,10))}</td><td><code>${esc(x.v)}</code></td><td>${vb(x.dev)}</td><td class="num">${x.dev?nf(x.dev.pooled.t,2):"—"}</td><td class="num">${mc(r&&r.markets.nq)}</td><td class="num hide-sm">${mc(r&&r.markets.es)}</td><td class="num hide-sm">${mc(r&&r.markets.dow)}</td><td>${vb(x.pre)}</td><td class="hide-sm">${vb(x.holdout)}</td></tr>`;}).join("")}
+  </tbody></table></div></div>`;
+}
+
+/* diario */
 const JK={inicio:["▶","Início"],estado:["⋯","A fazer"],ideia:["💡","Ideia nova"],teste:["🧪","Teste"],mudanca:["🔧","Mudança"],erro:["⚠️","Erro"],fim:["🏁","Fim de sessão"]};
-const JF={all:"Tudo",ideia:"Ideias",teste:"Testes",mudanca:"Mudanças",erro:"Erros"};
-let JSEL="all", JLOG=[];
-function setJ(k){JSEL=k; activity(JLOG);}
-function activity(log){
-  JLOG=log;
-  document.getElementById("jchips").innerHTML=Object.entries(JF).map(([k,v])=>{const n=k==="all"?"":` ${log.filter(e=>e.kind===k).length}`;return `<button class="${k===JSEL?"on":""}" onclick="setJ('${k}')">${v}${n}</button>`;}).join("");
-  const el=document.getElementById("journal");
-  // sessoes: do mais recente para o mais antigo; 'estado' antigo esconde-se (so interessa o atual)
-  let items=log.filter(e=>JSEL==="all"?true:e.kind===JSEL);
-  if(JSEL==="all"){ const firstState=items.findIndex(e=>e.kind==="estado"); items=items.filter((e,i)=>e.kind!=="estado"||i===firstState); }
-  if(!items.length){el.innerHTML='<div class="empty small">Nada por aqui ainda.</div>';return;}
-  let html="", lastDay="";
-  items.forEach(e=>{
-    const d=new Date(e.at), day=d.toLocaleDateString("pt-PT",{weekday:"long",day:"numeric",month:"long"});
-    if(day!==lastDay){html+=`<div class="jsess">${day}</div>`; lastDay=day;}
+function vDiario(){
+  const log=S.data.log; const F={all:"Tudo",teste:"Testes",ideia:"Ideias",mudanca:"Mudanças",fim:"Fins de sessão",erro:"Erros"};
+  const L=log.filter(e=>S.j==="all"?e.kind!=="estado":e.kind===S.j);
+  let h="",lastDay="";
+  for(const e of L){const d=new Date(e.at); const day=d.toLocaleDateString("pt-PT",{weekday:"long",day:"numeric",month:"long"});
+    if(day!==lastDay){h+=`<div class="jday">${day}</div>`; lastDay=day;}
+    let msg=e.message, det=Array.isArray(e.details)?e.details:[]; if(!det.length&&msg.includes(" | ")){const p=msg.split(" | "); msg=p.shift(); det=p;}
     const [ic,lab]=JK[e.kind]||["•",e.kind];
-    let msg=e.message, det=Array.isArray(e.details)?e.details:[];
-    if(!det.length && msg.includes(" | ")){const parts=msg.split(" | "); msg=parts.shift(); det=parts;}
-    html+=`<div class="jitem"><div class="jicon">${ic}</div><div class="jbody"><div class="jhead"><span class="jkind">${lab}</span><span class="jtime">${d.toLocaleTimeString("pt-PT",{hour:"2-digit",minute:"2-digit"})}</span></div>
-      <div class="jtitle">${esc(msg)}</div>${det.length?`<ul>${det.map(b=>`<li>${esc(b)}</li>`).join("")}</ul>`:""}</div></div>`;
-  });
-  el.innerHTML=html;
+    h+=`<div class="ji"><div class="jic">${ic}</div><div class="jb"><div class="jh"><span class="jk">${lab}</span><span class="jt">${d.toLocaleTimeString("pt-PT",{hour:"2-digit",minute:"2-digit"})}</span></div><div class="jm">${esc(msg)}</div>${det.length?`<ul>${det.map(b=>`<li>${esc(b)}</li>`).join("")}</ul>`:""}</div></div>`;}
+  return `<div class="card"><h2>Diário do agente</h2><p class="hint">O que o agente pensou, testou e mudou, do mais recente para o mais antigo.</p>
+    <div class="chips">${Object.entries(F).map(([k,v])=>`<button class="${S.j===k?"on":""}" onclick="S.j='${k}';render()">${v} ${k==="all"?"":log.filter(e=>e.kind===k).length}</button>`).join("")}</div>${h||`<div class="empty">Sem registos.</div>`}</div>`;
+}
+
+/* plano */
+function md(t){ const out=[]; const L=t.split("\n"); let i=0;
+  const inl=x=>esc(x).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/`(.+?)`/g,"<code>$1</code>");
+  while(i<L.length){const l=L[i];
+    if(/^\s*\|/.test(l)){const rows=[]; while(i<L.length&&/^\s*\|/.test(L[i])){ if(!/^\s*\|[\s|:-]+\|\s*$/.test(L[i])) rows.push(L[i].trim().replace(/^\||\|$/g,"").split("|").map(c=>c.trim())); i++;}
+      out.push(`<div class="scroll"><table class="t">${rows.map((r,j)=>`<tr>${r.map(c=>j?`<td>${inl(c)}</td>`:`<th>${inl(c)}</th>`).join("")}</tr>`).join("")}</table></div>`); continue;}
+    if(/^#+\s/.test(l)) out.push(`<div class="mh">${inl(l.replace(/^#+\s/,""))}</div>`);
+    else if(/^\s*-\s/.test(l)) out.push(`<p>• ${inl(l.replace(/^\s*-\s/,""))}</p>`);
+    else if(l.trim()) out.push(`<p>${inl(l)}</p>`);
+    i++;}
+  return out.join("");}
+function vPlano(){
+  const d=S.data; const sm=d.summary.split(/\nLeitura honesta/); const reading=sm[1]?"Leitura honesta"+sm[1]:"";
+  let ls=null; const todo=d.todo.map(t=>{const h=t.section!==ls?`<li class="sec">${esc(t.section||"")}</li>`:""; ls=t.section; return h+`<li class="${t.done?"done":""}"><span class="box">${t.done?"✓":""}</span><span>${esc(t.text||"")}</span></li>`;}).join("");
+  return `<div class="card"><h2>Leitura do agente</h2><p class="hint">O que o agente conclui de tudo até agora.</p><div class="md">${md(reading||d.summary)}</div></div>
+    <div class="grid2"><div class="card"><h2>Plano de testes</h2><p class="hint">O que já correu (✓) e o que falta.</p><ul class="todo">${todo}</ul></div>
+    <div><div class="card"><h2>Como ler isto</h2><div class="md small">
+      <p><b>R</b> = quanto arriscas por trade. Com 1% de risco, +1R = +1% da conta; −1R = levaste o stop. Já inclui spread e financiamento do CFD.</p>
+      <p><b>2019–2024</b> serve para escolher. <b>2012–2018</b> é um teste às cegas. <b>Holdout (2025–2026)</b> só se abre uma vez por variante que passe.</p>
+      <p><b>Para passar:</b> pelo menos 60 trades em cada índice, média positiva no NQ, no S&amp;P e no Dow, e t-stat conjunto ≥ 3,0.</p>
+      <p><b>Carteira:</b> várias estratégias em 10 índices, no máximo 3 trades abertas, 1 por região, e pára no mês em que perder 3%.</p></div></div>
+      ${d.holdoutLog.trim()?`<div class="card"><h2>Registo do holdout</h2><pre class="small" style="white-space:pre-wrap;margin:0">${esc(d.holdoutLog.trim())}</pre></div>`:""}</div></div>
+    <div class="card"><details><summary style="cursor:pointer;font-weight:650">Ideias do agente (registadas antes de correr)</summary><div class="md" style="margin-top:8px">${md(d.ideas)}</div></details></div>`;
+}
+
+/* ---------- render ---------- */
+const VIEWS={inicio:vInicio,calendario:vCalendario,periodos:vPeriodos,trades:vTrades,indices:vIndices,testes:vTestes,diario:vDiario,plano:vPlano};
+const SUBS={inicio:"Resumo da carteira escolhida",calendario:"Resultado de cada dia, semana e mês",periodos:"Todos os meses e todas as semanas",trades:"Lista completa, com filtros",indices:"De onde vem o resultado",testes:"Catálogo numerado de todas as estratégias testadas",diario:"O que o agente fez",plano:"Conclusões, plano e ideias"};
+function render(){
+  S.route=(location.hash.slice(1)||"inicio"); if(!VIEWS[S.route]) S.route="inicio";
+  renderNav();
+  const lab=ROUTES.find(r=>r[0]===S.route)[1];
+  document.getElementById("ttl").innerHTML=`${lab}<span class="sub">${SUBS[S.route]}</span>`;
+  document.getElementById("pfCtl").style.display=["testes","diario","plano"].includes(S.route)?"none":"";
+  if(!S.data){document.getElementById("view").innerHTML=`<div class="card"><div class="empty">A carregar dados…</div></div>`; return;}
+  const L=portfolios(); document.getElementById("pfSel").innerHTML=L.map(p=>`<option value="${p.id}" ${p.id===(curPf()||{}).id?"selected":""}>${esc(pfName(p))}</option>`).join("");
+  document.getElementById("acc").value=S.acc;
+  hideTip();
+  try{ document.getElementById("view").innerHTML=VIEWS[S.route](); }
+  catch(e){ console.error(e); document.getElementById("view").innerHTML=`<div class="card"><div class="empty">Erro a mostrar esta secção: ${esc(e.message)}</div></div>`; }
+}
+window.addEventListener("hashchange",()=>{render(); window.scrollTo({top:0});});
+
+function nextRun(){const now=new Date(); const lis=new Date(now.toLocaleString("en-US",{timeZone:"Europe/Lisbon"}));
+  for(let k=1;k<=24;k++){const t=new Date(lis.getTime()+k*36e5); const h=t.getHours(); if(h>=19||h<=3) return pad(h)+":00";} return "19:00";}
+function status(log){
+  const dot=document.getElementById("dot"), txt=document.getElementById("stTxt");
+  const last=log[0]; const ago=last?(Date.now()-Date.parse(last.at))/6e4:1e9;
+  const started=log.find(e=>e.kind==="inicio"), ended=log.find(e=>e.kind==="fim"||e.kind==="erro");
+  const running=started&&(!ended||Date.parse(started.at)>Date.parse(ended.at))&&ago<45;
+  const when=last?new Date(last.at).toLocaleString("pt-PT",{dateStyle:"short",timeStyle:"short"}):"";
+  if(running){dot.className="dot live"; txt.innerHTML=`<b>Agente a trabalhar</b> · ${esc(last.message)}`;}
+  else if(last&&last.kind==="erro"&&ago<720){dot.className="dot err"; txt.innerHTML=`<b>Parou com erro</b> · ${esc(last.message)}`;}
+  else {dot.className="dot"; txt.innerHTML=`<b>Agente em pausa</b> · próxima corrida às ${nextRun()}${last?` · última atividade ${when}`:""}`;}
 }
 function load(){
-  Promise.all([
-    q("runs?select=*&order=created_at.desc"),
-    q("state?select=key,value,updated_at"),
-    q("agent_log?select=*&order=at.desc&limit=200"),
-  ]).then(([runs,state,log])=>{
+  Promise.all([q("runs?select=*&order=created_at.desc"),q("state?select=key,value,updated_at"),q("agent_log?select=*&order=at.desc&limit=300")])
+  .then(([runs,state,log])=>{
     const st=Object.fromEntries(state.map(r=>[r.key,r.value]));
-    const d={runs:runs.map(r=>({...r,date:r.created_at.slice(0,16)})),todo:st.todo||[],summary:st.summary||"",holdoutLog:st.holdout_log||"",ideas:st.ideas||"",portfolio:st.portfolio||null};
-    if(d.ideas.split("\n").filter(l=>l.trim()).length>2){document.getElementById("ideasSec").hidden=false; document.getElementById("ideas").innerHTML=md(d.ideas);}
-    const last=log[0]?new Date(log[0].at):null;
-    document.getElementById("sub").textContent="Backtests NQ · S&P 500 · Dow em 5m, com custos de CFD"+(last?` · última atividade ${last.toLocaleString("pt-PT",{dateStyle:"short",timeStyle:"short"})}`:"");
-    tiles(d); runsTable(d); todoList(d); activity(log); nowStatus(log); if(PV.run){const u=d.runs.find(r=>r.id===PV.run.id); if(u){PV.run=u; renderPeriods();}}
-    if(d.summary.trim()){document.getElementById("sumSec").hidden=false; document.getElementById("summary").innerHTML=md(d.summary.trim());}
-    if(d.holdoutLog.trim()){document.getElementById("holdBox").hidden=false; document.getElementById("hold").textContent=d.holdoutLog.trim();}
-  }).catch(e=>{document.getElementById("sub").textContent="Erro a carregar dados: "+e;});
+    S.data={runs,log,todo:st.todo||[],summary:st.summary||"",holdoutLog:st.holdout_log||"",ideas:st.ideas||"",portfolio:st.portfolio||null,
+      extra:Object.keys(st).filter(k=>k.startsWith("portfolio_")).sort((a,b)=>a.localeCompare(b,undefined,{numeric:true})).map(k=>({label:k.slice(10),...st[k]}))};
+    status(log); render();
+  }).catch(e=>{document.getElementById("stTxt").textContent="Erro a carregar dados: "+e;});
 }
-load(); setInterval(load, 60000);
+(function(){const t=store("bt_theme"); if(t){document.documentElement.setAttribute("data-theme",t); document.getElementById("theme").value=t;}})();
+render(); load(); setInterval(load,120000);
 window.load=load;
 </script>
 <script type="module">
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const sb=createClient("https://ctyndeyumrvcwlxzdgnz.supabase.co","sb_publishable_hMd_xtAGBa1zcJY30QRNIA_LupFPdfp");
-let t=null; const kick=()=>{clearTimeout(t); t=setTimeout(()=>window.load(),400);};
+let t=null; const kick=()=>{clearTimeout(t); t=setTimeout(()=>window.load(),600);};
 const rt=document.getElementById("rt");
 sb.channel("bottrading").on("postgres_changes",{event:"*",schema:"public",table:"agent_log"},kick)
   .on("postgres_changes",{event:"*",schema:"public",table:"runs"},kick)
   .on("postgres_changes",{event:"*",schema:"public",table:"state"},kick)
-  .subscribe(s=>{rt.textContent = s==="SUBSCRIBED" ? "● tempo real" : (s==="CHANNEL_ERROR"||s==="TIMED_OUT" ? "atualiza a cada minuto" : "");});
+  .subscribe(s=>{rt.textContent = s==="SUBSCRIBED" ? "● tempo real" : (s==="CHANNEL_ERROR"||s==="TIMED_OUT" ? "atualiza a cada 2 min" : "");});
 </script>
 </body>
 </html>
