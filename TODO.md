@@ -137,4 +137,5 @@ Registada em IDEAS.md antes de correr. Fasquia t >= 3.0. Correr dev e depois `--
 
 ## Ideias do agente (2026-11-18, sessao 6)
 Registada em IDEAS.md antes de correr. Fasquia t >= 3.0 (custos de futuros). Correr dev e depois `--period pre` (2012-2018) como confirmacao.
-- [ ] #41: `python run_swing.py --idea flush-1h` (e `--period pre`)
+- [x] #41: `python run_swing.py --idea flush-1h` (e `--period pre`) -> REPROVADA (fut t junto +0.15; NQ +0.038R/346 trades,
+  S&P -0.017R/348, Dow -0.012R/307; CFD t +0.12). 2012-2018: t -2.95 (NQ -0.043R, S&P -0.122R, Dow -0.004R). Vela de 1h violenta nao reverte

@@ -298,6 +298,24 @@ def fomc_holiday_1h(b: pd.DataFrame) -> pd.Series:
     return pd.Series(on.astype(int), index=b.index)
 
 
+def flush_1h(b: pd.DataFrame) -> pd.Series:
+    """1h, horas de Nova Iorque. Vela de queda violenta a meio da sessao cash, em tendencia de alta (Nagel 2012):
+    sinal no fecho de uma vela que comeca entre as 10:00 e as 14:00 com amplitude > 2 x ATR(14), fecho < abertura,
+    fecho no quarto inferior da vela e fecho > media das ultimas 4600 velas. Long ate ao fecho da 6.a vela depois
+    do sinal (um novo sinal prolonga a janela). Stop 3 ATR (motor)."""
+    from .swing import atr
+    h = b.index.tz_convert("America/New_York").hour if b.index.tz is not None else b.index.hour
+    rng = b["high"] - b["low"]
+    a = pd.Series(atr(b), index=b.index)
+    loc = (b["close"] - b["low"]) / rng.replace(0, np.nan)
+    sig = ((h >= 10) & (h <= 14) & (rng > 2 * a) & (b["close"] < b["open"]) & (loc < 0.25)
+           & (b["close"] > b["close"].rolling(4600).mean())).to_numpy()
+    on = np.zeros(len(b), dtype=int)
+    for i in np.flatnonzero(sig):
+        on[i:i + 6] = 1           # quer estar long nas velas i..i+5 -> sai no fecho da vela i+6
+    return pd.Series(on, index=b.index)
+
+
 IDEAS = {
     "trend-sma100-d": (trend_sma100, "1d", 3.0, 0.0, 0),
     "rsi2-dip-d": (rsi2_dip, "1d", 3.0, 0.0, 10),
@@ -318,4 +336,5 @@ IDEAS = {
     "pullback20-d": (pullback20_d, "1d", 3.0, 0.0, 20),
     "calmhigh-d": (calmhigh_d, "1d", 3.0, 0.0, 0),
     "fomc-holiday-1h": (fomc_holiday_1h, "1h", 3.0, 0.0, 0),
+    "flush-1h": (flush_1h, "1h", 3.0, 0.0, 0),
 }
