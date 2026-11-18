@@ -14,16 +14,17 @@
 | ideia 21 (2026-11-18): turnaround-tue-d (comprar a terca depois de uma segunda em queda) | +0.21 | REPROVADA (~0R: NQ -0.002R, Dow negativo) |
 | ideia 22 (2026-11-18, sessao 2): keyrev-d (minimo novo de 10 dias que fecha acima do dia anterior) | +0.36 | REPROVADA (~0R em dev, poucas trades); piora a carteira (+11.6%/ano) |
 | ideia 23 (2026-11-18, sessao 3): pullback20-d (recuo a media de 20 dias em tendencia forte) | +1.15 | REPROVADA (poucas trades; NQ +0.11R); piora a carteira (+9.6%/ano) |
+| ideia 24 (2026-11-18, sessao 4): calmhigh-d (maximo novo de 10 dias numa subida calma) | +0.32 | REPROVADA (NQ +0.12R mas S&P e Dow negativos; 2012-2018 ~0R) |
 
 Leitura honesta (10 linhas):
-1. 38 testes; so 1 passou no criterio oficial (double7-d). Ideias do agente testadas: 23 (quanto mais, mais desconfianca num resultado isolado).
+1. 39 testes; so 1 passou no criterio oficial (double7-d). Ideias do agente testadas: 24 (quanto mais, mais desconfianca num resultado isolado).
 2. ibs-bear-d: pequeno (NQ +0.056R/trade, ~0.5R/ano por indice), t baixo (1.6 dev, 1.0 pre). Sozinha nao prova nada.
 3. Mas foi pensada para a carteira (trades quando as outras estao paradas) e faz isso: positiva nos 10 indices na carteira, e ganha em 2020 e 2022.
 4. Carteira nova (rsi2-dip-d + ibs-dip-d + down3-d + ibs-bear-d, 10 indices, max 3 abertas, 1 por regiao, paragem -3%/mes):
    +12.5%/ano (era +9.5%), 6/14 anos >= 14%, pior queda -9.1% (era -10.7%), 108/148 meses positivos, ~183 trades/ano (~3.5/semana).
 5. Custo: pior ano -4.5% (2018; era -2.5%) e pior mes -5.5% (era -5.1%). Ligeiramente menos consistente nos piores casos.
 6. Atencao: o periodo "tudo" da carteira inclui 2025; o ibs-bear-d nao foi ao holdout (nao passou no oficial). Tratar +12.5% com cautela.
-7. Intraday (1m/5m/1h) com custos de CFD: ~0R ou negativo. Calendario, NR7, vender, dias de reversao: ~0R. Recuos de semanas (pullback20-d): pouco nos EUA, negativo fora; ocupa lugares e piora a carteira.
-8. Carteira confirmada a 2026-11-18, sessao 3 (igual, +12.5%/ano, 6/14 anos >= 14%): faltam ~1.5% ao ano para o objetivo de 14%. Trades ~3.5/semana, um pouco acima das 2-3 pedidas.
+7. Intraday (1m/5m/1h) com custos de CFD: ~0R ou negativo. Calendario, NR7, vender, dias de reversao, comprar maximos em subidas calmas (calmhigh-d): ~0R. Recuos de semanas (pullback20-d) pioram a carteira.
+8. Carteira confirmada a 2026-11-18, sessao 4 (igual, +12.5%/ano, 6/14 anos >= 14%): faltam ~1.5% ao ano para o objetivo de 14%. Trades ~3.5/semana, um pouco acima das 2-3 pedidas.
 9. Proximo passo: confirmar a carteira nova no holdout (decisao do Antonio) antes de qualquer conta demo.
 10. Nota: RESULTS.md tem uma linha duplicada de tom-d (pre), corrida duas vezes por engano; mesmo resultado.

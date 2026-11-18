@@ -222,6 +222,20 @@ def pullback20_d(b: pd.DataFrame) -> pd.Series:
     return pos.reindex(b.index).ffill().fillna(0).astype(int)
 
 
+def calmhigh_d(b: pd.DataFrame) -> pd.Series:
+    """Diario. Maximo novo numa subida calma: primeiro fecho acima do maior fecho dos 10 dias anteriores, fecho acima
+    da media de 200 e media do true range de 5 dias < media de 50 -> long durante os 5 dias de semana seguintes
+    (sai no fecho do 5.o). Um novo sinal prolonga a janela."""
+    w = _weekdays(b)
+    h, l, c = w["high"], w["low"], w["close"]
+    tr = pd.concat([h - l, (h - c.shift()).abs(), (l - c.shift()).abs()], axis=1).max(axis=1)
+    newhi = c > c.shift(1).rolling(10).max()
+    sig = (newhi & ~newhi.shift(1, fill_value=False) & (c > c.rolling(200).mean())
+           & (tr.rolling(5).mean() < tr.rolling(50).mean())).astype(int)
+    pos = sig.rolling(5, min_periods=1).max()      # dia do sinal + 4 dias seguintes em posicao no fecho
+    return pos.reindex(b.index).ffill().fillna(0).astype(int)
+
+
 IDEAS = {
     "trend-sma100-d": (trend_sma100, "1d", 3.0, 0.0, 0),
     "rsi2-dip-d": (rsi2_dip, "1d", 3.0, 0.0, 10),
@@ -240,4 +254,5 @@ IDEAS = {
     "turnaround-tue-d": (turnaround_tue_d, "1d", 3.0, 0.0, 0),
     "keyrev-d": (keyrev_d, "1d", 3.0, 0.0, 0),
     "pullback20-d": (pullback20_d, "1d", 3.0, 0.0, 20),
+    "calmhigh-d": (calmhigh_d, "1d", 3.0, 0.0, 0),
 }

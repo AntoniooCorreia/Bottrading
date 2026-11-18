@@ -97,4 +97,5 @@ Registada em IDEAS.md antes de correr. Fasquia t >= 3.0. Correr dev e depois `--
 
 ## Ideias do agente (2026-11-18, sessao 4)
 Registada em IDEAS.md antes de correr. Fasquia t >= 3.0. Correr dev e depois `--period pre` (2012-2018) como confirmacao.
-- [ ] `python run_swing.py --idea calmhigh-d` (e `--period pre`)
+- [x] `python run_swing.py --idea calmhigh-d` (e `--period pre`) -> REPROVADA, t junto +0.32 (dev NQ +0.124R/55 trades, S&P -0.059R, Dow -0.003R;
+  pre t -0.01, NQ -0.040R). Nao e positiva nos 3 em nenhum dos periodos: nao vai a carteira. Comprar maximos em subidas calmas ~0R
