@@ -246,3 +246,27 @@ Diferente do donchian20-d (reprovado): so long, so em tendencia de alta (media d
 - Saida: no fecho do 5.o dia de semana depois do sinal (um novo sinal prolonga a janela). Stop 3 ATR(14) diario, sem alvo.
 - Timeframe: diario. Long-only. Parametros fixos (10 dias e 5 dias iguais as ideias anteriores; 5/50 sao a medida curta/longa
   de volatilidade mais comum; stop igual as outras ideias diarias).
+
+## 2026-11-18 - sessao 5 (1 ideia; total de ideias do agente ate agora: 25; hoje: 5 de 8) - registada antes de correr
+Objetivo (TODO: modo ideias com foco 1h/4h): um sinal em 1h que NAO dependa do preco, para nao coincidir com as compras
+de quedas da carteira, e com stops de 1h (cabem num MNQ). Efeitos de CALENDARIO conhecidos com antecedencia.
+So 1 ideia nesta sessao (outra sessao correu C14-C20 em paralelo; nao quero gastar o limite da noite).
+Verificacao de frequencia (contagem de sinais, sem olhar a resultados): dev 2019-2024: 104 (NQ), 104 (S&P), 104 (Dow);
+2012-2018: 118, 118, 90 (os dados do Dow comecam mais tarde).
+Diferente do tom-d (viragem do mes, reprovado) e do overnight-us-1h (todas as noites, reprovado): so ~17 janelas por ano,
+ligadas a eventos especificos.
+
+### Ideia 25 - `fomc-holiday-1h`: long antes do FOMC e na vespera de feriados
+- Hipotese: (a) deriva antes do FOMC (Lucca & Moench 2015, Journal of Finance): o S&P subiu em media ~0.5% nas 24h antes
+  do comunicado programado do FOMC (1994-2011), explicado por premio de risco antes do anuncio; (b) efeito vespera de
+  feriado (Ariel 1990; Lakonishok & Smidt 1988): o ultimo dia de bolsa antes de um feriado rende varias vezes um dia normal
+  (fecho de posicoes curtas, otimismo, pouca oferta). Os dois juntos dao ~17 trades por ano por indice.
+- Expectativa honesta: baixa a media. A deriva pre-FOMC enfraqueceu depois de 2015 (estudos posteriores) e o efeito
+  vespera de feriado tambem diminuiu desde que foi publicado.
+- Entrada: (a) long as 14:00 NY do dia de bolsa anterior ao comunicado do FOMC (sinal no fecho da vela de 1h das 13:00);
+  (b) long as 16:00 NY do dia anterior a vespera de feriado da NYSE (sinal no fecho da vela das 15:00).
+- Saida: (a) as 14:00 NY do dia do comunicado (antes do anuncio); (b) as 16:00 NY da vespera do feriado. Stop 3 ATR(14) de 1h,
+  sem alvo.
+- Datas: reunioes PROGRAMADAS do FOMC 2012-2026 (lista fixa em sr/swing_ideas.py); feriados da NYSE por regras fixas
+  (Ano Novo, MLK, Presidents, Sexta-feira Santa, Memorial, Juneteenth desde 2022, 4 de julho, Labor, Thanksgiving, Natal).
+- Timeframe: 1h, horas de Nova Iorque. Long-only. Parametros fixos (nenhum por afinar; stop igual ao overnight-us-1h).

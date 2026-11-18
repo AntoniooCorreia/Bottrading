@@ -6,10 +6,14 @@ from sr.swing import run_positions
 from sr.swing_ideas import IDEAS
 
 
-def synth_d(n=3000, seed=0, tf="1d"):
+# Ideias de calendario com datas fixas (ex.: FOMC desde 2012) precisam de velas sinteticas nesses anos e mais longas
+CAL = {"fomc-holiday-1h": ("2019-01-02", 12000)}
+
+
+def synth_d(n=3000, seed=0, tf="1d", start="2000-01-03"):
     rng = np.random.default_rng(seed)
     if tf == "1h":   # velas horarias seg-sex (ideias que dependem da hora do dia)
-        idx = pd.date_range("2000-01-03", periods=n * 2, freq="h", tz="America/New_York")
+        idx = pd.date_range(start, periods=n * 2, freq="h", tz="America/New_York")
         idx = idx[idx.dayofweek < 5][:n]
     else:
         idx = pd.bdate_range("2000-01-03", periods=n, tz="America/New_York")
@@ -25,7 +29,8 @@ def test_swing_random_walk_no_edge(name):
     fn, tf, st, tp, mh = IDEAS[name]
     rs = []
     for s in range(6):
-        b = synth_d(seed=s, tf=tf)
+        st0, n0 = CAL.get(name, ("2000-01-03", 3000))
+        b = synth_d(n=n0, seed=s, tf=tf, start=st0)
         tr = run_positions(b, fn(b), st, 0.0, 0.0, tp, mh, min_risk_cost=0.0)
         rs.append(tr["gross_R"].to_numpy())
     r = np.concatenate(rs)
@@ -37,7 +42,8 @@ def test_swing_random_walk_no_edge(name):
 @pytest.mark.parametrize("name", sorted(IDEAS))
 def test_swing_no_lookahead(name):
     fn, tf, st, tp, mh = IDEAS[name]
-    b = synth_d(seed=9, tf=tf)
+    st0, n0 = CAL.get(name, ("2000-01-03", 3000))
+    b = synth_d(n=n0, seed=9, tf=tf, start=st0)
     cut = b.index[len(b) // 2]
     a = run_positions(b, fn(b), st, 1.0, 1.0, tp, mh, 0.0)
     bb = b[b.index <= cut]

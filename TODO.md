@@ -124,3 +124,7 @@ Base: C11 (C5 corrigida). Agora com custos de micro-futuros. Uma carteira so sub
 - [x] C19: C14 + pullback20-d (refaz C7) `--label C19` -> +1.3%/ano, pior queda -20.0% (piora)
 - [x] C20: so NQ com rsi2-dip-d + ibs-dip-d + down3-d + ibs-bear-d + double7-d, `--markets nq --custos fut --label C20` -> +2.6%/ano, pior mes -1.7%, pior ano -1.5%, pior queda -3.0%, 31 trades/ano -> NOVA REFERENCIA (melhor % e muito mais estavel)
 Depois: modo ideias com o FOCO ATUAL (1h/4h, stops que caibam em MNQ).
+
+## Ideias do agente (2026-11-18, sessao 5)
+Registada em IDEAS.md antes de correr. Fasquia t >= 3.0. Correr dev e depois `--period pre` (2012-2018) como confirmacao.
+- [ ] #40: `python run_swing.py --idea fomc-holiday-1h` (e `--period pre`)
