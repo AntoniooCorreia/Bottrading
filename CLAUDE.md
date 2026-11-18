@@ -50,6 +50,8 @@ o trabalho e confirmar ou desmentir com honestidade, nao "encontrar" algo.
 - `python portfolio.py --ideas a,b,c [--markets nq,dax,...] [--period tudo]` - carteira de ideias em varios indices,
   1% por trade: media % ao ano, anos acima de 14%, pior queda. Envia para o dashboard. E A METRICA DO OBJETIVO.
   Indices disponiveis: nq es dow (confirmacao) + dax ftse nikkei estx cac asx hsi (carteira; ver sr/data.py)
+  Testes de carteira levam numero do catalogo: `--label C9` envia para o dashboard como carteira extra (nao toca na referencia);
+  `--label C9 --ref` substitui a carteira de referencia (so se for MELHOR). O doc inclui a lista de trades (calendario do dashboard).
 - `python run.py --play bounce|break|fake --levels pdhl|pwhl|swing1h|round [--tp 2 --stop-atr 0.5 --fake-atr 0.3 --session rth|all]`
   regista sozinho uma linha em `results/RESULTS.md`
 

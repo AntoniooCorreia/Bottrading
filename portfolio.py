@@ -35,6 +35,8 @@ def main():
     ap.add_argument("--no-push", action="store_true")
     ap.add_argument("--label", default="", help="numero do catalogo (ex.: C8): envia para o dashboard como carteira extra "
                     "(estado portfolio_<label>) e grava results/PORTFOLIO_<label>.md; nunca toca na carteira de referencia")
+    ap.add_argument("--ref", action="store_true", help="com --label: esta carteira e a de referencia (envia para o estado "
+                    "portfolio e grava results/PORTFOLIO.md); so usar se for MELHOR que a atual")
     ap.add_argument("--max-open", type=int, default=3,
                     help="maximo de trades abertas ao mesmo tempo (risco total maximo = max_open %%)")
     a = ap.parse_args()
@@ -116,7 +118,7 @@ def main():
     print(f"Meses: pior {monthly.min():.1f}% | meses positivos {int((monthly > 0).sum())}/{len(monthly)} "
           f"| meses abaixo de -3%: {int((monthly < -3).sum())} | pior ano {yearly.min():.1f}% | anos negativos {int((yearly < 0).sum())}")
     os.makedirs("results", exist_ok=True)
-    fname = f"PORTFOLIO_{a.label}.md" if a.label else "PORTFOLIO.md"
+    fname = f"PORTFOLIO_{a.label}.md" if a.label and not a.ref else "PORTFOLIO.md"
     with open(os.path.join("results", fname), "w") as f:
         f.write(f"# Carteira ({a.period})\n\nIdeias: {', '.join(ideas)}\n\n{per.to_markdown(index=False) if hasattr(per, 'to_markdown') else per.to_string(index=False)}\n\n"
                 f"Media {media:+.1f}% ao ano, anos >= {OBJETIVO:g}%: {years_ok}/{len(yearly)}, pior queda {dd:.1f}%\n")
@@ -128,8 +130,11 @@ def main():
            "dd": round(dd, 2), "trades_ano": round(len(allt) / len(yearly), 1),
            "por_ano": {str(k): round(float(v), 2) for k, v in yearly.items()},
            "por_indice": per.to_dict(orient="records"),
-           "label": a.label, "markets": sorted(set(per["indice"])) if "indice" in per else []}
-    key = f"portfolio_{a.label}" if a.label else "portfolio"
+           "label": a.label, "markets": sorted(set(per["indice"])) if "indice" in per else [],
+           # lista de trades (entrada, saida, indice, ideia, R = % da conta) para o calendario do dashboard
+           "trades": [[r.t0.strftime("%Y-%m-%d"), r.t.strftime("%Y-%m-%d"), r.mk, r.idea, round(float(r.R), 3)]
+                      for r in allt.sort_values("t0").itertuples()]}
+    key = f"portfolio_{a.label}" if a.label and not a.ref else "portfolio"
     if not a.no_push and supa.set_state(key, doc):
         print("(enviado para o dashboard)")
 
