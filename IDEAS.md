@@ -182,3 +182,23 @@ tendencia (mais trades e e nas fases de volatilidade alta que a reversao e mais 
 - Entrada: no fecho de segunda (dia CME, seg-sex), se fecho de segunda < fecho de sexta -> long na abertura seguinte.
 - Saida: no fecho de terca (posicao so durante 1 dia). Stop 3 ATR(14) diario, sem alvo.
 - Timeframe: diario. Long-only. Sem filtro de tendencia. Parametros fixos (stop igual as outras ideias diarias).
+
+## 2026-11-18 - sessao 2 (1 ideia; total de ideias do agente ate agora: 22; hoje: 2 de 8) - registada antes de correr
+Objetivo: um sinal de compra que NAO coincida com os da carteira. Todas as compras atuais (RSI(2), IBS, down3, IBS abaixo
+da media) entram quando o dia FECHA FRACO. Esta entra quando o dia fecha FORTE depois de um novo minimo (dia de reversao),
+por isso a sobreposicao com a carteira deve ser pequena. So 1 ideia: as outras que pensei (Bollinger sem filtro ~22-27
+sinais, conjuntos de IBS/RSI em 4h, overnight condicionado) ou tem trades a menos ou repetem o que ja deu ~0R.
+Verificacao de frequencia (contagem de sinais, sem olhar a resultados, dev 2019-2024): 54 (NQ), 58 (S&P), 58 (Dow);
+com filtro de media de 200 so 30-38. Regista-se SEM filtro de tendencia. Fica abaixo de 60 trades, por isso quase de
+certeza nao passa no criterio oficial; so pode entrar na carteira pela outra regra do CLAUDE.md (positiva nos 3 dos EUA
+em 2012-2018 e em 2019-2024) e se melhorar a carteira. Se nao, fica reprovada.
+
+### Ideia 22 - `keyrev-d`: dia de reversao depois de um novo minimo de 10 dias
+- Hipotese: um dia que faz um minimo novo de 10 dias (vendas forcadas / stops) mas fecha ACIMA do fecho anterior mostra
+  que os compradores absorveram a venda (capitulacao seguida de procura; padrao "key reversal" classico, e o premio de
+  liquidez de Nagel 2012 pago a quem compra nas vendas forcadas). Espera-se continuacao para cima nos dias seguintes.
+- Expectativa honesta: baixa a media. Padroes de velas tem pouca evidencia academica; poucas trades.
+- Entrada: no fecho do dia d (dia CME, so seg-sex), se minimo(d) < minimo dos 10 dias anteriores e fecho(d) > fecho(d-1)
+  -> long na abertura seguinte.
+- Saida: no fecho do 5.o dia de semana depois do sinal (um novo sinal prolonga a janela). Stop 3 ATR(14) diario, sem alvo.
+- Timeframe: diario. Long-only. Sem filtro de tendencia. Parametros fixos (stop igual as outras ideias diarias).
