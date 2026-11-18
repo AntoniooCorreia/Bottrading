@@ -209,17 +209,20 @@ function tiles(d){
 }
 
 let LASTD=null;
-function portfolioRow(P){
-  return `<tr class="row" data-pf="1"><td><code>Carteira: ${esc(P.ideas.join(" + "))}</code><div class="small muted">${P.por_indice.length} índices · 2012–2024 · 1% por trade</div></td>
+function pfYears(P){const y=Object.keys(P.por_ano||{}).map(Number).sort((a,b)=>a-b); return y.length?`${y[0]}–${y[y.length-1]}`:"";}
+function pfN(P){return new Set((P.por_indice||[]).map(r=>r.indice)).size;}
+function pfName(P){return (P.label?P.label+" · ":"Referência · ")+"Carteira: "+P.ideas.join(" + ");}
+function portfolioRow(P,j){
+  return `<tr class="row" data-pf="${j}"><td><code>${esc(pfName(P))}</code><div class="small muted">${pfN(P)} ${pfN(P)===1?"índice":"índices"} · ${pfYears(P)} · 1% por trade</div></td>
     <td><span class="badge ${P.anos_ok>=P.anos-1?"ok":"bad"}"><i>${P.anos_ok>=P.anos-1?"✓":"✕"}</i><span class="lbl">${P.media>=14?"Objetivo atingido":"Abaixo dos 14%"}</span></span><div class="small muted">${P.media>0?"+":""}${P.media.toFixed(1).replace(".",",")}% ao ano · ${P.anos_ok}/${P.anos} anos ≥14%</div></td>
     <td class="num">—</td><td class="num hide-sm" colspan="3">pior queda ${P.dd.toFixed(1).replace(".",",")}% · ${(P.trades_ano/52).toFixed(1).replace(".",",")} trades/semana</td></tr>`;
 }
 function portfolioDetail(P){
   const el=document.getElementById("detail"); el.hidden=false; PV.run=null;
-  const yrs=Object.entries(P.por_ano).filter(([y])=>+y>=2012&&+y<=2024);
+  const yrs=Object.entries(P.por_ano);
   const idx=P.por_indice.slice().sort((a,b)=>b["%/ano"]-a["%/ano"]);
   const NM={nq:"NQ (US100)",es:"S&P (US500)",dow:"Dow (US30)",dax:"DAX (GER40)",ftse:"FTSE (UK100)",nikkei:"Nikkei (JP225)",estx:"Euro Stoxx (EU50)",cac:"CAC (FRA40)",asx:"ASX (AUS200)",hsi:"Hang Seng (HK50)"};
-  el.innerHTML=`<h2>Carteira: ${esc(P.ideas.join(" + "))} <span class="muted small">· 2012–2024 · 1% por trade</span></h2>
+  el.innerHTML=`<h2>${esc(pfName(P))} <span class="muted small">· ${pfYears(P)} · 1% por trade</span></h2>
     ${P.regras?`<div class="whybox"><b>Regras de risco:</b> máximo ${P.regras.max_open} trades abertas${P.regras.region_cap?`, ${P.regras.region_cap} por região (EUA / Europa / Ásia)`:""}, 1 por índice${P.regras.month_stop?`, e se o mês já perdeu ${P.regras.month_stop}% não abre mais trades até ao mês seguinte`:""}. Pior mês ${P.pior_mes.toFixed(1).replace(".",",")}%, pior ano ${P.pior_ano.toFixed(1).replace(".",",")}%, ${P.meses_pos} de ${P.meses} meses positivos.</div>`:""}
     <div class="whybox"><b>Resumo:</b> média de <b>${P.media>0?"+":""}${P.media.toFixed(1).replace(".",",")}% ao ano</b>, ${P.anos_ok} de ${P.anos} anos acima de 14%, pior queda ${P.dd.toFixed(1).replace(".",",")}%, ${Math.round(P.trades_ano)} trades por ano. ${P.media>=14?"Atinge o objetivo.":`Faltam ${(14-P.media).toFixed(1).replace(".",",")}% por ano para o objetivo.`}</div>
     <div class="grid2"><div style="overflow-x:auto"><table class="runs"><thead><tr><th>Ano</th><th class="num">Resultado</th><th class="num">€ (conta ${eurFmt(ACC)})</th></tr></thead><tbody>
@@ -246,10 +249,11 @@ function runsTable(d){
       <td>${badge(r.verdict).replace(/<div class="small muted">.*<\/div>/,"")}<div class="small muted">${esc(whyShort(r))}</div></td><td class="num">${fmt(r.pooled.t)}</td>
       <td class="num hide-sm">${cell(r.markets.nq)}</td><td class="num hide-sm">${cell(r.markets.es)}</td><td class="num hide-sm">${cell(r.markets.dow)}</td></tr>`).join("")}
     </tbody></table></div>`;
-  if(d.portfolio){ const tb=box.querySelector("tbody"); tb.insertAdjacentHTML("afterbegin", portfolioRow(d.portfolio)); }
+  const PF=[d.portfolio,...d.extraPortfolios].filter(Boolean);
+  if(PF.length){ const tb=box.querySelector("tbody"); tb.insertAdjacentHTML("afterbegin", PF.map((P,j)=>portfolioRow(P,j)).join("")); }
   box.querySelectorAll("tr.row").forEach(tr=>tr.addEventListener("click",()=>{
     box.querySelectorAll("tr.sel").forEach(x=>x.classList.remove("sel"));
-    tr.classList.add("sel"); if(tr.dataset.pf) portfolioDetail(d.portfolio); else detail(runs[+tr.dataset.i]);
+    tr.classList.add("sel"); if(tr.dataset.pf!=null) portfolioDetail(PF[+tr.dataset.pf]); else detail(runs[+tr.dataset.i]);
   }));
 }
 
@@ -468,7 +472,8 @@ function load(){
     q("agent_log?select=*&order=at.desc&limit=200"),
   ]).then(([runs,state,log])=>{
     const st=Object.fromEntries(state.map(r=>[r.key,r.value]));
-    const d={runs:runs.map(r=>({...r,date:r.created_at.slice(0,16)})),todo:st.todo||[],summary:st.summary||"",holdoutLog:st.holdout_log||"",ideas:st.ideas||"",portfolio:st.portfolio||null};
+    const d={runs:runs.map(r=>({...r,date:r.created_at.slice(0,16)})),todo:st.todo||[],summary:st.summary||"",holdoutLog:st.holdout_log||"",ideas:st.ideas||"",portfolio:st.portfolio||null,
+      extraPortfolios:Object.keys(st).filter(k=>k.startsWith("portfolio_")).sort((a,b)=>a.localeCompare(b,undefined,{numeric:true})).map(k=>({label:k.slice(10),...st[k]}))};
     if(d.ideas.split("\n").filter(l=>l.trim()).length>2){document.getElementById("ideasSec").hidden=false; document.getElementById("ideas").innerHTML=md(d.ideas);}
     const last=log[0]?new Date(log[0].at):null;
     document.getElementById("sub").textContent="Backtests NQ · S&P 500 · Dow em 5m, com custos de CFD"+(last?` · última atividade ${last.toLocaleString("pt-PT",{dateStyle:"short",timeStyle:"short"})}`:"");
