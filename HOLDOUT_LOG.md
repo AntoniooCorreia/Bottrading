@@ -17,3 +17,9 @@
 - 2026-11-18 NOTA sobre o C9: o resultado acima foi calculado com o erro de portfolio.py (trades sobrepostas no mesmo indice
   no mesmo dia), encontrado no mesmo dia ao construir o bot da demo. Os +17.2%/+34.5% estao inflacionados e NAO contam como
   aprovacao. Nao se volta a correr o holdout desta carteira sem decisao explicita do Antonio.
+
+- 2026-11-18 `fomc-holiday-1h` (1h, ideia 25 do agente, #40; PASSA no dev com futuros t 3.81, CFD t 3.45; 2012-2018 t 0.85) -> holdout
+  2025-01-01 a 2026-11-15, futuros: NQ 38 trades +0.053R (t 0.45), S&P 41 -0.041R (t -0.35), Dow 42 +0.051R (t 0.40); junto
+  121 trades +0.020R, t 0.29. CFD: junto +0.003R, t 0.04. Veredicto automatico: REPROVADA (poucas trades, < 60).
+  Leitura: o resultado forte de 2019-2024 nao se repete nem em 2012-2018 nem no holdout: provavelmente sorte do periodo dev.
+  Nao se afina nada depois disto.

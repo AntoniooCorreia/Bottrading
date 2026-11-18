@@ -127,4 +127,8 @@ Depois: modo ideias com o FOCO ATUAL (1h/4h, stops que caibam em MNQ).
 
 ## Ideias do agente (2026-11-18, sessao 5)
 Registada em IDEAS.md antes de correr. Fasquia t >= 3.0. Correr dev e depois `--period pre` (2012-2018) como confirmacao.
-- [ ] #40: `python run_swing.py --idea fomc-holiday-1h` (e `--period pre`)
+- [x] #40: `python run_swing.py --idea fomc-holiday-1h` (e `--period pre`) -> PASSA no dev (fut t junto +3.81; NQ +0.197R/125 trades,
+  S&P +0.165R/124, Dow +0.104R/121; CFD t +3.45). 2012-2018: t +0.85 (NQ +0.065R, S&P +0.036R, Dow +0.016R; positiva nos 3 mas ~0).
+  Holdout (uma vez): t +0.29 (NQ +0.053R/38, S&P -0.041R/41, Dow +0.051R/42). Leitura: o forte de 2019-2024 nao se repete; edge fraco
+- [ ] C21: C20 + fomc-holiday-1h, so NQ: `python portfolio.py --ideas rsi2-dip-d,ibs-dip-d,down3-d,ibs-bear-d,double7-d,fomc-holiday-1h --markets nq --custos fut --period tudo --max-open 3 --region-cap 1 --month-stop 3 --label C21`
+  (registado antes de correr; entra pela regra "positiva nos 3 dos EUA em 2012-2018 e 2019-2024". So substitui a referencia se for MELHOR)
