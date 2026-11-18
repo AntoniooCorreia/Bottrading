@@ -105,5 +105,8 @@ numeros concretos. Usa `python sync.py --log <tipo> "titulo" -b "ponto" -b "pont
 4. Pega nos itens `[ ]` por ordem. ANTES de cada um: `--log estado "A correr <variante>"`; depois corre-o, marca `[x]`
    com o veredicto e regista um `--log teste` com pontos (ver Diario). Ideias novas: `--log ideia` com pontos antes de as testar;
    mudancas ao motor ou ao projeto: `--log mudanca` com pontos.
-5. Atualiza `SUMMARY.md`: tabela curta do que passou/reprovou e a tua leitura honesta, em 10 linhas.
+5. Atualiza `SUMMARY.md`: catalogo numerado do que passou/reprovou e a tua leitura honesta, em 10 linhas.
+   CATALOGO (pedido do Antonio, 2026-11-18): cada teste de estrategia recebe o numero seguinte (#40, #41, ...) e cada
+   teste de carteira o seguinte C (C9, C10, ...), sempre com a data. Os numeros nunca mudam. Usa o numero no titulo do
+   `--log teste` (ex.: "#40 nome: REPROVADA, t junto +0.5"), no TODO e no commit.
 6. Commit + push para `research`; se nao houver PR aberto de research -> main, abre um.
