@@ -211,6 +211,17 @@ def keyrev_d(b: pd.DataFrame) -> pd.Series:
     return pos.reindex(b.index).ffill().fillna(0).astype(int)
 
 
+def pullback20_d(b: pd.DataFrame) -> pd.Series:
+    """Diario. Recuo numa tendencia forte: fecho cruza abaixo da media de 20 dias com medias alinhadas
+    (20 > 50 > 200) -> long; sai no primeiro fecho acima do maior fecho dos 10 dias anteriores."""
+    w = _weekdays(b)
+    c = w["close"]
+    s20, s50, s200 = c.rolling(20).mean(), c.rolling(50).mean(), c.rolling(200).mean()
+    enter = (c < s20) & (c.shift(1) >= s20.shift(1)) & (s20 > s50) & (s50 > s200)
+    pos = _enter_exit(enter, c > c.shift(1).rolling(10).max())
+    return pos.reindex(b.index).ffill().fillna(0).astype(int)
+
+
 IDEAS = {
     "trend-sma100-d": (trend_sma100, "1d", 3.0, 0.0, 0),
     "rsi2-dip-d": (rsi2_dip, "1d", 3.0, 0.0, 10),
@@ -228,4 +239,5 @@ IDEAS = {
     "ibs-bear-d": (ibs_bear_d, "1d", 3.0, 0.0, 10),
     "turnaround-tue-d": (turnaround_tue_d, "1d", 3.0, 0.0, 0),
     "keyrev-d": (keyrev_d, "1d", 3.0, 0.0, 0),
+    "pullback20-d": (pullback20_d, "1d", 3.0, 0.0, 20),
 }

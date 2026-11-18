@@ -89,4 +89,8 @@ Registada em IDEAS.md antes de correr. Fasquia t >= 3.0. Correr dev e depois `--
 
 ## Ideias do agente (2026-11-18, sessao 3)
 Registada em IDEAS.md antes de correr. Fasquia t >= 3.0. Correr dev e depois `--period pre` (2012-2018) como confirmacao.
-- [ ] `python run_swing.py --idea pullback20-d` (e `--period pre`)
+- [x] `python run_swing.py --idea pullback20-d` (e `--period pre`) -> REPROVADA no criterio oficial (poucas trades: NQ 49 < 60), t junto +1.15
+  (dev NQ +0.106R, S&P +0.169R, Dow +0.007R; pre positiva nos 3, t +3.08) -> positiva nos 3 dos EUA nos dois periodos: testada na carteira
+- [x] carteira + pullback20-d (mesmas regras de risco, 10 indices): PIORA -> +9.6%/ano (era +12.5%), 5/14 anos >= 14% (era 6), pior queda -11.4% (era -9.1%),
+  pior mes -5.8% (era -5.5%), pior ano -5.0% (era -4.5%), 19 meses abaixo de -3% (era 12). Trades de semanas ocupam os lugares das compras de quedas
+  (161 trades/ano, era 183) e e negativa fora dos EUA (FTSE, CAC, HSI, Euro Stoxx). Carteira de referencia mantem-se
