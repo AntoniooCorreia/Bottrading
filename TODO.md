@@ -134,3 +134,7 @@ Registada em IDEAS.md antes de correr. Fasquia t >= 3.0. Correr dev e depois `--
   (registado antes de correr; entra pela regra "positiva nos 3 dos EUA em 2012-2018 e 2019-2024". So substitui a referencia se for MELHOR)
   -> +5.6%/ano, 1/14 anos >= 14%, pior mes -3.9%, pior ano -0.4%, pior queda -6.4%, 44 trades/ano. 2012 +16% quase todo do #40 (sorte);
   2013-2025 ~+4.8%/ano. Mais %/ano que C20 mas o #40 falhou em 2012-18 e no holdout: NAO troquei a referencia, decide o Antonio
+
+## Ideias do agente (2026-11-18, sessao 6)
+Registada em IDEAS.md antes de correr. Fasquia t >= 3.0 (custos de futuros). Correr dev e depois `--period pre` (2012-2018) como confirmacao.
+- [ ] #41: `python run_swing.py --idea flush-1h` (e `--period pre`)

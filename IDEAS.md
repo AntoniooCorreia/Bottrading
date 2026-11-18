@@ -270,3 +270,29 @@ ligadas a eventos especificos.
 - Datas: reunioes PROGRAMADAS do FOMC 2012-2026 (lista fixa em sr/swing_ideas.py); feriados da NYSE por regras fixas
   (Ano Novo, MLK, Presidents, Sexta-feira Santa, Memorial, Juneteenth desde 2022, 4 de julho, Labor, Thanksgiving, Natal).
 - Timeframe: 1h, horas de Nova Iorque. Long-only. Parametros fixos (nenhum por afinar; stop igual ao overnight-us-1h).
+
+## 2026-11-18 - sessao 6 (1 ideia; total de ideias do agente ate agora: 26; hoje: 6 de 8) - registada antes de correr
+Objetivo (FOCO ATUAL): 1h com stop que caiba em 1 MNQ a 1% e mais trades por semana no NQ.
+Pensei tambem em comprar a abertura europeia (02:00-04:00 NY) depois de um dia de queda nos EUA ("overnight drift",
+Boyarchenko, Larsen & Whelan 2023), mas os proprios autores (Liberty Street Economics, julho de 2026, "The Disappearing
+Overnight Drift") mostram que o efeito desapareceu desde 2021 no S&P, Nasdaq e Dow; o nosso dev e 2019-2024. Nao a registo
+(seria gastar um teste numa ideia que ja se sabe morta) e o overnight-us-1h ja reprovou.
+Verificacao de frequencia (contagem de sinais, sem olhar a resultados): dev 2019-2024: 327 (NQ), 320 (S&P), 286 (Dow);
+2012-2018: 561, 544, 339. Stop mediano no NQ (dev) ~128 pontos = ~256 USD por MNQ: cabe numa conta de 50 000 USD.
+Sobreposicao: ~44% dos dias de sinal no NQ caem em dias em que a carteira diaria (C20) ja esta comprada (com 1 trade por
+indice isso tira algumas trades a uma das duas).
+
+### Ideia 26 - `flush-1h`: comprar uma vela de 1h de queda violenta a meio da sessao, em tendencia de alta
+- Hipotese: reversao de curto prazo como pagamento por fornecer liquidez (Nagel 2012, "Evaporating Liquidity"; Grossman &
+  Miller 1988): uma hora de venda forcada (stops, margens, ordens grandes) empurra o preco para baixo do valor e quem compra
+  e pago com uma recuperacao parcial nas horas seguintes. Em tendencia de alta os vendedores forcados sao a excecao, nao
+  o inicio de uma queda. E a mesma logica das compras de quedas diarias que funcionam (ibs-dip-d, rsi2-dip-d), em 1h.
+- Expectativa honesta: baixa a media. Em 1m/5m as reversoes junto a niveis nao sobreviveram (#1-#4, #9-#12) e o
+  rsi2-dip-4h deu ~0R; a diferenca aqui e exigir uma vela anormal (> 2x ATR) e segurar ~6 horas com stop largo.
+- Entrada: no fecho de uma vela de 1h (horas de Nova Iorque) que comeca entre as 10:00 e as 14:00 (sessao cash, sem a
+  vela da abertura), se: amplitude (maximo - minimo) > 2 x ATR(14) de 1h, fecho < abertura, fecho no quarto inferior da
+  vela ((fecho - minimo) / (maximo - minimo) < 0.25), e fecho > media das ultimas 4600 velas de 1h (~200 dias de
+  negociacao, filtro de tendencia). Long na abertura da vela seguinte.
+- Saida: no fecho da 6.a vela de 1h depois do sinal (um novo sinal prolonga a janela). Stop 3 ATR(14) de 1h, sem alvo.
+- Timeframe: 1h. Long-only. Parametros fixos (2x ATR = vela anormal; 0.25 = quarto inferior, como o IBS < 0.2-0.25
+  classico; 6 horas = resto da sessao e inicio da noite; stop igual as outras ideias de 1h).
