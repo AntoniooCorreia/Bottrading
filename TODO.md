@@ -150,3 +150,10 @@ Registada em IDEAS.md antes de correr. Fasquia t >= 3.0 (custos de futuros). Cor
   (registado antes de correr. So substitui a referencia C20 se for MELHOR: mais %/ano sem piorar muito pior mes/pior queda)
   -> +5.8%/ano, 4/14 anos >= 14%, pior mes -4.5%, pior ano -5.7%, pior queda -12.8%, 41 trades/ano, 6 anos negativos.
   Mais %/ano mas pior queda 4x a da C20: NAO troquei a referencia, decide o Antonio
+
+## Ideias do agente (2026-11-18, sessao 8)
+Registada em IDEAS.md antes de correr. Fasquia t >= 3.0 (custos de futuros). Correr dev e depois `--period pre` (2012-2018) como confirmacao.
+- [ ] #43: `python run_swing.py --idea rsi2-cash-1h` (e `--period pre`)
+- [ ] C23 (so se #43 for positiva nos 3 dos EUA em 2019-2024 e em 2012-2018): C22 com rsi2-cash-1h NO LUGAR do rsi2-dip-d, so NQ, futuros:
+  `python portfolio.py --ideas rsi2-cash-1h,ibs-cash-1h,down3-d,ibs-bear-d,double7-d --markets nq --custos fut --period tudo --max-open 3 --region-cap 1 --month-stop 3 --label C23`
+  (So substitui a referencia C20 se for MELHOR: mais %/ano sem piorar muito pior mes/pior queda)

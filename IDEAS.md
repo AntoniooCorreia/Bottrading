@@ -317,3 +317,26 @@ Sobreposicao: alta com ibs-dip-d (mesmo efeito); se passar, entra NO LUGAR do ib
 - Saida: no fecho da vela das 15:00 (16:00) de um dia com IBS > 0.7; ou ao fim de 115 velas de 1h (~5 dias). Stop 3 ATR(14)
   de 1h na vela de sinal, sem alvo.
 - Timeframe: 1h. Long-only. Parametros fixos (0.2 / 0.7 / media 200 iguais ao ibs-dip-d; stop igual as outras ideias de 1h).
+
+## 2026-11-18 - sessao 8 (1 ideia; total de ideias do agente ate agora: 28; hoje: 8 de 8) - registada antes de correr
+Objetivo (FOCO ATUAL): stops que caibam em 1 MNQ a 1%. O #42 (ibs-cash-1h) mostrou que medir o IBS na sessao cash e
+comprar as 16:00 com stop de 1h mantem a vantagem do diario no NQ. Aqui faz-se o mesmo ao rsi2-dip-d (#23), cujo stop de
+3 ATR diarios tambem nao cabe num MNQ. E a ultima ideia que o limite da noite permite (8 de 8).
+Verificacao de frequencia (contagem de sinais, sem olhar a resultados): dias com RSI(2) < 10 acima da media de 200 fechos
+das 16:00, dev 2019-2024: 102 (NQ), 112 (S&P), 124 (Dow); entradas novas (primeiro dia de cada sequencia): 63, 63, 61.
+2012-2018: 69, 70, 51. Fica perto dos 60 trades: pode reprovar por poucas trades.
+Sobreposicao: 56-68% dos dias de sinal caem em dias em que o ibs-cash-1h ja esta comprado (mesmo efeito de reversao).
+Se passar, entra NO LUGAR do rsi2-dip-d no NQ, nao em cima dele.
+
+### Ideia 28 - `rsi2-cash-1h`: RSI(2) de Connors nos fechos das 16:00, stop de 1h
+- Hipotese: reversao de curto prazo nos indices (Connors & Alvarez 2009, "Short Term Trading Strategies That Work": RSI(2)
+  < 10 acima da media de 200 em SPY/QQQ, medido nos fechos da sessao cash). Medir como na literatura e entrar ao fecho
+  das 16:00 deve manter a vantagem do rsi2-dip-d com um stop de 1h (~1/2 do ATR diario).
+- Expectativa honesta: media a baixa. A vantagem do rsi2-dip-d e pequena (t +0.89 no dev); com stop mais curto as noites
+  com gap podem tocar o stop mais vezes. Poucas trades.
+- Entrada: no fecho da vela de 1h das 15:00 NY (= 16:00): serie dos fechos das 16:00; se RSI(2) dessa serie < 10 e fecho
+  das 16:00 > media dos ultimos 200 fechos das 16:00 -> long na abertura da vela das 16:00.
+- Saida: no fecho das 16:00 de um dia em que o fecho > media dos ultimos 5 fechos das 16:00; ou ao fim de 115 velas de 1h
+  (~5 dias). Stop 3 ATR(14) de 1h na vela de sinal, sem alvo.
+- Timeframe: 1h. Long-only. Parametros fixos (RSI(2) < 10, media 200, media 5 iguais ao rsi2-dip-d e a Connors; 115 velas e
+  stop iguais ao ibs-cash-1h).
