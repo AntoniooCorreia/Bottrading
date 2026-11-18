@@ -5,7 +5,8 @@ Decisao do Antonio: o laboratorio de indices foi arquivado (Supabase schema `arq
 - Backtest: `python crypto_lab.py --ideas a,b --period dev|pre|holdout [--label K2 --push]`. Imprime por ideia/moeda, a linha
   `VEREDICTO <ideia>: PASSA|REPROVADA` e a carteira (1 posicao por moeda, 1% de risco por trade, win rate, pior mes/ano/queda).
 - CRITERIO OFICIAL CRIPTO (fixo): por ideia, no dev 2019-2024, >= 60 trades em CADA moeda, meanR > 0 em CADA moeda, t junto >= 3.0.
-  Depois `--period pre` (2017-2018, confirmacao, tem de ser >= 0) e, se passar, UMA vez `--period holdout` (2025-2026), registado em HOLDOUT_LOG.md.
+  E CONFIRMACAO (pedido do Antonio, mais backtesting): a linha `CONFIRMACAO` tem de ser positiva em >= 3 das 5 moedas extra
+  (XRP, ADA, DOGE, LINK, AVAX; dados em data/crypto desde 2018-2020). Depois `--period pre` (2017-2018, confirmacao, tem de ser >= 0) e, se passar, UMA vez `--period holdout` (2025-2026), registado em HOLDOUT_LOG.md.
 - Catalogo cripto: K1 = k-donchian20-d + k-sma100-d + k-donchian55-4h + k-sma200-4h. Dev +52%/ano mas win rate 25%, pior ano -21%,
   holdout 2025-26 JA ABERTO: -10.9% (2025), queda -40%. Reprovado como robusto; o holdout da K1 nao pode voltar a ser usado.
   Numeracao cripto: estrategias #100, #101, ... e carteiras K2, K3, ..., sempre com data.
@@ -23,7 +24,7 @@ com variantes NOVAS registadas antes de correr. Caminhos com fundamento (escolhe
 - entradas em tendencia mas com recuo (compra em pullback dentro da tendencia da K1 em vez de na rutura), filtros de regime
   (BTC acima da media de 200 dias, volatilidade), confirmacao entre moedas;
 - menos custos por trade: menos trades com alvos maiores (custo ~0.57% ida e volta; uma ideia com ganho medio < 1% nunca sobrevive).
-Regras para isto nao virar procurar sorte: no maximo 3 ideias por sessao e 8 por noite (variantes contam como ideias), parametros
+Regras para isto nao virar procurar sorte: no maximo 4 ideias por sessao e 12 por noite (pedido do Antonio: mais backtesting) (variantes contam como ideias), parametros
 fixos (nada de grelhas), cada ideia escrita em IDEAS.md com hipotese ANTES de correr e commit desse registo primeiro; nunca afinar
 depois de ver o pre ou o holdout; no SUMMARY.md diz quantas ideias cripto ja foram testadas no total (mais testes = mais desconfianca).
 Proibido: martingale, sem stop, grid, alavancagem, mexer em custos/periodos/criterio, usar dados de 2025-2026 fora do holdout unico.

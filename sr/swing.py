@@ -26,7 +26,11 @@ RF = {2018: 1.8, 2019: 2.2, 2020: 0.4, 2021: 0.1, 2022: 1.7, 2023: 5.0, 2024: 5.
 TF = {"15m": "15min", "1h": "1h", "4h": "4h", "1d": "1d"}
 
 
-CRYPTO = {"btc": "BTCUSDT", "eth": "ETHUSDT", "sol": "SOLUSDT"}
+CRYPTO = {"btc": "BTCUSDT", "eth": "ETHUSDT", "sol": "SOLUSDT",
+          # moedas de confirmacao (detetor de sorte): um edge real deve aparecer na maioria delas
+          "xrp": "XRPUSDT", "ada": "ADAUSDT", "doge": "DOGEUSDT", "link": "LINKUSDT", "avax": "AVAXUSDT"}
+MAIN_COINS = ("btc", "eth", "sol")
+CONFIRM_COINS = ("xrp", "ada", "doge", "link", "avax")
 KRAKEN_FEE = 0.0026          # taker spot da Kraken por lado (0.26%); ida-e-volta = 0.52% do preco + 0.05% slippage
 
 

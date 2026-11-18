@@ -1,6 +1,7 @@
 """
 Laboratorio de crypto (criterio oficial cripto: por ideia, >= 60 trades em cada moeda, meanR > 0 em cada moeda
-BTC/ETH/SOL e t junto >= 3.0, com custos Kraken; a SOL so tem dados desde 2020-08). Laboratorio de crypto: corre ideias (sr/swing_ideas.py) em BTC/ETH/SOL com custos da Kraken spot e junta-as numa
+BTC/ETH/SOL e t junto >= 3.0, com custos Kraken; a SOL so tem dados desde 2020-08). Confirmacao (detetor de sorte):
+positiva em >= 3 das 5 moedas extra XRP/ADA/DOGE/LINK/AVAX (linha CONFIRMACAO). Laboratorio de crypto: corre ideias (sr/swing_ideas.py) em BTC/ETH/SOL com custos da Kraken spot e junta-as numa
 carteira com 1% de risco por trade, no maximo 1 posicao por moeda (o lugar so fica livre no dia a seguir ao fecho).
   python crypto_lab.py --ideas k-donchian20-d,k-sma100-d [--period dev|pre|tudo] [--label K1] [--push]
 """
@@ -15,7 +16,7 @@ import pandas as pd
 
 from sr import supa
 from sr.stats import summarize
-from sr.swing import CRYPTO, KRAKEN_FEE, load_tf, run_positions
+from sr.swing import CONFIRM_COINS, KRAKEN_FEE, MAIN_COINS, load_tf, run_positions
 from sr.swing_ideas import IDEAS
 
 COST_PCT = 2 * KRAKEN_FEE + 0.0005
@@ -24,7 +25,8 @@ COST_PCT = 2 * KRAKEN_FEE + 0.0005
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--ideas", required=True)
-    ap.add_argument("--coins", default=",".join(CRYPTO))
+    ap.add_argument("--coins", default=",".join(MAIN_COINS))
+    ap.add_argument("--confirm", default=",".join(CONFIRM_COINS), help="moedas de confirmacao ('' para nao correr)")
     ap.add_argument("--period", default="tudo", choices=["dev", "pre", "tudo", "holdout", "completo"])
     ap.add_argument("--label", default="")
     ap.add_argument("--push", action="store_true")
@@ -45,6 +47,16 @@ def main():
             t0 = pd.DatetimeIndex(tr["time"]).tz_localize(None)
             t1 = pd.DatetimeIndex(tr["exit"]).tz_localize(None)
             allt.append(pd.DataFrame({"t0": t0, "t": t1, "R": tr["R"].to_numpy(), "mk": k, "idea": name}))
+    conf = {}
+    for name in a.ideas.split(","):
+        fn, tf, st, tp, mh = IDEAS[name]
+        for k in [c for c in a.confirm.split(",") if c]:
+            b = load_tf(k, tf, None if a.period == "completo" else a.period)
+            if len(b) < 300:
+                continue
+            tr = run_positions(b, fn(b), st, 0.0, 0.0, tp, mh, cost_pct=COST_PCT, financing=False)
+            if len(tr):
+                conf.setdefault(name, {})[k] = tr["R"].to_numpy()
     per = pd.DataFrame(rows)
     print(per.to_string(index=False))
     print()
@@ -54,6 +66,12 @@ def main():
         ok = len(d) == len(a.coins.split(",")) and all(len(v) >= 60 and v.mean() > 0 for v in d.values()) and t >= 3.0
         print(f"VEREDICTO {name}: {'PASSA' if ok else 'REPROVADA'} | t junto {t:+.2f} | win rate {100 * (allr > 0).mean():.0f}% | "
               f"R/trade {allr.mean():+.3f} | " + ", ".join(f"{k} {v.mean():+.3f}R/{len(v)}" for k, v in d.items()))
+        if conf.get(name):
+            c = conf[name]
+            npos = sum(v.mean() > 0 for v in c.values())
+            cr = np.concatenate(list(c.values()))
+            print(f"CONFIRMACAO {name}: positiva em {npos}/{len(c)} moedas extra (precisa >= 3) | win rate {100 * (cr > 0).mean():.0f}% | "
+                  + ", ".join(f"{k} {v.mean():+.3f}R/{len(v)}" for k, v in c.items()))
     if not allt:
         return
     allt = pd.concat(allt).sort_values("t0").reset_index(drop=True)

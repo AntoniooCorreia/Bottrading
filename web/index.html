@@ -602,24 +602,35 @@ function vDemo(){
     <div class="card"><h2>Posições abertas</h2>${open.length?`<div class="scroll"><table class="t"><thead><tr><th>Moeda</th><th>Estratégia</th><th>Entrada</th><th class="num">Preço entrada</th><th class="num">Stop</th><th class="num">Preço atual</th><th class="num">Resultado</th><th>Estado</th></tr></thead><tbody>${open.map(row).join("")}</tbody></table></div>`:`<div class="empty">Sem posições abertas. O bot está à espera de uma tendência de subida em BTC, ETH ou SOL.</div>`}</div>
     <div class="card"><h2>Trades fechadas</h2>${closed.length?`<div class="scroll"><table class="t"><thead><tr><th>Moeda</th><th>Estratégia</th><th>Entrada</th><th class="num">Preço entrada</th><th class="num">Stop</th><th class="num">Saída</th><th class="num">Resultado</th><th>Motivo</th></tr></thead><tbody>${closed.slice().reverse().map(row).join("")}</tbody></table></div>`:`<div class="empty">Ainda nenhuma trade fechada.</div>`}</div>`;
 }
-/* distancia de cada moeda ao sinal de compra das 4 estrategias da K1 (velas fechadas da Kraken, recalculado a cada 5 min) */
+/* o que falta para LONG (as 4 estrategias da K1) e para SHORT (espelho, so informativo: spot na Kraken nao permite short) */
 function sigCard(D,open){
   const G=D.sig; if(!G) return "";
   const px=D.px||{};
-  const row=(c)=>{const g=G[c]; if(!g) return ""; const p=px[c]||g.c4; const o=open.find(x=>x.coin===c);
-    const item=(lab,lvl,cur)=>{const d=(lvl/cur-1)*100; const ok=cur>lvl; return `<td class="num">${ok?`<span class="badge ok">sinal ✓</span>`:`<span class="muted">falta</span> <b>${pc(d,1)}</b>`}<div class="small muted">${nf(lvl,2)} €</div></td>`;};
-    return `<tr><td><b>${CN[c]}</b>${o?`<div class="small"><span class="badge neu">em posição</span></div>`:""}</td><td class="num">${nf(p,2)} €</td>
-      ${item("max20d",g.hi20,p)}${item("sma100d",g.sma100,p)}${item("max55",g.hi55,p)}${item("sma200",g.sma200,p)}</tr>`;};
-  return `<div class="card"><h2>Quanto falta para comprar</h2><p class="hint">Cada estratégia compra quando o preço <b>fecha</b> acima do nível (vela diária ou de 4h). "Falta +12%" = o preço tem de subir 12%. Atualiza sozinho.</p>
-    <div class="scroll"><table class="t"><thead><tr><th>Moeda</th><th class="num">Preço</th><th class="num">Máx. 20 dias<div class="small muted">k-donchian20-d</div></th><th class="num">Média 100 dias<div class="small muted">k-sma100-d</div></th><th class="num">Máx. 55 velas 4h<div class="small muted">k-donchian55-4h</div></th><th class="num">Média 200 velas 4h<div class="small muted">k-sma200-4h</div></th></tr></thead>
-    <tbody>${["btc","eth","sol"].map(row).join("")}</tbody></table></div></div>`;
+  const cell=(lvl,cur,up)=>{const ok=up?cur>lvl:cur<lvl; const d=(lvl/cur-1)*100;
+    return `<td class="num">${ok?`<span class="badge ${up?"ok":"bad"}">${up?"long ✓":"short ✓"}</span>`:`<span class="muted">${up?"subir":"descer"}</span> <b>${pc(Math.abs(d),1).replace(/^[+−]/,"")}</b>`}<div class="small muted">${up?"fecho >":"fecho <"} ${nf(lvl,2)} €</div></td>`;};
+  const rows=(up)=>["btc","eth","sol"].map(c=>{const g=G[c]; if(!g) return ""; const p=px[c]||g.c4; const o=open.find(x=>x.coin===c);
+    const L=up?[g.hi20,g.sma100,g.hi55,g.sma200]:[g.lo20,g.sma100,g.lo55,g.sma200];
+    const n=L.filter(l=>up?p>l:p<l).length;
+    return `<tr><td><b>${CN[c]}</b><div class="small muted">${nf(p,2)} €${o?" · em posição":""}</div></td>${L.map(l=>cell(l,p,up)).join("")}<td class="num"><b>${n}/4</b></td></tr>`;}).join("");
+  const head=(up)=>`<thead><tr><th>Moeda</th><th class="num">${up?"Máximo":"Mínimo"} 20 dias</th><th class="num">Média 100 dias</th><th class="num">${up?"Máximo":"Mínimo"} 55 velas 4h</th><th class="num">Média 200 velas 4h</th><th class="num">Sinais</th></tr></thead>`;
+  const dir=["btc","eth","sol"].map(c=>{const g=G[c]; if(!g) return ""; const p=px[c]||g.c4; const up=(p>g.sma100)+(p>g.sma200), dn=(p<g.sma100)+(p<g.sma200);
+    return `<span class="badge ${up===2?"ok":dn===2?"bad":"mid"}">${c.toUpperCase()}: ${up===2?"tendência de subida":dn===2?"tendência de descida":"sem tendência clara"}</span>`;}).join(" ");
+  return `<div class="card"><h2>O que falta para dar long / short</h2>
+    <p class="hint">Cada coluna é uma das 4 estratégias da K1. Para comprar, o preço tem de <b>fechar</b> acima do nível (vela diária ou de 4h); "subir 12%" = falta subir 12%. Preços ao vivo, níveis recalculados a cada 5 min.</p>
+    <div style="margin:0 0 10px">${dir}</div>
+    <h2 style="font-size:14px;margin-top:6px">Long (o bot opera isto)</h2>
+    <div class="scroll"><table class="t">${head(true)}<tbody>${rows(true)}</tbody></table></div>
+    <h2 style="font-size:14px;margin-top:16px">Short (só informação)</h2>
+    <p class="hint">Espelho das mesmas regras para vender a descoberto. Na Kraken spot não é possível shortar; o bot <b>não</b> abre estas trades, mas assim vês quando o mercado está do lado vendedor.</p>
+    <div class="scroll"><table class="t">${head(false)}<tbody>${rows(false)}</tbody></table></div></div>`;
 }
 async function loadSig(){
   const pairs={btc:"XBTEUR",eth:"ETHEUR",sol:"SOLEUR"}, sig={};
   const get=async(p,i)=>{const j=await fetch(`https://api.kraken.com/0/public/OHLC?pair=${p}&interval=${i}`,{cache:"no-store"}).then(r=>r.json()); const k=Object.keys(j.result).find(x=>x!=="last"); return j.result[k].slice(0,-1).map(r=>[+r[2],+r[3],+r[4]]);};
   try{ for(const [c,p] of Object.entries(pairs)){ const d=await get(p,1440), h=await get(p,240);
       const avg=a=>a.reduce((s,x)=>s+x[2],0)/a.length;
-      sig[c]={hi20:Math.max(...d.slice(-20).map(x=>x[0])),sma100:avg(d.slice(-100)),hi55:Math.max(...h.slice(-55).map(x=>x[0])),sma200:avg(h.slice(-200)),c4:h[h.length-1][2]}; }
+      sig[c]={hi20:Math.max(...d.slice(-20).map(x=>x[0])),lo20:Math.min(...d.slice(-20).map(x=>x[1])),sma100:avg(d.slice(-100)),
+        hi55:Math.max(...h.slice(-55).map(x=>x[0])),lo55:Math.min(...h.slice(-55).map(x=>x[1])),sma200:avg(h.slice(-200)),c4:h[h.length-1][2]}; }
     S.demo={...(S.demo||{}),sig}; if(S.route==="demo"&&S.demo.acc) render();
   }catch(e){console.error(e);}
 }
