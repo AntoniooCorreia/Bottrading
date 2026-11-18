@@ -23,3 +23,4 @@
   121 trades +0.020R, t 0.29. CFD: junto +0.003R, t 0.04. Veredicto automatico: REPROVADA (poucas trades, < 60).
   Leitura: o resultado forte de 2019-2024 nao se repete nem em 2012-2018 nem no holdout: provavelmente sorte do periodo dev.
   Nao se afina nada depois disto.
+- 2026-11-18 crypto K1 (k-donchian20-d,k-sma100-d,k-donchian55-4h,k-sma200-4h; BTC/ETH/SOL) holdout 2025-26 aberto UMA vez

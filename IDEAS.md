@@ -340,3 +340,11 @@ Se passar, entra NO LUGAR do rsi2-dip-d no NQ, nao em cima dele.
   (~5 dias). Stop 3 ATR(14) de 1h na vela de sinal, sem alvo.
 - Timeframe: 1h. Long-only. Parametros fixos (RSI(2) < 10, media 200, media 5 iguais ao rsi2-dip-d e a Connors; 115 velas e
   stop iguais ao ibs-cash-1h).
+
+## 2026-11-18 Crypto (Claude, a pedido do Antonio: so crypto a partir de agora) - registadas antes de correr
+Hipotese: em crypto o momentum/tendencia e o efeito com mais evidencia; spot na Kraken so permite long.
+- **k-donchian20-d**: long ao fechar acima do maximo de 20 dias; sai abaixo do minimo de 10. Stop 3 ATR.
+- **k-sma100-d**: long acima da media de 100 dias, fora abaixo. Stop 3 ATR.
+- **k-donchian55-4h**: long ao fechar acima do maximo de 55 velas de 4h; sai abaixo do minimo de 20. Stop 3 ATR.
+- **k-sma200-4h**: long acima da media de 200 velas de 4h. Stop 3 ATR.
+Custos Kraken spot 0.26% por lado + 0.05% slippage. Mercados: BTC, ETH, SOL.

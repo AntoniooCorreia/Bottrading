@@ -1,3 +1,15 @@
+# FOCO ATUAL (2026-11-18): SO CRIPTO (Kraken spot, long-only)
+Decisao do Antonio: o laboratorio de indices foi arquivado (Supabase schema `arquivo`); agora so se testa cripto
+(BTC, ETH, SOL; dados 1h da Binance em data/crypto, `python crypto_download.py`). Custos Kraken: 0.26% por lado + 0.05% slippage.
+- Backtest: `python crypto_lab.py --ideas k-... --period dev|pre|tudo [--push --label K2]` (1 posicao por moeda, 1% de risco por trade).
+- Catalogo cripto: K1 = k-donchian20-d + k-sma100-d + k-donchian55-4h + k-sma200-4h. Dev 2019-24 +52%/ano, pre 2017-18 +2%/ano,
+  HOLDOUT 2025-26 JA ABERTO: -10.8% (2025), queda -40%. Reprovou: nao e robusto. Holdout de K1 nao pode voltar a ser usado.
+- Conta demo: Edge Function Supabase `paper-bot` (cron de hora a hora) simula K1 com precos reais da Kraken em 10 000 EUR;
+  tabelas paper_account/paper_positions/paper_equity; pagina "Conta demo" no dashboard; avisos no Telegram. Nenhuma ordem real.
+- Novas ideias cripto seguem o mesmo protocolo (registo previo em IDEAS.md, dev -> pre -> holdout uma vez).
+  Prioridade: regras que sobrevivam a anos de queda (2018, 2022, 2025) com pior ano > -10%.
+O texto abaixo sobre indices e historico: as regras de protocolo continuam validas.
+
 # Bottrading: pesquisa de suporte e resistencia (backtest)
 
 Projeto do Antonio. Objetivo: descobrir se alguma regra MECANICA de suporte/resistencia tem edge real

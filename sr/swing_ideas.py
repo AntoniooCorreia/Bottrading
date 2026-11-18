@@ -173,6 +173,24 @@ def week_rev_d(b: pd.DataFrame) -> pd.Series:
     return pos.reindex(b.index).ffill().fillna(0).astype(int)
 
 
+def donchian_long(n_in: int, n_out: int):
+    """Rutura de n_in velas so long (spot nao permite short): entra ao fechar acima do maximo das n_in velas
+    anteriores; sai ao fechar abaixo do minimo das n_out velas anteriores."""
+    def f(b: pd.DataFrame) -> pd.Series:
+        hi = b["high"].rolling(n_in).max().shift(1)
+        lo = b["low"].rolling(n_out).min().shift(1)
+        return _enter_exit(b["close"] > hi, b["close"] < lo)
+    return f
+
+
+def sma_long(n: int):
+    """So long acima da media de n velas, fora abaixo."""
+    def f(b: pd.DataFrame) -> pd.Series:
+        sma = b["close"].rolling(n).mean()
+        return pd.Series(np.where(b["close"] > sma, 1, 0), index=b.index).where(sma.notna(), 0)
+    return f
+
+
 # nome -> (funcao, timeframe, stop_atr, tp_r, max_hold)
 def rsi2_pop_short_4h(b: pd.DataFrame) -> pd.Series:
     """4h. Espelho do rsi2-dip-4h do lado vendedor: short quando RSI(2) > 90 e fecho abaixo da media de 200 velas
@@ -394,4 +412,9 @@ IDEAS = {
     "flush-1h": (flush_1h, "1h", 3.0, 0.0, 0),
     "ibs-cash-1h": (ibs_cash_1h, "1h", 3.0, 0.0, 0),
     "rsi2-cash-1h": (rsi2_cash_1h, "1h", 3.0, 0.0, 0),
+    # crypto (2026-11-18, registadas antes de correr): tendencia so long, para spot na Kraken
+    "k-donchian20-d": (donchian_long(20, 10), "1d", 3.0, 0.0, 0),
+    "k-sma100-d": (sma_long(100), "1d", 3.0, 0.0, 0),
+    "k-donchian55-4h": (donchian_long(55, 20), "4h", 3.0, 0.0, 0),
+    "k-sma200-4h": (sma_long(200), "4h", 3.0, 0.0, 0),
 }
