@@ -112,3 +112,15 @@ Leitura combinada antes de ver: positiva no total e sem pior mes abaixo de -6% -
 - [x] C11: C5 corrigida (`--label C11 --ref`) -> +0.9%/ano, 1/14 anos >= 14%, pior ano -14.7%, pior queda -22.0%
 - [x] C12: C11 `--sem-domingos` (como o MT5) -> +2.2%/ano, pior ano -9.2%, pior queda -13.6%
 - [x] C13: C11 so NQ -> +2.1%/ano, pior ano -0.9%, pior queda -4.0%
+
+## Futuros e carteiras corrigidas (decisao do Antonio, 2026-11-18) - correr por ordem, mesmas regras de risco
+Base: C11 (C5 corrigida). Agora com custos de micro-futuros. Uma carteira so substitui a referencia se tiver mais % ao ano
+(compara sempre pior mes e pior ano). Ideias que mudam a carteira: so as ja aprovadas pela regra 2012-2018 + 2019-2024.
+- [ ] C14: `python portfolio.py --ideas rsi2-dip-d,ibs-dip-d,down3-d,ibs-bear-d --period tudo --max-open 3 --region-cap 1 --month-stop 3 --custos fut --label C14`
+- [ ] C15: o mesmo que C14 com `--markets nq --label C15` (so MNQ)
+- [ ] C16: C14 + double7-d (refaz C3 sem o erro) `--label C16`
+- [ ] C17: C14 + week-rev-d (refaz C4) `--label C17`
+- [ ] C18: C14 + keyrev-d (refaz C6) `--label C18`
+- [ ] C19: C14 + pullback20-d (refaz C7) `--label C19`
+- [ ] C20: so NQ com rsi2-dip-d + ibs-dip-d + down3-d + ibs-bear-d + double7-d, `--markets nq --custos fut --label C20`
+Depois: modo ideias com o FOCO ATUAL (1h/4h, stops que caibam em MNQ).

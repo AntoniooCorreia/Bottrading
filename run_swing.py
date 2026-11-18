@@ -2,7 +2,9 @@
 Corre uma ideia de prazo mais longo (sr/swing_ideas.py) nos 3 indices, com custos de CFD e de micro-futuros.
   python run_swing.py --idea trend-sma100-d
   python run_swing.py --idea ... --period holdout --unlock-holdout
-O veredicto oficial usa custos de CFD (a conta que o Antonio tem). Se so passar com futuros, fica assinalado.
+Desde 2026-11-18 (decisao do Antonio: vai operar FUTUROS, nao CFDs) o veredicto oficial usa custos de micro-futuros
+(--custos fut, por defeito; o nome da variante leva '-fut'). --custos cfd repete o modelo antigo.
+Mostra tambem quanto arrisca 1 micro-contrato no stop (MNQ/MES/MYM) e a conta minima para isso ser 1%.
 Criterio: >= 60 trades por indice (prazo longo tem menos trades), meanR > 0 em cada indice, t junto >= 3.0.
 """
 from __future__ import annotations
@@ -22,6 +24,7 @@ from sr.swing import FUT_COST, load_tf, run_positions
 from sr.swing_ideas import IDEAS
 
 MIN_T, MIN_N = 3.0, 60
+MICRO_RISK: dict = {}   # stop mediano em pontos por indice (preenchido na corrida)
 
 
 def verdict(per: dict, t: float) -> str:
@@ -40,6 +43,7 @@ def main():
     ap.add_argument("--period", default="dev", choices=list(PERIODS))
     ap.add_argument("--unlock-holdout", action="store_true")
     ap.add_argument("--no-log", action="store_true")
+    ap.add_argument("--custos", default="fut", choices=["fut", "cfd"], help="modelo de custos do veredicto oficial")
     a = ap.parse_args()
     if a.period == "holdout" and not a.unlock_holdout:
         raise SystemExit("O holdout esta FECHADO. Ver CLAUDE.md.")
@@ -50,6 +54,8 @@ def main():
         for key in ("nq", "es", "dow"):
             b = load_tf(key, tf, a.period)
             tr = run_positions(b, fn(b), stop_atr, SPEC[key]["cost_pts"], FUT_COST[key], tp_r, max_hold)
+            if len(tr):
+                MICRO_RISK[key] = float(tr["risk_pts"].median())
             if model == "fut" and len(tr):
                 tr = tr.assign(R=tr["R_fut"])
             yrs = max((b.index[-1] - b.index[0]).days / 365.25, 0.1)
@@ -64,27 +70,32 @@ def main():
         out[model] = dict(per=per, pooled=pooled, yearly=yearly, curves=curves, periods=periods,
                           verdict=verdict(per, pooled["t"]))
     cfd, fut = out["cfd"], out["fut"]
+    if a.custos == "fut":     # o modelo oficial passa a ser o de futuros; o outro fica guardado como alternativa
+        cfd, fut = fut, cfd
     vd = cfd["verdict"]
-    if not vd.startswith("PASSA") and fut["verdict"].startswith("PASSA"):
-        vd += " - mas PASSA com micro-futuros"
-    name = f"{a.idea}"
+    name = f"{a.idea}-fut" if a.custos == "fut" else f"{a.idea}"
     print(f"Ideia: {name} ({tf}) | periodo: {a.period}")
     for model in ("cfd", "fut"):
         print(f"\n[{model}]")
         print(pd.DataFrame(out[model]["per"]).T.to_string())
         print(f"Junto: n={out[model]['pooled']['n']} meanR={out[model]['pooled']['meanR']} t={out[model]['pooled']['t']}"
               f" -> {out[model]['verdict']}")
-    print(f"\nVEREDICTO: {vd}")
+    print(f"\nVEREDICTO ({a.custos}): {vd}")
+    for key, (pv, nm) in {"nq": (2.0, "MNQ"), "es": (5.0, "MES"), "dow": (0.5, "MYM")}.items():
+        rk = MICRO_RISK.get(key)
+        if rk:
+            print(f"  {nm}: stop mediano {rk:.0f} pontos = {rk * pv:,.0f} USD por contrato -> conta minima para 1%: {rk * pv * 100:,.0f} USD")
     if a.no_log:
         return
     os.makedirs(R.RUNS_DIR, exist_ok=True)
     doc = {"variant": name, "params": {"play": "swing", "levels": a.idea, "tf": tf, "stop_atr": stop_atr,
-                                         "tp_r": tp_r, "max_hold": max_hold, "custos": "cfd (fut em markets_fut)"},
+                                         "tp_r": tp_r, "max_hold": max_hold, "custos": a.custos},
            "period": a.period, "date": datetime.now().astimezone().isoformat(timespec="minutes"), "verdict": vd,
            "pooled": cfd["pooled"], "markets": cfd["per"],
            "yearly": {k: {str(y): float(r) for y, r in s.items()} for k, s in cfd["yearly"].items()},
            "equity": cfd["curves"], "periods": cfd["periods"],
-           "fut": {"markets": fut["per"], "pooled": fut["pooled"], "verdict": fut["verdict"]}}
+           "fut": {"markets": fut["per"], "pooled": fut["pooled"], "verdict": fut["verdict"]},
+           "micro_risco_usd": {k: round(v * {"nq": 2.0, "es": 5.0, "dow": 0.5}[k]) for k, v in MICRO_RISK.items()}}
     with open(os.path.join(R.RUNS_DIR, f"{name}__{a.period}.json"), "w") as f:
         json.dump(doc, f)
     cell = lambda k: f"{cfd['per'][k]['n']} / {cfd['per'][k]['meanR']:+.3f} / {cfd['per'][k]['t']:+.2f}"

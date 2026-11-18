@@ -5,6 +5,11 @@ nos indices americanos (NQ, S&P 500, Dow) em CFDs, DEPOIS de custos. So backtest
 nada de broker, nada de chaves. O MT5 (conta demo STARTRADER) so entra no PC do Antonio e so
 para uma variante que tenha passado o holdout.
 
+DECISAO DO ANTONIO (2026-11-18): vai operar FUTUROS (micro: MNQ primeiro; MES/MYM so como confirmacao), NAO CFDs nem MT5.
+O veredicto oficial passa a usar custos de micro-futuros (run_swing.py --custos fut, por defeito; portfolio.py --custos fut).
+Tamanho de conta assumido ate o Antonio dizer outro: 50 000 USD -> 1% = 500 USD -> 1 MNQ (2 USD/ponto) so cabe se o stop
+mediano no NQ for <= 250 pontos. run_swing.py mostra o stop mediano e a conta minima: uma ideia que passe mas precise de
+conta maior fica "PASSA mas nao cabe em MNQ" (regista isso; nunca aumentar o risco para a fazer caber).
 O Antonio so opera o US100 (NQ). O S&P e o Dow ficam nos testes APENAS como confirmacao (detetor de sorte):
 um edge real tem de aparecer nos tres. Em relatorios, diario e Telegram mostra sempre o NQ primeiro e com mais
 detalhe (R por trade, win rate, R por mes); S&P e Dow numa linha curta como confirmacao.
@@ -77,7 +82,9 @@ O Antonio quer que o agente invente e teste ideias novas durante a noite. Regras
 2. Cada ideia e registada em `IDEAS.md` ANTES de correr, com: data, nome curto, hipotese (porque podera ter edge,
    com base em comportamento de mercado conhecido, nao em olhar para os resultados), regras exatas de entrada,
    stop, alvo e sessao, e os parametros (fixos; nada de grelhas de otimizacao). Faz commit desse registo primeiro.
-3. FOCO (decidido a 2026-11-16 depois de tudo em 1m/5m dar ~0R antes de custos): ideias de PRAZO MAIS LONGO,
+3. FOCO ATUAL (2026-11-18): ideias em 1h e 4h (e 15m com razao forte) com STOPS PEQUENOS que caibam em 1 MNQ a 1% (ver acima),
+   mais trades por semana, NQ primeiro. As ideias diarias com stop de 3 ATR diario nao cabem numa conta normal.
+   FOCO ANTERIOR (decidido a 2026-11-16 depois de tudo em 1m/5m dar ~0R antes de custos): ideias de PRAZO MAIS LONGO,
    timeframes 15m, 1h, 4h e diario, trades de horas a dias, stops largos (custos passam de ~0.15-0.25R para ~0.03R).
    Usa sr/swing.py + sr/swing_ideas.py + run_swing.py (os testes em tests/test_swing.py apanham a ideia sozinhos).
    Intraday 1m/5m so com uma razao muito forte. Pode ser long-only. Proibido: martingale, sem stop,

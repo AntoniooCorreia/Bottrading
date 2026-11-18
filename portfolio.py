@@ -40,6 +40,7 @@ def main():
                     "portfolio e grava results/PORTFOLIO.md); so usar se for MELHOR que a atual")
     ap.add_argument("--sem-domingos", action="store_true", help="tira as velas diarias de domingo (precos parados do fim de "
                     "semana nos dados Dukascopy); e assim que o MT5 da demo ve os dias (C10)")
+    ap.add_argument("--custos", default="cfd", choices=["cfd", "fut"], help="fut = micro-futuros (sem financiamento)")
     ap.add_argument("--max-open", type=int, default=3,
                     help="maximo de trades abertas ao mesmo tempo (risco total maximo = max_open %%)")
     a = ap.parse_args()
@@ -74,7 +75,7 @@ def main():
             t = t.tz_localize(None) if t.tz is not None else t
             t0 = pd.DatetimeIndex(tr["time"])
             t0 = t0.tz_localize(None) if t0.tz is not None else t0
-            df = pd.DataFrame({"t0": t0, "t": t, "R": tr["R"].to_numpy(), "mk": key, "idea": name})
+            df = pd.DataFrame({"t0": t0, "t": t, "R": tr["R_fut" if a.custos == "fut" else "R"].to_numpy(), "mk": key, "idea": name})
             if hold:
                 df = df[df["t0"] >= hold_start]
                 if not len(df):
@@ -150,7 +151,7 @@ def main():
            "dd": round(dd, 2), "trades_ano": round(len(allt) / len(yearly), 1),
            "por_ano": {str(k): round(float(v), 2) for k, v in yearly.items()},
            "por_indice": per.to_dict(orient="records"),
-           "label": a.label, "markets": sorted(set(per["indice"])) if "indice" in per else [],
+           "label": a.label, "custos": a.custos, "markets": sorted(set(per["indice"])) if "indice" in per else [],
            # lista de trades (entrada, saida, indice, ideia, R = % da conta) para o calendario do dashboard
            "trades": [[r.t0.strftime("%Y-%m-%d"), r.t.strftime("%Y-%m-%d"), r.mk, r.idea, round(float(r.R), 3)]
                       for r in allt.sort_values("t0").itertuples()]}
