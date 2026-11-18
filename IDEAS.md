@@ -348,3 +348,8 @@ Hipotese: em crypto o momentum/tendencia e o efeito com mais evidencia; spot na 
 - **k-donchian55-4h**: long ao fechar acima do maximo de 55 velas de 4h; sai abaixo do minimo de 20. Stop 3 ATR.
 - **k-sma200-4h**: long acima da media de 200 velas de 4h. Stop 3 ATR.
 Custos Kraken spot 0.26% por lado + 0.05% slippage. Mercados: BTC, ETH, SOL.
+
+## 2026-11-18 Diagnostico win rate (Claude, a pedido do Antonio: quer win rate alto) - registado antes de correr
+Pergunta: quanto win rate se ganha e quanto resultado se perde se a K1 fechar com alvo fixo em vez de deixar correr.
+Variantes: as 4 estrategias da K1 iguais (entrada, stop 3 ATR, saida por sinal) + alvo fixo de 1R (k1-tp1) e de 2R (k1-tp2).
+Periodo: so dev 2019-2024 (holdout da K1 ja foi visto: nao conta como validacao). E um diagnostico, nao uma ideia nova para operar.
