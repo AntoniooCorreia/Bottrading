@@ -99,3 +99,9 @@ Registada em IDEAS.md antes de correr. Fasquia t >= 3.0. Correr dev e depois `--
 Registada em IDEAS.md antes de correr. Fasquia t >= 3.0. Correr dev e depois `--period pre` (2012-2018) como confirmacao.
 - [x] `python run_swing.py --idea calmhigh-d` (e `--period pre`) -> REPROVADA, t junto +0.32 (dev NQ +0.124R/55 trades, S&P -0.059R, Dow -0.003R;
   pre t -0.01, NQ -0.040R). Nao e positiva nos 3 em nenhum dos periodos: nao vai a carteira. Comprar maximos em subidas calmas ~0R
+
+## Holdout da carteira (decisao do Antonio, 2026-11-18) - UMA vez, sem afinar depois
+Antes da conta demo. Mesmas ideias e regras de risco da C5, periodo 2025-01-01 a 2026-11-15 (fim dos dados).
+Os indicadores (media de 200 etc.) aquecem com dados de antes de 2025; so contam trades com entrada >= 2025-01-01.
+Leitura combinada antes de ver: positiva no total e sem pior mes abaixo de -6% -> segue para demo; caso contrario, decide o Antonio.
+- [ ] C9: `python portfolio.py --ideas rsi2-dip-d,ibs-dip-d,down3-d,ibs-bear-d --period holdout --unlock-holdout --max-open 3 --region-cap 1 --month-stop 3 --label C9`
