@@ -1,5 +1,6 @@
 """
-Laboratorio de crypto: corre ideias (sr/swing_ideas.py) em BTC/ETH/SOL com custos da Kraken spot e junta-as numa
+Laboratorio de crypto (criterio oficial cripto: por ideia, >= 60 trades em cada moeda, meanR > 0 em cada moeda
+BTC/ETH/SOL e t junto >= 3.0, com custos Kraken; a SOL so tem dados desde 2020-08). Laboratorio de crypto: corre ideias (sr/swing_ideas.py) em BTC/ETH/SOL com custos da Kraken spot e junta-as numa
 carteira com 1% de risco por trade, no maximo 1 posicao por moeda (o lugar so fica livre no dia a seguir ao fecho).
   python crypto_lab.py --ideas k-donchian20-d,k-sma100-d [--period dev|pre|tudo] [--label K1] [--push]
 """
@@ -28,7 +29,7 @@ def main():
     ap.add_argument("--label", default="")
     ap.add_argument("--push", action="store_true")
     a = ap.parse_args()
-    rows, allt = [], []
+    rows, allt, byidea = [], [], {}
     for name in a.ideas.split(","):
         fn, tf, st, tp, mh = IDEAS[name]
         for k in a.coins.split(","):
@@ -38,6 +39,7 @@ def main():
                 continue
             yrs = (b.index[-1] - b.index[0]).days / 365.25
             s = summarize(tr, yrs)
+            byidea.setdefault(name, {})[k] = tr["R"].to_numpy()
             rows.append({"ideia": name, "moeda": k, "trades": s["n"], "R/trade": s["meanR"], "t": s["t"],
                          "win%": s["win%"], "%/ano": s["R/ano"], "pior_queda": s["maxDD_R"]})
             t0 = pd.DatetimeIndex(tr["time"]).tz_localize(None)
@@ -45,6 +47,13 @@ def main():
             allt.append(pd.DataFrame({"t0": t0, "t": t1, "R": tr["R"].to_numpy(), "mk": k, "idea": name}))
     per = pd.DataFrame(rows)
     print(per.to_string(index=False))
+    print()
+    for name, d in byidea.items():
+        allr = np.concatenate(list(d.values()))
+        t = allr.mean() / allr.std(ddof=1) * np.sqrt(len(allr)) if len(allr) > 1 else 0.0
+        ok = len(d) == len(a.coins.split(",")) and all(len(v) >= 60 and v.mean() > 0 for v in d.values()) and t >= 3.0
+        print(f"VEREDICTO {name}: {'PASSA' if ok else 'REPROVADA'} | t junto {t:+.2f} | win rate {100 * (allr > 0).mean():.0f}% | "
+              f"R/trade {allr.mean():+.3f} | " + ", ".join(f"{k} {v.mean():+.3f}R/{len(v)}" for k, v in d.items()))
     if not allt:
         return
     allt = pd.concat(allt).sort_values("t0").reset_index(drop=True)
@@ -72,7 +81,7 @@ def main():
     print(yearly.round(1).to_string())
     print(f"Media {yearly.mean():+.1f}%/ano | anos >= 14%: {(yearly >= 14).sum()}/{len(yearly)} | pior mes {monthly.min():.1f}% "
           f"| pior ano {yearly.min():.1f}% | pior queda {dd:.1f}% | meses positivos {(monthly > 0).sum()}/{len(monthly)} "
-          f"| {len(p) / max(len(yearly), 1):.0f} trades/ano")
+          f"| {len(p) / max(len(yearly), 1):.0f} trades/ano | win rate {100 * (p['R'] > 0).mean():.0f}%")
     if a.push and a.label:
         doc = {"label": a.label, "ideas": a.ideas.split(","), "period": a.period, "mercado": "crypto",
                "media": round(float(yearly.mean()), 2), "anos_ok": int((yearly >= 14).sum()), "anos": int(len(yearly)),

@@ -1,14 +1,36 @@
-# FOCO ATUAL (2026-11-18): SO CRIPTO (Kraken spot, long-only)
+# FOCO ATUAL (2026-11-18): SO CRIPTO (Kraken spot, long-only). ESTA SECCAO MANDA SOBRE O RESTO DO FICHEIRO.
 Decisao do Antonio: o laboratorio de indices foi arquivado (Supabase schema `arquivo`); agora so se testa cripto
-(BTC, ETH, SOL; dados 1h da Binance em data/crypto, `python crypto_download.py`). Custos Kraken: 0.26% por lado + 0.05% slippage.
-- Backtest: `python crypto_lab.py --ideas k-... --period dev|pre|tudo [--push --label K2]` (1 posicao por moeda, 1% de risco por trade).
-- Catalogo cripto: K1 = k-donchian20-d + k-sma100-d + k-donchian55-4h + k-sma200-4h. Dev 2019-24 +52%/ano, pre 2017-18 +2%/ano,
-  HOLDOUT 2025-26 JA ABERTO: -10.8% (2025), queda -40%. Reprovou: nao e robusto. Holdout de K1 nao pode voltar a ser usado.
-- Conta demo: Edge Function Supabase `paper-bot` (cron de hora a hora para sinais + cada minuto para stops, ?mode=stops) simula K1 com precos reais da Kraken em 10 000 EUR;
-  tabelas paper_account/paper_positions/paper_equity; pagina "Conta demo" no dashboard; avisos no Telegram. Nenhuma ordem real.
-- Novas ideias cripto seguem o mesmo protocolo (registo previo em IDEAS.md, dev -> pre -> holdout uma vez).
-  Prioridade: regras que sobrevivam a anos de queda (2018, 2022, 2025) com pior ano > -10%.
-O texto abaixo sobre indices e historico: as regras de protocolo continuam validas.
+(BTC, ETH, SOL; dados 1h da Binance em data/crypto, `python crypto_download.py` se faltarem). Custos Kraken: 0.26% por lado + 0.05% slippage
+(COST_PCT em crypto_lab.py: NAO mexer). Spot = so long, sem alavancagem.
+- Backtest: `python crypto_lab.py --ideas a,b --period dev|pre|holdout [--label K2 --push]`. Imprime por ideia/moeda, a linha
+  `VEREDICTO <ideia>: PASSA|REPROVADA` e a carteira (1 posicao por moeda, 1% de risco por trade, win rate, pior mes/ano/queda).
+- CRITERIO OFICIAL CRIPTO (fixo): por ideia, no dev 2019-2024, >= 60 trades em CADA moeda, meanR > 0 em CADA moeda, t junto >= 3.0.
+  Depois `--period pre` (2017-2018, confirmacao, tem de ser >= 0) e, se passar, UMA vez `--period holdout` (2025-2026), registado em HOLDOUT_LOG.md.
+- Catalogo cripto: K1 = k-donchian20-d + k-sma100-d + k-donchian55-4h + k-sma200-4h. Dev +52%/ano mas win rate 25%, pior ano -21%,
+  holdout 2025-26 JA ABERTO: -10.9% (2025), queda -40%. Reprovado como robusto; o holdout da K1 nao pode voltar a ser usado.
+  Numeracao: estrategias cripto #K1-1, #K1-2... nao; usa #100, #101, ... (estrategias) e K2, K3, ... (carteiras), sempre com data.
+- JA TESTADO EM CRIPTO (2017-2024, nao repetir igual): rsi2-dip-d, ibs-dip-d, down3-d, double7-d, pullback20-d -> win rate 56-71% mas ~0R
+  depois de custos; rsi2-dip-4h negativo (-0.1R/trade). K1 com alvo fixo: 1R -> win rate 49% e +0.10R/trade; 2R -> 35%, +0.21R; sem alvo 25%, +0.91R.
+- Conta demo: Edge Function Supabase `paper-bot` (supabase/functions/paper-bot; sinais de hora a hora, stops a cada minuto com ?mode=stops)
+  simula a K1 com precos reais da Kraken em 10 000 EUR; pagina "Conta demo" no dashboard; avisos no Telegram. Nenhuma ordem real.
+  So troca de estrategia na demo uma variante que tenha PASSADO dev + pre + holdout, e com o OK do Antonio.
+
+## MISSAO NOTURNA (pedido do Antonio, 2026-11-18): AUMENTAR O WIN RATE SEM MATAR O RESULTADO
+O Antonio quer win rate alto E bom resultado. Objetivo de uma carteira cripto: win rate >= 50%, positiva em 2019-2024 e em 2017-2018,
+pior ano > -10%, pior mes > -5%, e o mais % ao ano possivel com 1% de risco por trade. Estuda, testa, analisa o porque, e volta a testar
+com variantes NOVAS registadas antes de correr. Caminhos com fundamento (escolhe e justifica no IDEAS.md):
+- saidas: alvo parcial/tempo maximo/stop movido para breakeven (mede o efeito no win rate E no R por trade; reportar os dois sempre);
+- entradas em tendencia mas com recuo (compra em pullback dentro da tendencia da K1 em vez de na rutura), filtros de regime
+  (BTC acima da media de 200 dias, volatilidade), confirmacao entre moedas;
+- menos custos por trade: menos trades com alvos maiores (custo ~0.57% ida e volta; uma ideia com ganho medio < 1% nunca sobrevive).
+Regras para isto nao virar procurar sorte: no maximo 3 ideias por sessao e 8 por noite (variantes contam como ideias), parametros
+fixos (nada de grelhas), cada ideia escrita em IDEAS.md com hipotese ANTES de correr e commit desse registo primeiro; nunca afinar
+depois de ver o pre ou o holdout; no SUMMARY.md diz quantas ideias cripto ja foram testadas no total (mais testes = mais desconfianca).
+Proibido: martingale, sem stop, grid, alavancagem, mexer em custos/periodos/criterio, usar dados de 2025-2026 fora do holdout unico.
+Diario: `python sync.py --log teste "#100 nome: PASSA|REPROVADA" -b "BTC +0.10R/80 trades, ETH ..., SOL ..." -b "Win rate 58% (antes 25%)"
+-b "% ao ano da carteira e pior ano" -b "O que aprendemos: ..."`. Fala sempre em % da conta (1R = 1%) e da sempre o WIN RATE.
+No fim: `--log fim` com o que passou, o melhor win rate com resultado positivo e o proximo passo.
+Ignora tudo o que, no texto abaixo, fala de NQ/MNQ/futuros/indices/portfolio.py: e historico. As regras de protocolo, diario e commits continuam.
 
 # Bottrading: pesquisa de suporte e resistencia (backtest)
 

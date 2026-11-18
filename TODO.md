@@ -159,3 +159,6 @@ Registada em IDEAS.md antes de correr. Fasquia t >= 3.0 (custos de futuros). Cor
 - [x] C23 NAO CORRIDA: a condicao registada falhou (#43 negativa no S&P em 2019-24). Era: (so se #43 for positiva nos 3 dos EUA em 2019-2024 e em 2012-2018): C22 com rsi2-cash-1h NO LUGAR do rsi2-dip-d, so NQ, futuros:
   `python portfolio.py --ideas rsi2-cash-1h,ibs-cash-1h,down3-d,ibs-bear-d,double7-d --markets nq --custos fut --period tudo --max-open 3 --region-cap 1 --month-stop 3 --label C23`
   (So substitui a referencia C20 se for MELHOR: mais %/ano sem piorar muito pior mes/pior queda)
+
+## Cripto (2026-11-18, missao noturna: aumentar o win rate sem matar o resultado)
+Sem itens [ ]: o agente entra em modo ideias (ver CLAUDE.md, seccao MISSAO NOTURNA). Cada ideia nova entra aqui antes de correr.
