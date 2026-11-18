@@ -201,6 +201,16 @@ def turnaround_tue_d(b: pd.DataFrame) -> pd.Series:
     return sig.reindex(b.index).fillna(0).astype(int)
 
 
+def keyrev_d(b: pd.DataFrame) -> pd.Series:
+    """Diario. Dia de reversao: minimo do dia abaixo do minimo dos 10 dias de semana anteriores e fecho acima do fecho
+    anterior -> long durante os 5 dias de semana seguintes (sai no fecho do 5.o). Um novo sinal prolonga a janela."""
+    w = _weekdays(b)
+    c = w["close"]
+    sig = ((w["low"] < w["low"].shift(1).rolling(10).min()) & (c > c.shift(1))).astype(int)
+    pos = sig.rolling(5, min_periods=1).max()      # dia do sinal + 4 dias seguintes em posicao no fecho
+    return pos.reindex(b.index).ffill().fillna(0).astype(int)
+
+
 IDEAS = {
     "trend-sma100-d": (trend_sma100, "1d", 3.0, 0.0, 0),
     "rsi2-dip-d": (rsi2_dip, "1d", 3.0, 0.0, 10),
@@ -217,4 +227,5 @@ IDEAS = {
     "rsi2-pop-short-4h": (rsi2_pop_short_4h, "4h", 3.0, 0.0, 30),
     "ibs-bear-d": (ibs_bear_d, "1d", 3.0, 0.0, 10),
     "turnaround-tue-d": (turnaround_tue_d, "1d", 3.0, 0.0, 0),
+    "keyrev-d": (keyrev_d, "1d", 3.0, 0.0, 0),
 }

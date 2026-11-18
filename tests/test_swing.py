@@ -77,3 +77,18 @@ def test_rsi2_pop_short_only_short():
     b = synth_d(n=3000, seed=2)
     p = rsi2_pop_short_4h(b)
     assert set(p.unique()) <= {0, -1} and (p == -1).sum() > 50
+
+
+def test_keyrev_signal_rule():
+    from sr.swing_ideas import keyrev_d, _weekdays
+    b = synth_d(n=1500, seed=3)
+    p = keyrev_d(b)
+    assert set(p.unique()) <= {0, 1} and (p == 1).sum() > 0
+    w = _weekdays(b)
+    c = w["close"]
+    sig = (w["low"] < w["low"].shift(1).rolling(10).min()) & (c > c.shift(1))
+    # cada dia com sinal fica em posicao no fecho; sem sinal nos ultimos 5 dias -> fora
+    pw = p.reindex(w.index)
+    assert (pw[sig] == 1).all()
+    recent = sig.astype(int).rolling(5, min_periods=1).max()
+    assert ((pw == 1) == (recent == 1)).all()

@@ -82,4 +82,7 @@ Registada em IDEAS.md antes de correr. Fasquia t >= 3.0. Correr dev e depois `--
 
 ## Ideias do agente (2026-11-18, sessao 2)
 Registada em IDEAS.md antes de correr. Fasquia t >= 3.0. Correr dev e depois `--period pre` (2012-2018) como confirmacao.
-- [ ] `python run_swing.py --idea keyrev-d` (e `--period pre`)
+- [x] `python run_swing.py --idea keyrev-d` (e `--period pre`) -> REPROVADA no criterio oficial (poucas trades: NQ 45 < 60), t junto +0.36
+  (dev NQ +0.035R, S&P +0.022R, Dow +0.004R, ~0R; pre positiva nos 3, t +2.77) -> positiva nos 3 dos EUA nos dois periodos: testada na carteira
+- [x] carteira + keyrev-d (mesmas regras de risco, 10 indices): PIORA -> +11.6%/ano (era +12.5%), 4/14 anos >= 14% (era 6), pior queda -12.2% (era -9.1%),
+  17 meses abaixo de -3% (era 12); so melhora pior ano (-0.4%, era -4.5%) e pior mes (-4.9%, era -5.5%). Rouba lugares as outras ideias. Carteira de referencia mantem-se
