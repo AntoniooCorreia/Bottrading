@@ -104,4 +104,6 @@ Registada em IDEAS.md antes de correr. Fasquia t >= 3.0. Correr dev e depois `--
 Antes da conta demo. Mesmas ideias e regras de risco da C5, periodo 2025-01-01 a 2026-11-15 (fim dos dados).
 Os indicadores (media de 200 etc.) aquecem com dados de antes de 2025; so contam trades com entrada >= 2025-01-01.
 Leitura combinada antes de ver: positiva no total e sem pior mes abaixo de -6% -> segue para demo; caso contrario, decide o Antonio.
-- [ ] C9: `python portfolio.py --ideas rsi2-dip-d,ibs-dip-d,down3-d,ibs-bear-d --period holdout --unlock-holdout --max-open 3 --region-cap 1 --month-stop 3 --label C9`
+- [x] C9: `python portfolio.py --ideas rsi2-dip-d,ibs-dip-d,down3-d,ibs-bear-d --period holdout --unlock-holdout --max-open 3 --region-cap 1 --month-stop 3 --label C9`
+  -> POSITIVA: 2025 +17.2%, 2026 (ate 15/11) +34.5%, pior mes -3.6%, pior queda -7.4%, 16/23 meses positivos, ~440 trades.
+  Cumpre a leitura combinada (positiva e pior mes > -6%) -> segue para demo. 2025-26 foram anos de subida: resultado acima do esperado, tratar com cautela

@@ -27,7 +27,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--ideas", required=True)
     ap.add_argument("--markets", default=",".join(CARTEIRA))
-    ap.add_argument("--period", default="tudo", choices=[p for p in PERIODS if p != "holdout"])
+    ap.add_argument("--period", default="tudo", choices=list(PERIODS))
+    ap.add_argument("--unlock-holdout", action="store_true", help="holdout: UMA vez por carteira, fica em HOLDOUT_LOG.md")
     ap.add_argument("--only", default="", help="lista indice:ideia a usar (ex.: nq:rsi2-dip-d,es:ibs-dip-d)")
     ap.add_argument("--region-cap", type=int, default=0, help="maximo de trades abertas por regiao (EUA/Europa/Asia); 0 = sem limite")
     ap.add_argument("--month-stop", type=float, default=0.0, help="para de abrir trades no mes depois de perder X%% (0 = desligado)")
@@ -41,6 +42,16 @@ def main():
                     help="maximo de trades abertas ao mesmo tempo (risco total maximo = max_open %%)")
     a = ap.parse_args()
     ideas = a.ideas.split(",")
+    hold = a.period == "holdout"
+    if hold:
+        if not a.unlock_holdout:
+            raise SystemExit("O holdout esta FECHADO. Ver CLAUDE.md.")
+        if not a.label:
+            raise SystemExit("Holdout de carteira precisa de --label (numero do catalogo).")
+        log = open("HOLDOUT_LOG.md", encoding="utf-8").read() if os.path.exists("HOLDOUT_LOG.md") else ""
+        if f"carteira {a.label} " in log:
+            raise SystemExit(f"A carteira {a.label} ja foi ao holdout (HOLDOUT_LOG.md). So uma vez.")
+    hold_start = pd.Timestamp(PERIODS["holdout"][0])
     rows, trades = [], []
     for key in a.markets.split(","):
         if not os.path.exists(m5_path(key)):
@@ -50,7 +61,8 @@ def main():
             if a.only and f"{key}:{name}" not in a.only.split(","):
                 continue
             fn, tf, st, tp, mh = IDEAS[name]
-            b = load_tf(key, tf, a.period)
+            # holdout: carrega tudo para aquecer os indicadores (media de 200...) e so conta trades com entrada >= 2025
+            b = load_tf(key, tf, None if hold else a.period)
             tr = run_positions(b, fn(b), st, SPEC[key]["cost_pts"], FUT_COST[key], tp, mh)
             if not len(tr):
                 continue
@@ -59,6 +71,10 @@ def main():
             t0 = pd.DatetimeIndex(tr["time"])
             t0 = t0.tz_localize(None) if t0.tz is not None else t0
             df = pd.DataFrame({"t0": t0, "t": t, "R": tr["R"].to_numpy(), "mk": key, "idea": name})
+            if hold:
+                df = df[df["t0"] >= hold_start]
+                if not len(df):
+                    continue
             if a.vol_filter:
                 d = load_tf(key, "1d", a.period)["close"]
                 d.index = d.index.tz_localize(None) if d.index.tz is not None else d.index

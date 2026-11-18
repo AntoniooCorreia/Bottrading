@@ -58,6 +58,7 @@ Catalogo: cada teste tem um numero fixo. Estrategias #1, #2, ...; carteiras C1, 
 | C6 | 2026-11-18 | C5 + #37 keyrev-d | +11.6% | 4/14 | -4.9% / -0.4% / -12.2% | - | piora |
 | C7 | 2026-11-18 | C5 + #38 pullback20-d | +9.6% | 5/14 | -5.8% / -5.0% / -11.4% | ~3.1 | piora |
 | C8 | 2026-11-18 | C5 so no NQ (pedido do Antonio) | +3.6% | 0/14 | -1.7% / -0.9% / -3.1% | ~0.7 | muito estavel mas longe dos 14% |
+| C9 | 2026-11-18 | C5 no **holdout 2025-26** (uma vez, decisao do Antonio) | 2025 +17.2%, 2026 +34.5% | 2/2 | -3.6% / +17.2% / -7.4% | ~4.4 | **positiva -> segue para demo** (anos de subida: cautela) |
 
 Leitura honesta (10 linhas):
 1. 39 testes de estrategias (#1-#39); so 1 passou no criterio oficial (#30 double7-d). Ideias do agente: 24 (quanto mais, mais desconfianca num resultado isolado).
@@ -68,5 +69,5 @@ Leitura honesta (10 linhas):
 6. C8 (so NQ): +3.6%/ano, ~0.7 trades/semana. So com o NQ o objetivo nao e alcancavel com estas regras.
 7. Atencao: C5 inclui 2025 e o #35 nao foi ao holdout. Tratar +12.5% com cautela.
 8. Calendario, NR7, vender, dias de reversao, maximos em subidas calmas (#28, #31, #32, #34, #36, #37, #39): ~0R.
-9. Proximo passo: decisao do Antonio sobre levar C5 ao holdout antes de qualquer conta demo.
+9. C9 (C5 no holdout 2025-26): positiva, pior mes -3.6%. Proximo passo: conta demo MT5 no PC do Antonio (live/c5_live.py).
 10. Nota: RESULTS.md tem uma linha duplicada de tom-d (pre), corrida duas vezes por engano; mesmo resultado.

@@ -4,3 +4,12 @@
   NQ 25 trades +0.036R (t 0.31), S&P 26 +0.070R (t 0.68), Dow 27 +0.156R (t 1.71); junto 78 trades +0.089R, t 1.51.
   Veredicto automatico: REPROVADA (poucas trades, < 60 - o holdout so tem ~2 anos). Leitura: positiva nos 3 indices,
   na mesma direcao do dev, mas amostra pequena e NQ fraco. Nao se afina mais nada depois disto.
+
+- 2026-11-18 carteira C9 (= carteira C5: rsi2-dip-d + ibs-dip-d + down3-d + ibs-bear-d, 10 indices, max 3 abertas, 1 por regiao,
+  paragem mensal -3%; decisao do Antonio antes da demo) -> holdout 2025-01-01 a 2026-11-15, CFD, 1% por trade:
+  2025 +17.2%, 2026 +34.5% (10.5 meses), pior mes -3.6%, pior queda -7.4%, 16/23 meses positivos; positiva em 8 de 10 indices
+  (ASX e Hang Seng ligeiramente negativos). Indicadores aquecidos com dados de antes de 2025; so trades com entrada >= 2025.
+  Leitura: passa a regra combinada antes de ver (positiva e pior mes > -6%). Muito acima do dev (+12.5%/ano): 2025-26 foram
+  anos de subida forte, por isso parte disto e sorte do periodo. Nao se afina nada depois disto.
+  Nota: o holdout do double7-d (2026-11-17) foi corrido SEM aquecimento (run_swing.py carrega so 2025+), por isso a media de 200
+  so existia a partir de ~out/2025 e teve menos trades do que devia. Nao se repete (uma vez por variante); fica registado.
