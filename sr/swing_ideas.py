@@ -345,6 +345,32 @@ def ibs_cash_1h(b: pd.DataFrame) -> pd.Series:
     return pd.Series(pos, index=b.index)
 
 
+def rsi2_cash_1h(b: pd.DataFrame) -> pd.Series:
+    """1h, horas de Nova Iorque. RSI(2) de Connors na serie dos fechos das 16:00 (fecho da vela das 15:00 NY).
+    Long quando RSI(2) < 10 e o fecho das 16:00 esta acima da media dos ultimos 200 fechos das 16:00; sai no fecho das
+    16:00 de um dia com fecho > media dos ultimos 5 fechos das 16:00 ou ao fim de 115 velas (~5 dias). Stop 3 ATR de 1h."""
+    ny = b.index.tz_convert("America/New_York") if b.index.tz is not None else b.index
+    last = np.asarray(ny.hour) == 15
+    c16 = b["close"][last]
+    r = np.full(len(b), np.nan)
+    s200 = np.full(len(b), np.nan)
+    s5 = np.full(len(b), np.nan)
+    r[last] = _rsi(c16, 2).to_numpy()
+    s200[last] = c16.rolling(200).mean().to_numpy()
+    s5[last] = c16.rolling(5).mean().to_numpy()
+    c = b["close"].to_numpy()
+    pos, cur, held = np.zeros(len(b), dtype=int), 0, 0
+    for i in range(len(b)):
+        if cur == 1:
+            held += 1
+            if (last[i] and c[i] > s5[i]) or held >= 115:
+                cur = 0
+        elif last[i] and r[i] < 10 and c[i] > s200[i]:
+            cur, held = 1, 0
+        pos[i] = cur
+    return pd.Series(pos, index=b.index)
+
+
 IDEAS = {
     "trend-sma100-d": (trend_sma100, "1d", 3.0, 0.0, 0),
     "rsi2-dip-d": (rsi2_dip, "1d", 3.0, 0.0, 10),
@@ -367,4 +393,5 @@ IDEAS = {
     "fomc-holiday-1h": (fomc_holiday_1h, "1h", 3.0, 0.0, 0),
     "flush-1h": (flush_1h, "1h", 3.0, 0.0, 0),
     "ibs-cash-1h": (ibs_cash_1h, "1h", 3.0, 0.0, 0),
+    "rsi2-cash-1h": (rsi2_cash_1h, "1h", 3.0, 0.0, 0),
 }
