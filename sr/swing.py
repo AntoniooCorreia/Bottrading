@@ -44,7 +44,7 @@ def atr(b: pd.DataFrame, n: int = 14) -> np.ndarray:
 
 
 def run_positions(b: pd.DataFrame, pos: pd.Series, stop_atr: float, cfd_cost: float, fut_cost: float,
-                  tp_r: float = 0.0, max_hold: int = 0, min_risk_cost: float = 4.0) -> pd.DataFrame:
+                  tp_r: float = 0.0, max_hold: int = 0, min_risk_cost: float = 4.0, return_open: bool = False):
     o, h, l, c = (b[k].to_numpy() for k in ("open", "high", "low", "close"))
     want = pos.reindex(b.index).fillna(0).to_numpy()
     a = atr(b)
@@ -91,6 +91,8 @@ def run_positions(b: pd.DataFrame, pos: pd.Series, stop_atr: float, cfd_cost: fl
                 cur = {"d": w, "entry": entry, "stop": entry - w * risk, "risk": risk,
                        "tp": entry + w * tp_r * risk, "i": i + 1, "t": idx[i + 1]}
                 # a posicao so vive a partir da vela i+1: gerida na proxima iteracao
+    if return_open:   # usado pelo bot da demo: devolve a trade ainda aberta no fim (sem a fechar)
+        return pd.DataFrame(trades), (dict(cur) if cur is not None else None)
     if cur is not None:
         close_trade(n - 1, c[n - 1])
     return pd.DataFrame(trades)

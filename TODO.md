@@ -107,3 +107,8 @@ Leitura combinada antes de ver: positiva no total e sem pior mes abaixo de -6% -
 - [x] C9: `python portfolio.py --ideas rsi2-dip-d,ibs-dip-d,down3-d,ibs-bear-d --period holdout --unlock-holdout --max-open 3 --region-cap 1 --month-stop 3 --label C9`
   -> POSITIVA: 2025 +17.2%, 2026 (ate 15/11) +34.5%, pior mes -3.6%, pior queda -7.4%, 16/23 meses positivos, ~440 trades.
   Cumpre a leitura combinada (positiva e pior mes > -6%) -> segue para demo. 2025-26 foram anos de subida: resultado acima do esperado, tratar com cautela
+
+## Erro na carteira (2026-11-18) - refazer com portfolio.py corrigido (pedido pelo protocolo, ponto 5)
+- [x] C11: C5 corrigida (`--label C11 --ref`) -> +0.9%/ano, 1/14 anos >= 14%, pior ano -14.7%, pior queda -22.0%
+- [x] C12: C11 `--sem-domingos` (como o MT5) -> +2.2%/ano, pior ano -9.2%, pior queda -13.6%
+- [x] C13: C11 so NQ -> +2.1%/ano, pior ano -0.9%, pior queda -4.0%

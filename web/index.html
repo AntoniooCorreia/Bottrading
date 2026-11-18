@@ -262,7 +262,7 @@ function setAcc(v){S.acc=Math.max(100,+v||10000);store("bt_acc",S.acc);render();
 /* ---------- dados da carteira ---------- */
 function portfolios(){const d=S.data; if(!d) return []; return [d.portfolio?{id:"ref",...d.portfolio,ref:true}:null,...d.extra.map(p=>({id:p.label,...p}))].filter(Boolean);}
 function curPf(){const L=portfolios(); return L.find(p=>p.id===S.pf)||L[0]||null;}
-function pfName(P){return (P.label?P.label+" · ":"")+(P.ref?"Referência":"Carteira")+" ("+(P.markets&&P.markets.length?P.markets.length:new Set(P.por_indice.map(r=>r.indice)).size)+" índices)";}
+function pfName(P){return (P.aviso?"⚠ ":"")+(P.label?P.label+" · ":"")+(P.ref?"Referência":"Carteira")+" ("+(P.markets&&P.markets.length?P.markets.length:new Set(P.por_indice.map(r=>r.indice)).size)+" índices)";}
 /* agrega trades por dia de saida: {date:{r,n,w,list}} */
 function dayMap(trades){const m={}; for(const t of trades){const k=t[1]; const o=m[k]||(m[k]={r:0,n:0,w:0,list:[]}); o.r+=t[4]; o.n++; if(t[4]>0)o.w++; o.list.push(t);} return m;}
 function filtTrades(P,mk,idea){return (P.trades||[]).filter(t=>(mk==="all"||t[2]===mk)&&(idea==="all"||t[3]===idea));}
@@ -380,7 +380,7 @@ function vInicio(){
   let peak=0; const dd=eq.map(([k,v])=>{peak=Math.max(peak,v); return [k,+(v-peak).toFixed(2)];});
   const L=portfolios();
   const last=(S.data.log||[]).filter(e=>["teste","fim","mudanca","ideia"].includes(e.kind)).slice(0,5);
-  return `<div class="kpis">
+  return `${P.aviso?`<div class="card" style="border-color:var(--warn)"><b style="color:var(--warn)">Atenção:</b> ${esc(P.aviso)}</div>`:""}<div class="kpis">
     ${kpi("Média por ano",pc(P.media),`objetivo +14% · ${P.media>=14?"atingido":"faltam "+nf(14-P.media,1)+"%"}`,cls(P.media))}
     ${kpi("Anos acima de 14%",`${P.anos_ok}/${P.anos}`,`${P.anos_neg??"—"} anos negativos`)}
     ${kpi("Pior mês / pior ano",`<span class="neg">${pc(P.pior_mes)}</span>`,`pior ano ${pc(P.pior_ano)} · ${P.meses_pos}/${P.meses} meses positivos`)}
@@ -402,7 +402,7 @@ function vInicio(){
   </div>
   <div class="card"><h2>Comparar carteiras</h2><p class="hint">Cada teste de carteira tem um número (C1, C2…). Toca numa linha para a escolher em todo o painel.</p>
     <div class="scroll"><table class="t"><thead><tr><th>Carteira</th><th>Estratégias</th><th class="num">% ao ano</th><th class="num">Anos ≥14%</th><th class="num">Pior mês</th><th class="num">Pior ano</th><th class="num">Pior queda</th><th class="num">Trades/semana</th></tr></thead><tbody>
-    ${L.map(p=>`<tr class="click ${p.id===P.id?"sel":""}" onclick="setPf('${p.id}')"><td><b>${esc(pfName(p))}</b></td><td class="small">${esc(p.ideas.join(", "))}</td><td class="num ${cls(p.media)}"><b>${pc(p.media)}</b></td><td class="num">${p.anos_ok}/${p.anos}</td><td class="num neg">${pc(p.pior_mes)}</td><td class="num ${cls(p.pior_ano)}">${pc(p.pior_ano)}</td><td class="num neg">${pc(p.dd)}</td><td class="num">${nf(p.trades_ano/52,1)}</td></tr>`).join("")}
+    ${L.map(p=>`<tr class="click ${p.id===P.id?"sel":""}" onclick="setPf('${p.id}')"><td><b>${esc(pfName(p))}</b>${p.aviso?`<div class="small" style="color:var(--warn)">números inflacionados (erro corrigido)</div>`:""}</td><td class="small">${esc(p.ideas.join(", "))}</td><td class="num ${cls(p.media)}"><b>${pc(p.media)}</b></td><td class="num">${p.anos_ok}/${p.anos}</td><td class="num neg">${pc(p.pior_mes)}</td><td class="num ${cls(p.pior_ano)}">${pc(p.pior_ano)}</td><td class="num neg">${pc(p.dd)}</td><td class="num">${nf(p.trades_ano/52,1)}</td></tr>`).join("")}
     </tbody></table></div></div>`;
 }
 function openYear(i){const P=curPf(); const y=+Object.keys(P.por_ano)[i]; S.cal.y=y; S.cal.mode="ano"; location.hash="#calendario";}
@@ -526,9 +526,9 @@ function vTestes(){
 }
 
 /* diario */
-const JK={inicio:["▶","Início"],estado:["⋯","A fazer"],ideia:["💡","Ideia nova"],teste:["🧪","Teste"],mudanca:["🔧","Mudança"],erro:["⚠️","Erro"],fim:["🏁","Fim de sessão"]};
+const JK={demo:["📈","Conta demo"],inicio:["▶","Início"],estado:["⋯","A fazer"],ideia:["💡","Ideia nova"],teste:["🧪","Teste"],mudanca:["🔧","Mudança"],erro:["⚠️","Erro"],fim:["🏁","Fim de sessão"]};
 function vDiario(){
-  const log=S.data.log; const F={all:"Tudo",teste:"Testes",ideia:"Ideias",mudanca:"Mudanças",fim:"Fins de sessão",erro:"Erros"};
+  const log=S.data.log; const F={all:"Tudo",demo:"Conta demo",teste:"Testes",ideia:"Ideias",mudanca:"Mudanças",fim:"Fins de sessão",erro:"Erros"};
   const L=log.filter(e=>S.j==="all"?e.kind!=="estado":e.kind===S.j);
   let h="",lastDay="";
   for(const e of L){const d=new Date(e.at); const day=d.toLocaleDateString("pt-PT",{weekday:"long",day:"numeric",month:"long"});

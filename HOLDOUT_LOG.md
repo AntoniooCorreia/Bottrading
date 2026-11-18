@@ -13,3 +13,7 @@
   anos de subida forte, por isso parte disto e sorte do periodo. Nao se afina nada depois disto.
   Nota: o holdout do double7-d (2026-11-17) foi corrido SEM aquecimento (run_swing.py carrega so 2025+), por isso a media de 200
   so existia a partir de ~out/2025 e teve menos trades do que devia. Nao se repete (uma vez por variante); fica registado.
+
+- 2026-11-18 NOTA sobre o C9: o resultado acima foi calculado com o erro de portfolio.py (trades sobrepostas no mesmo indice
+  no mesmo dia), encontrado no mesmo dia ao construir o bot da demo. Os +17.2%/+34.5% estao inflacionados e NAO contam como
+  aprovacao. Nao se volta a correr o holdout desta carteira sem decisao explicita do Antonio.

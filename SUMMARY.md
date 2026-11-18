@@ -48,26 +48,34 @@ Catalogo: cada teste tem um numero fixo. Estrategias #1, #2, ...; carteiras C1, 
 
 ## Carteiras (C) - 1% por trade, % da conta por ano (2012-2025)
 
+ATENCAO (2026-11-18): C1 a C10 foram calculadas com um ERRO em portfolio.py: uma trade que fechava num dia libertava o lugar
+para outra que entrava na abertura desse mesmo dia, e as trades de 1 dia (as que mais ganham) nunca ocupavam lugar. Resultado:
+varias trades ao mesmo tempo no mesmo indice e numeros muito inflacionados. C11-C13 sao as versoes corrigidas.
+
 | # | data | carteira | % ao ano | anos >= 14% | pior mes / pior ano / pior queda | trades/semana | veredicto |
 |---|---|---|---|---|---|---|---|
 | C1 | 2026-11-16 | #23 + #26 + #27 (rsi2-dip-d, ibs-dip-d, down3-d), 10 indices, max 3 abertas | +8.7% | 5/13 | - / - / -21.6% | ~3.4 | substituida por C2 |
 | C2 | 2026-11-17 | C1 + 1 trade por regiao + paragem mensal a -3% | +9.5% | 5/14 | -5.1% / -2.5% / -10.7% | - | substituida por C5 |
 | C3 | 2026-11-17 | C2 + #30 double7-d | +7.3% | - | - / - / -16.5% | - | piora |
 | C4 | 2026-11-17 | C2 + #33 week-rev-d | +5.8% | - | - / - / -13.8% | - | piora |
-| C5 | 2026-11-17 | C2 + #35 ibs-bear-d | **+12.5%** | **6/14** | -5.5% / -4.5% / -9.1% | ~3.5 | **REFERENCIA ATUAL** |
+| C5 | 2026-11-17 | C2 + #35 ibs-bear-d | +12.5% | 6/14 | -5.5% / -4.5% / -9.1% | ~3.5 | inflacionada (erro, ver C11) |
 | C6 | 2026-11-18 | C5 + #37 keyrev-d | +11.6% | 4/14 | -4.9% / -0.4% / -12.2% | - | piora |
 | C7 | 2026-11-18 | C5 + #38 pullback20-d | +9.6% | 5/14 | -5.8% / -5.0% / -11.4% | ~3.1 | piora |
 | C8 | 2026-11-18 | C5 so no NQ (pedido do Antonio) | +3.6% | 0/14 | -1.7% / -0.9% / -3.1% | ~0.7 | muito estavel mas longe dos 14% |
 | C9 | 2026-11-18 | C5 no **holdout 2025-26** (uma vez, decisao do Antonio) | 2025 +17.2%, 2026 +34.5% | 2/2 | -3.6% / +17.2% / -7.4% | ~4.4 | **positiva -> segue para demo** (anos de subida: cautela) |
+| C10 | 2026-11-18 | C5 sem velas de domingo (como no MT5) - ainda com o erro | +12.6% | 6/14 | -5.3% / -0.4% / -8.6% | ~3.5 | inflacionada (erro) |
+| **C11** | 2026-11-18 | **C5 corrigida** (o lugar so fica livre no dia a seguir ao fecho) | **+0.9%** | 1/14 | -5.5% / -14.7% / -22.0% | ~2.4 | **REFERENCIA ATUAL** (verdade da C5) |
+| C12 | 2026-11-18 | C11 sem velas de domingo (= o que o bot da demo faria) | +2.2% | 1/14 | -5.5% / -9.2% / -13.6% | ~2.4 | longe dos 14% |
+| C13 | 2026-11-18 | C11 so no NQ | +2.1% | 0/14 | -1.9% / -0.9% / -4.0% | ~0.6 | estavel, pequena |
 
 Leitura honesta (10 linhas):
 1. 39 testes de estrategias (#1-#39); so 1 passou no criterio oficial (#30 double7-d). Ideias do agente: 24 (quanto mais, mais desconfianca num resultado isolado).
 2. #1-#21 (suporte/resistencia, intraday 1m/5m, setup do Antonio): todos negativos ou ~0R depois de custos.
-3. O que funciona sao compras de quedas no diario (#23, #26, #27, #35): pequenas (+0.05 a +0.2R por trade) mas positivas em quase todos os indices.
-4. Carteira de referencia C5: +12.5%/ano, 6/14 anos >= 14%, pior mes -5.5%, pior ano -4.5%, pior queda -9.1%, ~3.5 trades/semana.
-5. Faltam ~1.5% ao ano para o objetivo de 14%; trades um pouco acima das 2-3 por semana pedidas.
-6. C8 (so NQ): +3.6%/ano, ~0.7 trades/semana. So com o NQ o objetivo nao e alcancavel com estas regras.
-7. Atencao: C5 inclui 2025 e o #35 nao foi ao holdout. Tratar +12.5% com cautela.
-8. Calendario, NR7, vender, dias de reversao, maximos em subidas calmas (#28, #31, #32, #34, #36, #37, #39): ~0R.
-9. C9 (C5 no holdout 2025-26): positiva, pior mes -3.6%. Proximo passo: conta demo MT5 no PC do Antonio (live/c5_live.py).
-10. Nota: RESULTS.md tem uma linha duplicada de tom-d (pre), corrida duas vezes por engano; mesmo resultado.
+3. As compras de quedas no diario (#23, #26, #27, #35) tem uma vantagem pequena por trade (+0.05 a +0.2R), positiva em quase todos os indices.
+4. ERRO ENCONTRADO a 2026-11-18 ao construir o bot da demo: a carteira C5 (+12.5%/ano) contava trades sobrepostas no mesmo indice. Corrigida (C11): +0.9%/ano.
+5. C11: 1/14 anos >= 14%, pior ano -14.7%, pior queda -22%. Sem velas de domingo (C12, como no MT5): +2.2%/ano. So NQ (C13): +2.1%/ano, pior queda -4%.
+6. O holdout C9 (+17%/+34%) tambem tinha o erro: nao serve de prova. A demo da C5 NAO deve avancar com estes numeros.
+7. As comparacoes "carteira + ideia X piora/melhora" (C3, C4, C6, C7) foram feitas com o erro: tem de ser refeitas.
+8. Leitura: com 1 trade por indice e 3 no total, as compras de quedas dao ~1-2%/ano. O objetivo de 14%/ano esta muito longe.
+9. O bot da demo (live/c5_live.py) existe e foi verificado: toma as mesmas decisoes que o backtest corrigido, dia a dia (tests/test_live.py).
+10. Proximo passo: decisao do Antonio (ver conversa de 2026-11-18). Calendario, NR7, vender, reversoes, maximos calmos (#28, #31, #32, #34, #36, #37, #39): ~0R.

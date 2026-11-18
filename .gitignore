@@ -7,3 +7,6 @@ __pycache__/
 .env
 *.zip
 public/
+live/state.json
+live/diario.log
+live/config.json

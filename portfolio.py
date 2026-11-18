@@ -38,6 +38,8 @@ def main():
                     "(estado portfolio_<label>) e grava results/PORTFOLIO_<label>.md; nunca toca na carteira de referencia")
     ap.add_argument("--ref", action="store_true", help="com --label: esta carteira e a de referencia (envia para o estado "
                     "portfolio e grava results/PORTFOLIO.md); so usar se for MELHOR que a atual")
+    ap.add_argument("--sem-domingos", action="store_true", help="tira as velas diarias de domingo (precos parados do fim de "
+                    "semana nos dados Dukascopy); e assim que o MT5 da demo ve os dias (C10)")
     ap.add_argument("--max-open", type=int, default=3,
                     help="maximo de trades abertas ao mesmo tempo (risco total maximo = max_open %%)")
     a = ap.parse_args()
@@ -63,6 +65,8 @@ def main():
             fn, tf, st, tp, mh = IDEAS[name]
             # holdout: carrega tudo para aquecer os indicadores (media de 200...) e so conta trades com entrada >= 2025
             b = load_tf(key, tf, None if hold else a.period)
+            if a.sem_domingos and tf == "1d":
+                b = b[(b.index.tz_localize(None) if b.index.tz is not None else b.index).dayofweek < 5]
             tr = run_positions(b, fn(b), st, SPEC[key]["cost_pts"], FUT_COST[key], tp, mh)
             if not len(tr):
                 continue
@@ -92,8 +96,8 @@ def main():
     # limite de risco: no maximo max_open trades abertas ao mesmo tempo e 1 por indice (as outras sao ignoradas)
     keep, open_, closed = [], [], []
     for i, row in allt.iterrows():
-        closed += [o for o in open_ if o[0] <= row.t0]
-        open_ = [o for o in open_ if o[0] > row.t0]
+        closed += [o for o in open_ if o[0] < row.t0]   # so liberta o lugar se fechou ANTES do dia de entrada
+        open_ = [o for o in open_ if o[0] >= row.t0]
         if len(open_) >= a.max_open or any(o[1] == row.mk for o in open_):
             continue
         if a.region_cap and sum(REGIAO[o[1]] == REGIAO[row.mk] for o in open_) >= a.region_cap:
