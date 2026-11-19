@@ -399,3 +399,31 @@ abertura seguinte (regra comum). Uma mudanca registada de cada vez, parametros f
   de 200 dias, stop 3 ATR(14) diario (~ largura de 6-7 ATR de 4h) e alvo fixo de 1R. A mesma hipotese no diario (menos custos por trade).
 Fasquia (criterio oficial cripto, fixo): >= 60 trades em CADA uma de BTC/ETH/SOL, meanR > 0 em cada, t junto >= 3.0, CONFIRMACAO
 positiva em >= 3/5 moedas extra; depois --period pre >= 0. Reportar sempre win rate e R por trade, e pior ano/pior mes da carteira.
+
+## 2026-11-19 cripto - sessao 3 (:00) (4 ideias; ideias cripto testadas antes: 20; hoje: 12 de 20) - registadas antes de correr
+Leitura das sessoes 1-2: o alvo de 1R sobe o win rate para 54-60% mas corta o ganho por trade de ~+1.7R para ~+0.2-0.3R
+(% ao ano cai de ~32% para 3-9%). E o regime BTC deixa a SOL abaixo de 60 trades quando a ideia segura muito tempo.
+Duas perguntas desta sessao, uma mudanca de cada vez, parametros fixos:
+(1) SAIDA PARCIAL: fechar METADE da posicao no alvo de 1R e passar o stop do resto para o preco de entrada + custos
+    (breakeven: o resto ja nao pode perder) e deixar o resto correr ate a saida do sinal. Hipotese: o win rate fica perto do
+    da versao com alvo (quase todas as trades que tocam 1R acabam positivas: +0.5R garantido) e o ganho medio sobe muito,
+    porque metade apanha as tendencias grandes. Mudanca no motor: run_positions ganha 'partial' (fracao fechada no alvo) e
+    'be' (stop do resto para a entrada x (1 + custos) depois do alvo). Regra conservadora: se na vela do alvo o minimo tambem
+    toca o breakeven, o resto sai no breakeven nessa vela. Custos cobrados uma vez sobre a posicao inteira (como hoje).
+(2) MAIS TRADES: a #107 (rutura de 20 dias + regime BTC + alvo 1R; win rate 60%, +0.28R, pior ano 0%) so falhou por a SOL ter
+    57 trades. Proximo passo escrito no SUMMARY: a mesma regra em 4h (sinais ~6x mais frequentes). Rutura de 20/10 velas
+    (sistema 1 das Tartarugas), stop 6 ATR(14) de 4h (igual a #102/#104/#106: ~1 dia de volatilidade).
+- **#108 k-persist-bw-half** (4h): #105 (6 fechos de 4h acima da media de 200 velas, so entra com BTC > media 200 dias; sai com
+  6 fechos abaixo; stop 6 ATR(14) de 4h) + saida parcial: metade em 1R, resto com stop em breakeven ate ao sinal de saida.
+  Espera-se win rate ~45-55% e R/trade entre +0.22 (#106) e +1.70 (#105). Risco conhecido: #105 tinha 31-42 trades por moeda
+  (sem re-entradas depois do alvo) -> provavelmente REPROVADA por trades; corre-se na mesma para medir o efeito da saida parcial.
+- **#109 k-dc20-4h-bw-tp1** (4h): long ao fechar acima do maximo das 20 velas de 4h anteriores, so com BTC > media 200 dias
+  (dia anterior fechado); sai ao fechar abaixo do minimo das 10 velas anteriores; stop 6 ATR(14) de 4h; alvo fixo 1R.
+  Espera-se win rate >= 50%, R/trade > 0 e >= 60 trades na SOL.
+- **#110 k-dc20-4h-bw-half** (4h): #109 com saida parcial (metade em 1R, resto em breakeven ate ao fecho abaixo do minimo de 10).
+  Compara diretamente alvo inteiro vs parcial nas mesmas entradas.
+- **#111 k-dc20-4h-bw-be** (4h): #109 SEM alvo, mas com o stop passado para breakeven (entrada + custos) quando o preco toca +1R.
+  Mede o efeito do breakeven sozinho (pedido do Antonio: medir alvo parcial e breakeven separados). Espera-se win rate mais baixo
+  que #109 (trades que voltam a zero contam como nao-ganhas) mas R/trade maior.
+Fasquia (criterio oficial cripto, fixo): >= 60 trades em CADA uma de BTC/ETH/SOL, meanR > 0 em cada, t junto >= 3.0, CONFIRMACAO
+positiva em >= 3/5 moedas extra; depois --period pre >= 0. Reportar sempre win rate e R por trade, pior ano e pior mes da carteira.

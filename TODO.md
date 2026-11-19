@@ -179,3 +179,10 @@ Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --p
 - [x] #106: k-persist-bw-tp1 -> PASSA no dev (t +4.64; BTC +0.226R/100, ETH +0.161R/106, SOL +0.304R/71; confirmacao 5/5; win rate 54%).
   Pre 2017-18 negativo (2 trades, -0.75R): REPROVADA no pre (pre quase vazio pelo filtro BTC). Holdout NAO aberto
 - [x] #107: k-dc20-d-bull-tp1 -> REPROVADA (SOL 57 trades < 60); t +4.43, win rate 60%, +0.277R/trade, confirmacao 5/5; carteira +8.6%/ano, pior ano 0.0%, pior mes -2.0%
+
+## Ideias do agente (2026-11-19, cripto sessao 3 :00)
+Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --period dev` (e `--period pre` se passar dev + confirmacao).
+- [ ] #108: k-persist-bw-half (saida parcial: metade em 1R, resto em breakeven)
+- [ ] #109: k-dc20-4h-bw-tp1 (rutura 20 velas de 4h + regime BTC + stop 6 ATR + alvo 1R)
+- [ ] #110: k-dc20-4h-bw-half (#109 com saida parcial)
+- [ ] #111: k-dc20-4h-bw-be (#109 sem alvo, stop para breakeven em +1R)
