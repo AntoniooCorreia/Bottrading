@@ -130,3 +130,23 @@ def test_rsi2_cash_enters_and_exits_at_1500_bar():
     assert set(starts.hour) == {15}
     ends = p.index[(p == 0) & (p.shift(1, fill_value=0) == 1)]
     assert len(ends) > 20
+
+
+def test_btc_bull_regime_no_lookahead():
+    """O regime do BTC (media de 200 dias) so pode usar dias ja fechados: cortar os dados depois de uma data nao muda nada antes."""
+    import os
+    from sr.swing import load_tf
+    from sr.swing_ideas import btc_bull_regime
+    if not os.path.exists(os.path.join("data", "crypto", "BTCUSDT_1h.csv.gz")):
+        pytest.skip("sem dados do BTC")
+    d = load_tf("btc", "1d", None)
+    idx = load_tf("eth", "4h", "dev").index
+    full = btc_bull_regime(idx, d)
+    cut = pd.Timestamp("2022-03-15", tz="UTC")
+    part = btc_bull_regime(idx[idx < cut], d[d.index < cut])
+    pd.testing.assert_series_equal(full[idx < cut], part)
+    # o valor de um dia e o fecho do dia ANTERIOR
+    day = pd.Timestamp("2021-06-10", tz="UTC")
+    c = d["close"]
+    exp = bool(c.loc[day - pd.Timedelta(days=1)] > c.rolling(200).mean().loc[day - pd.Timedelta(days=1)])
+    assert bool(full[idx >= day].iloc[0]) == exp

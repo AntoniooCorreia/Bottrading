@@ -165,7 +165,8 @@ Sem itens [ ]: o agente entra em modo ideias (ver CLAUDE.md, seccao MISSAO NOTUR
 
 ## Ideias do agente (2026-11-19, cripto sessao 1)
 Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --period dev` (e `--period pre` se passar dev + confirmacao).
-- [ ] #100: k-sma200-4h-persist (persistencia de 1 dia contra as serras)
-- [ ] #101: k-dc55-4h-btcbull (rutura de 55 velas so com BTC acima da media de 200 dias)
-- [ ] #102: k-dc55-4h-wide (rutura de 55 velas com stop de 6 ATR)
-- [ ] #103: k-dip-hold-4h (minimo de 5 dias em tendencia, segura 7 dias)
+- [x] #100: k-sma200-4h-persist -> PASSA no dev (t +3.06; BTC +2.26R/77, ETH +1.67R/75, SOL +2.21R/60; confirmacao 5/5; win rate 28%, antes 16%).
+  Pre 2017-18 positivo (+0.59R/trade). Holdout (uma vez): BTC/ETH/SOL +0.79R/trade, t 1.53, 2025 +15.7%, mas confirmacao 1/5 -> misto, nao robusta
+- [x] #101: k-dc55-4h-btcbull -> REPROVADA (SOL 53 trades < 60); t +3.02, win rate 34%, confirmacao 5/5; carteira sem ano negativo no dev (pior 2019 +21.4%)
+- [x] #102: k-dc55-4h-wide -> REPROVADA (SOL 59 trades < 60); t +3.44, win rate 42% (antes 35%), +0.44R/trade (antes +0.66R); carteira +17%/ano, pior ano -4.9%
+- [x] #103: k-dip-hold-4h -> REPROVADA (t +0.77; +0.04R/trade; win rate 49%)

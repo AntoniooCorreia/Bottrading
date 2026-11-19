@@ -1,4 +1,26 @@
-# Resumo (custos CFD incluidos)
+# CRIPTO (foco atual desde 2026-11-18; Kraken spot, so long, custos 0.57% ida e volta, 1% de risco por trade)
+
+| # | data | variante | t dev | win rate | R/trade | carteira dev (%/ano, pior ano) | veredicto |
+|---|---|---|---|---|---|---|---|
+| K1 | 2026-11-18 | k-donchian20-d + k-sma100-d + k-donchian55-4h + k-sma200-4h | - | 21% | - | +52%, -21.0% | holdout 2025 -10.9%: nao robusta |
+| #100 | 2026-11-19 | k-sma200-4h-persist (6 fechos de 4h seguidos acima/abaixo da media 200) | +3.06 | 28% | +2.04 | +70%, -20.8% | **PASSA dev + pre**; holdout BTC/ETH/SOL +0.79R mas confirmacao 1/5: misto |
+| #101 | 2026-11-19 | k-dc55-4h-btcbull (rutura 55 velas so com BTC > media 200 dias) | +3.02 | 34% | +0.77 | +32%, sem ano negativo | REPROVADA (SOL 53 trades < 60) |
+| #102 | 2026-11-19 | k-dc55-4h-wide (rutura 55 velas, stop 6 ATR) | +3.44 | 42% | +0.44 | +17%, -4.9% | REPROVADA (SOL 59 trades < 60) |
+| #103 | 2026-11-19 | k-dip-hold-4h (minimo de 5 dias em tendencia, segura 7 dias) | +0.77 | 49% | +0.04 | +1.6%, -4.0% | REPROVADA |
+
+Leitura honesta cripto (2026-11-19):
+1. Ideias cripto testadas no total: 16 (K1 = 4, 6 compras de quedas, 2 diagnosticos de alvo, #100-#103). Mais testes = mais desconfianca.
+2. O win rate baixo da K1 vem das "serras": 431 de 974 trades duram <= 1 dia e perdem todas.
+3. #100 (persistencia de 1 dia) corta as serras: win rate 16% -> 28%, R/trade x2.6. Passou dev e pre; holdout bom nas 3 moedas, fraco nas de confirmacao.
+4. #102 (stop largo) tem o melhor perfil de risco: win rate 42%, pior ano -4.9%, pior mes -5.0%; reprovou por 1 trade na SOL.
+5. #101 (filtro BTC > media 200 dias) apaga 2022 (sem ano negativo no dev), mas corta trades a mais para o criterio.
+6. Win rate perto de 50% so aparece com saidas curtas ou compras de quedas (#103, K1 com alvo 1R) e ai o ganho ~0 depois de custos.
+7. Melhor win rate com resultado positivo: 49% (K1 com alvo 1R, +0.10R; #103 +0.04R ~0). Entre ideias que passaram: 28% (#100).
+8. Nenhuma carteira cumpre ainda o objetivo (win rate >= 50%, pior ano > -10%). Nao se criou K2 (so #100 passou e nao melhora o pior ano).
+9. Proximo: juntar as tres mudancas que funcionaram (persistencia, stop largo, regime BTC) numa variante NOVA registada antes, sem afinar.
+10. Conta demo continua na K1; nada muda sem uma variante que passe dev + pre + holdout e o OK do Antonio.
+
+# Resumo indices (ARQUIVO, custos CFD incluidos)
 
 Catalogo: cada teste tem um numero fixo. Estrategias #1, #2, ...; carteiras C1, C2, ... Os numeros nunca mudam; testes novos recebem o numero seguinte.
 

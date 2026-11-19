@@ -191,6 +191,74 @@ def sma_long(n: int):
     return f
 
 
+# ---- cripto 2026-11-19 (registadas em IDEAS.md antes de correr) ----
+def btc_bull_regime(index: pd.DatetimeIndex, btc_daily: pd.DataFrame | None = None) -> pd.Series:
+    """True quando o BTC FECHOU o dia (UTC) anterior acima da media de 200 dias. So usa dias ja fechados:
+    o valor do dia D vale a partir das 00:00 de D+1. Fora do intervalo dos dados do BTC (ex.: velas sinteticas dos testes)
+    devolve None para a ideia usar o regime da propria serie."""
+    if btc_daily is None:
+        try:
+            from .swing import load_tf
+            btc_daily = load_tf("btc", "1d", None)
+        except Exception:
+            return None
+    if index.tz is None or len(btc_daily) < 201 or index[-1] < btc_daily.index[0] + pd.Timedelta(days=200):
+        return None
+    c = btc_daily["close"]
+    bull = (c > c.rolling(200).mean()).astype(float).where(c.rolling(200).mean().notna())
+    bull.index = bull.index + pd.Timedelta(days=1)          # conhecido so no fim do dia -> vale no dia seguinte
+    out = bull.reindex(bull.index.union(index)).ffill().reindex(index)
+    return out.fillna(0).astype(bool)
+
+
+def _regime(b: pd.DataFrame, n_own: int) -> pd.Series:
+    r = btc_bull_regime(b.index)
+    if r is None:   # sem dados do BTC para estas datas: regime da propria serie (so passado)
+        c = b["close"]
+        r = (c > c.rolling(n_own).mean()).shift(1).fillna(False).astype(bool)
+    return r
+
+
+def sma_persist(n: int, k: int):
+    """So long quando os ultimos k fechos estao todos acima da media de n velas; sai quando os ultimos k estao todos abaixo."""
+    def f(b: pd.DataFrame) -> pd.Series:
+        c = b["close"]
+        sma = c.rolling(n).mean()
+        above = (c > sma).astype(int).rolling(k).sum() == k
+        below = (c < sma).astype(int).rolling(k).sum() == k
+        return _enter_exit(above & sma.notna(), below)
+    return f
+
+
+def donchian_long_bull(n_in: int, n_out: int):
+    """donchian_long, mas so entra com o BTC acima da media de 200 dias (dia anterior fechado). Saida igual."""
+    def f(b: pd.DataFrame) -> pd.Series:
+        hi = b["high"].rolling(n_in).max().shift(1)
+        lo = b["low"].rolling(n_out).min().shift(1)
+        return _enter_exit((b["close"] > hi) & _regime(b, 200), b["close"] < lo)
+    return f
+
+
+def dip_hold(n_trend: int, n_low: int, hold: int):
+    """Recuo dentro da tendencia: BTC em alta (media 200 dias) e moeda acima da media de n_trend velas e fecho = minimo
+    das ultimas n_low velas -> long durante 'hold' velas (sai no fecho da vela hold depois da entrada)."""
+    def f(b: pd.DataFrame) -> pd.Series:
+        c = b["close"]
+        sma = c.rolling(n_trend).mean()
+        low = c <= c.rolling(n_low).min()
+        trig = (_regime(b, 200) & (c > sma) & low & sma.notna()).to_numpy()
+        pos, left = np.zeros(len(c), dtype=int), 0
+        for i in range(len(c)):
+            if left > 0:
+                pos[i] = 1
+                left -= 1
+            elif trig[i]:
+                pos[i] = 1
+                left = hold   # posicao vive da vela i+1 a i+hold; sai no fecho da vela i+hold
+        return pd.Series(pos, index=b.index)
+    return f
+
+
 # nome -> (funcao, timeframe, stop_atr, tp_r, max_hold)
 def rsi2_pop_short_4h(b: pd.DataFrame) -> pd.Series:
     """4h. Espelho do rsi2-dip-4h do lado vendedor: short quando RSI(2) > 90 e fecho abaixo da media de 200 velas
@@ -417,4 +485,9 @@ IDEAS = {
     "k-sma100-d": (sma_long(100), "1d", 3.0, 0.0, 0),
     "k-donchian55-4h": (donchian_long(55, 20), "4h", 3.0, 0.0, 0),
     "k-sma200-4h": (sma_long(200), "4h", 3.0, 0.0, 0),
+    # cripto 2026-11-19 (win rate): registadas em IDEAS.md antes de correr
+    "k-sma200-4h-persist": (sma_persist(200, 6), "4h", 3.0, 0.0, 0),
+    "k-dc55-4h-btcbull": (donchian_long_bull(55, 20), "4h", 3.0, 0.0, 0),
+    "k-dc55-4h-wide": (donchian_long(55, 20), "4h", 6.0, 0.0, 0),
+    "k-dip-hold-4h": (dip_hold(600, 30, 42), "4h", 6.0, 0.0, 0),
 }

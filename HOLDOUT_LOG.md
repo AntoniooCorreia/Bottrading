@@ -24,3 +24,11 @@
   Leitura: o resultado forte de 2019-2024 nao se repete nem em 2012-2018 nem no holdout: provavelmente sorte do periodo dev.
   Nao se afina nada depois disto.
 - 2026-11-18 crypto K1 (k-donchian20-d,k-sma100-d,k-donchian55-4h,k-sma200-4h; BTC/ETH/SOL) holdout 2025-26 aberto UMA vez
+- 2026-11-19 cripto #100 `k-sma200-4h-persist` (PASSA no dev: t 3.06, confirmacao 5/5; pre 2017-18 positivo: BTC +0.80R/23,
+  ETH +0.33R/19, carteira 2017 +26.0%, 2018 +4.9%) -> holdout 2025-01-01 ate ao fim dos dados, UMA vez, custos Kraken:
+  BTC +0.112R/19, ETH +1.330R/18, SOL +0.962R/19; junto 56 trades +0.79R, t 1.53, win rate 34%. Carteira (so #100):
+  2025 +15.7%, 2026 +32.0%, pior mes -5.3%, pior queda -15.8%. CONFIRMACAO no holdout: so 1/5 positivas (XRP -0.31R, ADA -0.37R,
+  DOGE -0.26R, LINK +0.03R, AVAX -0.10R). Veredicto automatico REPROVADA (poucas trades em 2 anos, < 60 por moeda).
+  Leitura: positiva nas 3 moedas principais (a K1 deu -10.9% em 2025), mas falha nas moedas de confirmacao -> sinal misto, nao
+  conta como robusta. Win rate continua baixo (~30%) e o pior ano no dev e -20.8%. Aquecimento: a media de 200 velas de 4h so
+  existe a partir de ~fev/2025 (o laboratorio carrega so 2025+). Nao se afina nada depois disto; o holdout desta variante fica gasto.
