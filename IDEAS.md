@@ -427,3 +427,32 @@ Duas perguntas desta sessao, uma mudanca de cada vez, parametros fixos:
   que #109 (trades que voltam a zero contam como nao-ganhas) mas R/trade maior.
 Fasquia (criterio oficial cripto, fixo): >= 60 trades em CADA uma de BTC/ETH/SOL, meanR > 0 em cada, t junto >= 3.0, CONFIRMACAO
 positiva em >= 3/5 moedas extra; depois --period pre >= 0. Reportar sempre win rate e R por trade, pior ano e pior mes da carteira.
+
+## 2026-11-19 cripto - sessao 4 (:30) (4 ideias; ideias cripto testadas antes: 24; hoje: 16 de 20) - registadas antes de correr
+Leitura das sessoes 1-3: a melhor combinacao de win rate e resultado e a #107 (rutura de 20 dias no DIARIO + BTC > media 200 dias +
+stop 3 ATR(14) diario + alvo 1R: win rate 60%, +0.28R, pior ano 0%), que so falhou por a SOL ter 57 trades (< 60). Em 4h a mesma
+regra piora (saida de 10 velas de 4h curta demais). O win rate alto vem do alvo de 1R com stop largo em regime de alta e das
+RE-ENTRADAS depois do alvo (o motor volta a entrar na abertura seguinte se o sinal ainda estiver ativo: regra comum).
+Esta sessao fica no DIARIO (stop 3 ATR(14) diario, ~10-15% do preco: custos 0.57% pesam ~0.05R) e testa 3 formas de ter mais
+trades com o mesmo mecanismo, e 1 de ganhar mais por trade com as mesmas entradas. Parametros fixos ja usados (20/10, 100, 200, 3, 1R):
+- **#112 k-dc20-d-own-tp1** (1d): #107 com o regime da PROPRIA moeda em vez do BTC: so entra se a moeda fechou o dia anterior
+  acima da sua media de 200 dias. Entrada: fecho acima do maximo dos 20 dias anteriores; saida: fecho abaixo do minimo dos 10
+  dias anteriores; stop 3 ATR(14) diario; alvo 1R. Hipotese: o momentum que conta e o da propria moeda (a SOL teve tendencias
+  proprias em 2021 e 2023 com o BTC ainda abaixo da media); mais trades na SOL, mesmo win rate. Risco: filtra menos 2022.
+- **#113 k-sma100-d-bull-tp1** (1d): BRACKETS DE 1R DENTRO DA TENDENCIA. Entra quando a moeda fecha acima da media de 100 dias
+  e o BTC fechou o dia anterior acima da media de 200 dias; sai ao fechar abaixo da media de 100 dias; stop 3 ATR(14) diario;
+  alvo 1R; enquanto a tendencia durar o motor volta a entrar depois de cada alvo. Hipotese: em regime de alta a cripto tem
+  deriva positiva forte; uma aposta simetrica (alvo = stop) com deriva a favor ganha mais de 50% das vezes; muitos mais
+  trades que a rutura (cada dia de tendencia pode gerar nova entrada). Espera-se win rate >= 55%, R/trade +0.1 a +0.3.
+- **#114 k-pb-d-bull-tp1** (1d): RECUO DENTRO DA TENDENCIA com alvo. Entra quando o BTC fechou o dia anterior acima da media de
+  200 dias E a moeda fecha acima da media de 100 dias E o fecho e mais baixo que todos os 5 fechos anteriores (recuo de 1 semana).
+  Saida por sinal: fecho acima do maximo dos 20 dias anteriores (tendencia retomada); stop 3 ATR(14) diario; alvo 1R.
+  Hipotese: comprar mais barato dentro da tendencia (pedido do Antonio) e esperar o alvo de 1R (~10-15%) em vez de sair
+  ao fim de 1-3 dias como as compras de quedas ja reprovadas (essas tinham ganho medio < custos).
+- **#115 k-dc20-d-own-be** (1d): as entradas da #112 SEM alvo, com o stop passado para breakeven (entrada + custos) quando o
+  preco toca +1R; sai ao fechar abaixo do minimo de 10 dias. Mede, nas mesmas entradas, o lado "mais % ao ano" (win rate
+  esperado ~35-45%, R/trade maior). Serve para o Antonio ver a troca win rate vs resultado com numeros.
+Fasquia (criterio oficial cripto, fixo): >= 60 trades em CADA uma de BTC/ETH/SOL, meanR > 0 em cada, t junto >= 3.0, CONFIRMACAO
+positiva em >= 3/5 moedas extra; depois --period pre >= 0. Reportar sempre win rate e R por trade, pior ano e pior mes da carteira.
+Nota: com qualquer filtro de media de 200 dias o pre 2017-18 fica quase vazio (os dados comecam em 2017-08; a media so existe
+a partir de ~2018-03, ja em mercado de baixa). Isto e conhecido antes de correr.

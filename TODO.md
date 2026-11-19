@@ -190,3 +190,10 @@ Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --p
   Carteira +6.8%/ano, pior ano 0.0%, pior mes -4.9%
 - [x] #111: k-dc20-4h-bw-be -> REPROVADA por pouco (t +2.96 < 3.0; BTC +0.266R/104, ETH +0.203R/120, SOL +0.205R/89; confirmacao 5/5; win rate 35%).
   Carteira +11.9%/ano, pior ano 0.0% (sem ano negativo), pior mes -4.9%
+
+## Ideias do agente (2026-11-19, cripto sessao 4 :30)
+Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --period dev` (e `--period pre` se passar dev + confirmacao).
+- [ ] #112: k-dc20-d-own-tp1
+- [ ] #113: k-sma100-d-bull-tp1
+- [ ] #114: k-pb-d-bull-tp1
+- [ ] #115: k-dc20-d-own-be
