@@ -15,18 +15,22 @@
 | #109 | 2026-11-19 | k-dc20-4h-bw-tp1 (#107 em 4h, stop 6 ATR, alvo 1R) | +2.67 | 41% | +0.08 | +3.2%, 0.0% | REPROVADA |
 | #110 | 2026-11-19 | k-dc20-4h-bw-half (#109 com saida parcial) | +2.54 | 36% | +0.13 | +6.8%, 0.0% | REPROVADA |
 | #111 | 2026-11-19 | k-dc20-4h-bw-be (#109 sem alvo, stop para breakeven em +1R) | +2.96 | 35% | +0.23 | +11.9%, 0.0% | REPROVADA por pouco (t < 3.0) |
+| #112 | 2026-11-19 | k-dc20-d-own-tp1 (#107 com regime da propria moeda) | +4.13 | 60% | +0.28 | +7.4%, -2.1% | REPROVADA (BTC 55, SOL 44 trades) |
+| #113 | 2026-11-19 | k-sma100-d-bull-tp1 (acima da media 100 dias + regime BTC, alvo 1R repetido) | +4.78 | 53% | +0.24 | +10.0%, 0.0% | **PASSA dev** (conf. 4/5); pre 1 trade -0.26R: REPROVADA no pre |
+| #114 | 2026-11-19 | k-pb-d-bull-tp1 (recuo de 5 dias na tendencia, alvo 1R) | +1.82 | 66% | +0.12 | +3.0%, -3.2% | REPROVADA |
+| #115 | 2026-11-19 | k-dc20-d-own-be (#112 sem alvo, breakeven em +1R) | +1.93 | 50% | +1.74 | +19.7%, -7.3% | REPROVADA (20-25 trades por moeda) |
 
-Leitura honesta cripto (2026-11-19, sessao das :00 n.o 3):
-1. Ideias cripto testadas no total: 24 (K1 = 4, 6 compras de quedas, 2 diagnosticos de alvo, #100-#111). Mais testes = mais desconfianca.
-2. Melhor win rate com resultado positivo: 60% (#107, +0.28R, falha trades na SOL); entre as que passaram o dev: 54% (#106, +0.22R).
-3. Saida parcial (#108, #110) e breakeven (#111) medidos: sobem o ganho por trade (2-3x o do alvo inteiro) mas NAO sobem o win rate.
-4. Causa provavel: a #106 tem ~100 trades por moeda e a #105 (mesmas entradas) ~40; o win rate de 54% vem sobretudo das RE-ENTRADAS depois do alvo (tendencia forte -> novo alvo rapido). Com metade a correr nao ha re-entrada.
-5. Em 4h a rutura de 20 velas (#109) e pior que no diario (#107): a saida de 10 velas de 4h e curta e corta as trades antes do alvo (win rate 41% vs 60%).
-6. O regime BTC continua a apagar 2022: #109-#111 nao tem nenhum ano negativo no dev. #111 (+11.9%/ano, pior ano 0%) falhou so por t 2.96.
-7. Escolha clara: win rate >= 50% (alvo inteiro, ~+3-9%/ano) OU mais % ao ano (parcial/breakeven/sem alvo, win rate 35-42%). Ainda nada da as duas coisas.
-8. Pre 2017-18 continua quase vazio com o filtro BTC (BTC acima da media de 200 dias so 9 dias em 2018): decisao do Antonio pendente.
+Leitura honesta cripto (2026-11-19, sessao das :30 n.o 4):
+1. Ideias cripto testadas no total: 28 (K1 = 4, 6 compras de quedas, 2 diagnosticos de alvo, #100-#115). Mais testes = mais desconfianca.
+2. Melhor win rate com resultado positivo: 66% (#114, +0.12R, t 1.82: fraco); melhor equilibrio: #113 (53%, +0.24R, +10%/ano, pior ano 0%, pior mes -2.8%).
+3. #113 e a primeira que junta win rate > 50%, ~+10%/ano e nenhum ano negativo no dev, com 247 trades e confirmacao 4/5. Reprovou so no pre (1 trade).
+4. Mecanismo que funciona: alvo = stop (1R, stop 3 ATR diario ~10-15%) em regime de alta do BTC, repetido enquanto a tendencia dura. A deriva positiva faz o alvo ganhar > 50%.
+5. Regime da propria moeda (#112) da MENOS trades que o do BTC: hipotese errada. Recuo com alvo (#114) sobe o win rate para 66% mas o ganho por trade cai para +0.12R.
+6. Sem alvo + breakeven (#115) da +1.7R/trade mas 2021 vale +95% e 2023 -7.3%: resultado concentrado num ano, nao serve o objetivo de consistencia.
+7. PROBLEMA ESTRUTURAL: com filtro de media de 200 dias o pre 2017-18 tem 0-2 trades (dados desde 2017-08; media so existe em 2018, ano de baixa). #104, #106 e #113 passaram o dev e cairam no pre por 1-2 trades.
+8. Decisao pendente do Antonio: aceitar "pre sem trades / quase vazio" como neutro, ou exigir outro teste de confirmacao. Sem isso nenhuma ideia com regime BTC chega ao holdout.
 9. Nenhuma carteira K2 criada. Conta demo continua na K1. Holdouts abertos: so K1 e #100.
-10. Proximo: rutura no DIARIO com mais sinais (ex.: rutura de 20 dias com alvo 1R e saida de 10 dias, mas com o regime da propria moeda em vez do BTC) para a SOL passar 60 trades.
+10. Proximo: limite da noite (20) quase atingido (16). Proxima noite: variantes da #113 (outra media/timeframe so com hipotese nova) e carteira #106 + #113 se o Antonio decidir o pre.
 
 # Resumo indices (ARQUIVO, custos CFD incluidos)
 

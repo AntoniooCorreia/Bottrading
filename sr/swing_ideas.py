@@ -272,6 +272,44 @@ def sma_persist_bull(n: int, k: int):
     return f
 
 
+# ---- cripto sessao 4 (2026-11-19 :30), registadas em IDEAS.md antes de correr ----
+def _own_regime(b: pd.DataFrame, n: int) -> pd.Series:
+    """True quando a propria serie fechou a vela ANTERIOR acima da media de n velas (so passado)."""
+    c = b["close"]
+    sma = c.rolling(n).mean()
+    return ((c > sma) & sma.notna()).shift(1, fill_value=False).astype(bool)
+
+
+def donchian_long_own(n_in: int, n_out: int, n_reg: int):
+    """donchian_long, mas so entra com a propria moeda acima da media de n_reg velas (vela anterior fechada)."""
+    def f(b: pd.DataFrame) -> pd.Series:
+        hi = b["high"].rolling(n_in).max().shift(1)
+        lo = b["low"].rolling(n_out).min().shift(1)
+        return _enter_exit((b["close"] > hi) & _own_regime(b, n_reg), b["close"] < lo)
+    return f
+
+
+def sma_long_bull(n: int):
+    """Entra ao fechar acima da media de n velas com o BTC acima da media de 200 dias; sai ao fechar abaixo da media."""
+    def f(b: pd.DataFrame) -> pd.Series:
+        c = b["close"]
+        sma = c.rolling(n).mean()
+        return _enter_exit((c > sma) & sma.notna() & _regime(b, 200), c < sma)
+    return f
+
+
+def pullback_bull(n_trend: int, n_dip: int, n_hi: int):
+    """Recuo na tendencia: BTC em alta, moeda acima da media de n_trend e fecho abaixo dos n_dip fechos anteriores.
+    Sai ao fechar acima do maximo das n_hi velas anteriores (tendencia retomada)."""
+    def f(b: pd.DataFrame) -> pd.Series:
+        c = b["close"]
+        sma = c.rolling(n_trend).mean()
+        dip = c < c.rolling(n_dip).min().shift(1)
+        hi = b["high"].rolling(n_hi).max().shift(1)
+        return _enter_exit(_regime(b, 200) & (c > sma) & sma.notna() & dip, c > hi)
+    return f
+
+
 # nome -> (funcao, timeframe, stop_atr, tp_r, max_hold)
 def rsi2_pop_short_4h(b: pd.DataFrame) -> pd.Series:
     """4h. Espelho do rsi2-dip-4h do lado vendedor: short quando RSI(2) > 90 e fecho abaixo da media de 200 velas
@@ -513,6 +551,11 @@ IDEAS = {
     "k-dc20-4h-bw-tp1": (donchian_long_bull(20, 10), "4h", 6.0, 1.0, 0),
     "k-dc20-4h-bw-half": (donchian_long_bull(20, 10), "4h", 6.0, 1.0, 0),
     "k-dc20-4h-bw-be": (donchian_long_bull(20, 10), "4h", 6.0, 1.0, 0),
+    # cripto sessao 4 (2026-11-19 :30): diario, regime proprio, brackets de 1R, recuo com alvo (registadas antes de correr)
+    "k-dc20-d-own-tp1": (donchian_long_own(20, 10, 200), "1d", 3.0, 1.0, 0),
+    "k-sma100-d-bull-tp1": (sma_long_bull(100), "1d", 3.0, 1.0, 0),
+    "k-pb-d-bull-tp1": (pullback_bull(100, 5, 20), "1d", 3.0, 1.0, 0),
+    "k-dc20-d-own-be": (donchian_long_own(20, 10, 200), "1d", 3.0, 1.0, 0),
 }
 
 # saidas extra por ideia (argumentos de run_positions): partial = fracao fechada no alvo tp_r (resto com stop em breakeven);
@@ -521,4 +564,5 @@ EXITS = {
     "k-persist-bw-half": {"partial": 0.5},
     "k-dc20-4h-bw-half": {"partial": 0.5},
     "k-dc20-4h-bw-be": {"be": True},
+    "k-dc20-d-own-be": {"be": True},
 }
