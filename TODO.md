@@ -170,3 +170,10 @@ Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --p
 - [x] #101: k-dc55-4h-btcbull -> REPROVADA (SOL 53 trades < 60); t +3.02, win rate 34%, confirmacao 5/5; carteira sem ano negativo no dev (pior 2019 +21.4%)
 - [x] #102: k-dc55-4h-wide -> REPROVADA (SOL 59 trades < 60); t +3.44, win rate 42% (antes 35%), +0.44R/trade (antes +0.66R); carteira +17%/ano, pior ano -4.9%
 - [x] #103: k-dip-hold-4h -> REPROVADA (t +0.77; +0.04R/trade; win rate 49%)
+
+## Ideias do agente (2026-11-19, cripto sessao 2 :30)
+Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --period dev` (e `--period pre` se passar dev + confirmacao).
+- [ ] #104: k-dc55-4h-bw-tp1 (rutura 55 + BTC > media 200 dias + stop 6 ATR + alvo 1R)
+- [ ] #105: k-persist-bw (persistencia 6 velas + BTC > media 200 dias + stop 6 ATR, sem alvo)
+- [ ] #106: k-persist-bw-tp1 (a #105 com alvo 1R)
+- [ ] #107: k-dc20-d-bull-tp1 (rutura 20 dias + BTC > media 200 dias + stop 3 ATR diario + alvo 1R)

@@ -380,3 +380,22 @@ e quase todo desse regime. Daqui saem 4 ideias (parametros fixos, uma mudanca de
   sinal ainda estiver ativo, o motor volta a entrar (regra comum a todas as ideias).
 Fasquia (criterio oficial cripto): >= 60 trades em CADA uma de BTC/ETH/SOL, meanR > 0 em cada, t junto >= 3.0, CONFIRMACAO
 positiva em >= 3/5 moedas extra; depois --period pre >= 0. Reportar sempre win rate e R por trade.
+
+## 2026-11-19 cripto - sessao 2 (:30) (4 ideias; ideias cripto testadas antes: 16; hoje: 8 de 20) - registadas antes de correr
+Leitura da sessao 1: (a) trend following tem win rate 16-42% porque deixa correr; (b) o filtro BTC > media 200 dias (#101)
+apagou 2022 e o stop largo (#102) cortou os stops do 1.o dia (win rate 35% -> 42%); (c) a K1 com alvo de 1R ja dava 49% de win
+rate e +0.10R com stop de 3 ATR de 4h. Hipotese central: com o REGIME BTC (so entra em mercado de alta, onde a deriva e para cima)
+e STOP LARGO (6 ATR de 4h, ruido nao apanha), um alvo SIMETRICO de 1R deve ganhar mais vezes do que perde (> 50%), porque a deriva
+positiva empurra o preco para o alvo antes do stop. O alvo de 1R com stop de 6 ATR de 4h fica a ~6-10% do preco: custos (0.57%)
+pesam ~0.07-0.1R, nao matam. Nota do motor: depois de um alvo ou stop, se o sinal ainda estiver ativo o motor volta a entrar na
+abertura seguinte (regra comum). Uma mudanca registada de cada vez, parametros fixos (os mesmos ja usados: 55/20, 200, 6, 1R):
+- **#104 k-dc55-4h-bw-tp1** (4h): rutura de 55 velas de 4h so com BTC acima da media de 200 dias (= #101) + stop 6 ATR(14) de 4h
+  (= #102) + alvo fixo de 1R. Saida tambem ao fechar abaixo do minimo de 20 velas. Espera-se win rate >= 50% e R/trade > 0.
+- **#105 k-persist-bw** (4h): #100 (6 fechos de 4h seguidos acima da media de 200 velas; sai com 6 abaixo) so com ENTRADAS
+  com BTC acima da media de 200 dias + stop 6 ATR(14) de 4h, sem alvo. Junta as tres mudancas que funcionaram (proximo passo do
+  SUMMARY). Espera-se win rate ~35-40% e pior ano bem melhor que o -20.8% da #100.
+- **#106 k-persist-bw-tp1** (4h): a #105 com alvo fixo de 1R. Espera-se win rate >= 50%.
+- **#107 k-dc20-d-bull-tp1** (diario): rutura de 20 dias (k-donchian20-d: sai abaixo do minimo de 10 dias) so com BTC acima da media
+  de 200 dias, stop 3 ATR(14) diario (~ largura de 6-7 ATR de 4h) e alvo fixo de 1R. A mesma hipotese no diario (menos custos por trade).
+Fasquia (criterio oficial cripto, fixo): >= 60 trades em CADA uma de BTC/ETH/SOL, meanR > 0 em cada, t junto >= 3.0, CONFIRMACAO
+positiva em >= 3/5 moedas extra; depois --period pre >= 0. Reportar sempre win rate e R por trade, e pior ano/pior mes da carteira.
