@@ -199,7 +199,7 @@ li.done .box{background:var(--pos);color:#fff;border-color:var(--pos)}
       <div class="top">
         <h1 id="ttl">Visão geral<span class="sub" id="ttlSub"></span></h1>
         <label class="ctl" id="pfCtl">Carteira <select id="pfSel" onchange="setPf(this.value)"></select></label>
-        <label class="ctl">Conta <input type="number" id="acc" min="100" step="500" onchange="setAcc(this.value)"> €</label>
+        <label class="ctl">Conta <input type="number" id="acc" min="100" step="500" onchange="setAcc(this.value)"> $</label>
       </div>
       <div class="status"><span class="dot" id="dot"></span><span id="stTxt">A carregar…</span></div>
       <div id="view"></div>
@@ -216,7 +216,7 @@ const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&
 const nf=(x,d=1)=>(+x).toLocaleString("pt-PT",{minimumFractionDigits:d,maximumFractionDigits:d});
 const pc=(x,d=1)=>x==null||isNaN(x)?"—":(x>0?"+":x<0?"−":"")+nf(Math.abs(x),d)+"%";
 const rr=(x,d=2)=>x==null||isNaN(x)?"—":(x>0?"+":x<0?"−":"")+nf(Math.abs(x),d)+"R";
-const eur=x=>(x<0?"−":x>0?"+":"")+Math.abs(x).toLocaleString("pt-PT",{maximumFractionDigits:0})+" €";
+const eur=x=>(x<0?"−":x>0?"+":"")+Math.abs(x).toLocaleString("pt-PT",{maximumFractionDigits:0})+" $";
 const cls=x=>x>0?"pos":x<0?"neg":"muted";
 const MES=["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
 const MS=["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
@@ -365,7 +365,7 @@ function calMove(ns,d){const st=nsState(ns); if(st.mode==="ano") st.y+=d; else {
 
 function tradeTable(list,unit="%"){
   if(!list.length) return `<div class="empty">Sem trades.</div>`;
-  return `<div class="scroll"><table class="t"><thead><tr><th>Entrada</th><th>Saída</th><th>Índice</th><th>Estratégia</th><th class="num">Dias</th><th class="num">Resultado</th>${unit==="%"?`<th class="num">€</th>`:""}</tr></thead><tbody>
+  return `<div class="scroll"><table class="t"><thead><tr><th>Entrada</th><th>Saída</th><th>Índice</th><th>Estratégia</th><th class="num">Dias</th><th class="num">Resultado</th>${unit==="%"?`<th class="num">$</th>`:""}</tr></thead><tbody>
     ${list.map(t=>`<tr><td>${fdate(t[0])}</td><td>${fdate(t[1])}</td><td>${esc(nm(t[2]))}</td><td><code>${esc(t[3])}</code></td><td class="num">${Math.round((pd(t[1])-pd(t[0]))/864e5)}</td><td class="num"><b class="${cls(t[4])}">${unit==="%"?pc(t[4],2):rr(t[4],2)}</b></td>${unit==="%"?`<td class="num ${cls(t[4])}">${eur(t[4]/100*S.acc)}</td>`:""}</tr>`).join("")}
   </tbody></table></div>`;
 }
@@ -385,7 +385,7 @@ function vInicio(){
     ${kpi("Média por ano",pc(P.media),`objetivo +14% · ${P.media>=14?"atingido":"faltam "+nf(14-P.media,1)+"%"}`,cls(P.media))}
     ${kpi("Anos acima de 14%",`${P.anos_ok}/${P.anos}`,`${P.anos_neg??"—"} anos negativos`)}
     ${kpi("Pior mês / pior ano",`<span class="neg">${pc(P.pior_mes)}</span>`,`pior ano ${pc(P.pior_ano)} · ${P.meses_pos}/${P.meses} meses positivos`)}
-    ${kpi("Pior queda",`<span class="neg">${pc(P.dd)}</span>`,`${eur(P.dd/100*S.acc)} numa conta de ${S.acc.toLocaleString("pt-PT")} €`)}
+    ${kpi("Pior queda",`<span class="neg">${pc(P.dd)}</span>`,`${eur(P.dd/100*S.acc)} numa conta de ${S.acc.toLocaleString("pt-PT")} $`)}
     ${kpi("Trades por semana",nf(P.trades_ano/52,1),`${Math.round(P.trades_ano)} por ano · objetivo 2–3/semana`)}
     ${kpi("Trades ganhas",s.n?nf(s.wr,0)+"%":"—",`${s.w} de ${s.n}`)}
     ${kpi("Média por trade",s.n?pc(s.avg,3):"—",`= ${rr(s.avg,3)} com 1% de risco`,cls(s.avg))}
@@ -420,7 +420,7 @@ function vCalendario(){
   return `<div class="card"><div class="filters">
       <label class="ctl">Índice ${sel("cMk",[["all","Todos"],...mks.map(k=>[k,nm(k)])],S.cal.mk,"(v=>{S.cal.mk=v;S.cal.sel=null;render()})")}</label>
       <label class="ctl">Estratégia ${sel("cId",[["all","Todas"],...ids.map(k=>[k,k])],S.cal.idea,"(v=>{S.cal.idea=v;S.cal.sel=null;render()})")}</label>
-      <span class="small muted">Cada dia mostra o resultado das trades que <b>fecharam</b> nesse dia (% da conta e €). Toca num dia para ver as trades.</span></div>
+      <span class="small muted">Cada dia mostra o resultado das trades que <b>fecharam</b> nesse dia (% da conta e $). Toca num dia para ver as trades.</span></div>
     ${calendar(dm,S.cal,"cal","%")}</div>${det}`;
 }
 
@@ -430,7 +430,7 @@ function vPeriodos(){
   const mon=group(dm,k=>k.slice(0,7)); const years=[...new Set(Object.keys(mon).map(k=>k.slice(0,4)))].sort();
   if(S.per.y==null){ const yn=y=>Object.entries(mon).filter(([k])=>k.startsWith(y)).reduce((a,[,v])=>a+v.n,0); S.per.y=[...years].reverse().find(y=>yn(y)>=20)||years[years.length-1]; }
   const maxM=Math.max(...Object.values(mon).map(v=>Math.abs(v.r)))*0.7||1;
-  const hm=`<div class="scroll"><table class="t hm"><thead><tr><th>Ano</th>${MS.map(m=>`<th class="num">${m}</th>`).join("")}<th class="num">Total</th><th class="num hide-sm">€</th><th class="num hide-sm">Trades</th></tr></thead><tbody>
+  const hm=`<div class="scroll"><table class="t hm"><thead><tr><th>Ano</th>${MS.map(m=>`<th class="num">${m}</th>`).join("")}<th class="num">Total</th><th class="num hide-sm">$</th><th class="num hide-sm">Trades</th></tr></thead><tbody>
     ${years.map(y=>{let tot=0,n=0; const cells=MS.map((_,i)=>{const v=mon[y+"-"+pad(i+1)]; if(v){tot+=v.r;n+=v.n;} return `<td class="c" style="${v?heat(v.r,maxM):""}" onclick="S.cal.y=${y};S.cal.m=${i};S.cal.mode='mes';location.hash='#calendario'" title="${MES[i]} ${y}${v?": "+pc(v.r,2)+" · "+v.n+" trades":""}">${v?nf(v.r,1):""}</td>`;}).join("");
       return `<tr class="${y===S.per.y?"sel":""}"><td><a href="#periodos" onclick="S.per.y='${y}';render();return false"><b>${y}</b></a></td>${cells}<td class="num"><b class="${tot>=14?"pos":cls(tot)}">${pc(tot)}</b>${tot>=14?" ✓":""}</td><td class="num hide-sm ${cls(tot)}">${eur(tot/100*S.acc)}</td><td class="num hide-sm">${n}</td></tr>`;}).join("")}
     </tbody></table></div>`;
@@ -442,9 +442,9 @@ function vPeriodos(){
   <div class="card"><div class="card-head"><div><h2>${S.per.y}: semana a semana</h2><p class="hint">Cada barra é uma semana (seg–dom). Total do ano: <b class="${cls(cum)}">${pc(cum)}</b> · ${eur(cum/100*S.acc)}</p></div>
     <label class="ctl">Ano ${sel("pY",years.map(y=>[y,y]),S.per.y,"(v=>{S.per.y=v;render()})")}</label>${seg([["semanas","Semanas"],["meses","Meses"]],S.per.view,"(v=>{S.per.view=v;render()})")}</div>
     ${S.per.view==="semanas"?barChart("wb",wrows.map(r=>({label:"S"+r.iw,v:r.r,full:`Semana ${r.iw} · ${fdate(r.k).slice(0,5)} a ${fdate(r.end).slice(0,5)}`,sub:`${r.n} trades · ${eur(r.r/100*S.acc)}`})),{unit:"%",h:200,maxLabels:13}):barChart("mb",mrows.map(r=>({label:MS[r.i],v:r.r,full:MES[r.i]+" "+S.per.y,sub:`${r.n} trades · ${eur(r.r/100*S.acc)}`})),{unit:"%",h:200})}
-    <div class="scroll" style="margin-top:10px">${S.per.view==="semanas"?`<table class="t"><thead><tr><th>Semana</th><th>Datas</th><th class="num">Trades</th><th class="num">Ganhas</th><th class="num">Resultado</th><th class="num">€</th><th class="num">Acumulado no ano</th></tr></thead><tbody>
+    <div class="scroll" style="margin-top:10px">${S.per.view==="semanas"?`<table class="t"><thead><tr><th>Semana</th><th>Datas</th><th class="num">Trades</th><th class="num">Ganhas</th><th class="num">Resultado</th><th class="num">$</th><th class="num">Acumulado no ano</th></tr></thead><tbody>
       ${wrows.map(r=>`<tr class="click" onclick="S.cal.y=${+r.k.slice(0,4)};S.cal.m=${+r.k.slice(5,7)-1};S.cal.mode='mes';location.hash='#calendario'"><td>S${r.iw}</td><td>${fdate(r.k).slice(0,5)} – ${fdate(r.end).slice(0,5)}</td><td class="num">${r.n}</td><td class="num">${nf(r.w/r.n*100,0)}%</td><td class="num"><b class="${cls(r.r)}">${pc(r.r,2)}</b></td><td class="num ${cls(r.r)}">${eur(r.r/100*S.acc)}</td><td class="num ${cls(r.cum)}">${pc(r.cum,1)}</td></tr>`).join("")}</tbody></table>`
-    :`<table class="t"><thead><tr><th>Mês</th><th class="num">Trades</th><th class="num">Ganhas</th><th class="num">Dias +/−</th><th class="num">Resultado</th><th class="num">€</th></tr></thead><tbody>
+    :`<table class="t"><thead><tr><th>Mês</th><th class="num">Trades</th><th class="num">Ganhas</th><th class="num">Dias +/−</th><th class="num">Resultado</th><th class="num">$</th></tr></thead><tbody>
       ${mrows.map(r=>`<tr class="click" onclick="S.cal.y=${+S.per.y};S.cal.m=${r.i};S.cal.mode='mes';location.hash='#calendario'"><td style="text-transform:capitalize">${MES[r.i]}</td><td class="num">${r.n}</td><td class="num">${r.n?nf(r.w/r.n*100,0)+"%":"—"}</td><td class="num">${r.has?r.pd+" / "+(r.days-r.pd):"—"}</td><td class="num"><b class="${cls(r.r)}">${r.has?pc(r.r,2):"—"}</b></td><td class="num ${cls(r.r)}">${r.has?eur(r.r/100*S.acc):""}</td></tr>`).join("")}</tbody></table>`}</div></div>`;
 }
 
@@ -467,7 +467,7 @@ function vTrades(){
     <label class="ctl">Resultado ${sel("fR",[["all","Todas"],["g","Ganhas"],["p","Perdidas"]],F.res,set("res"))}</label>
     <button class="btn" onclick="S.tr={y:'all',m:'all',mk:'all',idea:'all',res:'all',sort:'saida',dir:-1,page:0};render()">Limpar filtros</button></div>
     <div class="kpis sm">${kpi("Trades",s.n,`${s.w} ganhas · ${s.n-s.w} perdidas`)}${kpi("Resultado",pc(s.r,1),eur(s.r/100*S.acc),cls(s.r))}${kpi("Ganhas",s.n?nf(s.wr,0)+"%":"—",s.pf?`fator de lucro ${nf(s.pf,2)}`:"")}${kpi("Média por trade",pc(s.avg,3),`melhor ${pc(s.best,2)} · pior ${pc(s.worst,2)}`,cls(s.avg))}</div>
-    <div class="scroll"><table class="t"><thead><tr>${th("entrada","Entrada")}${th("saida","Saída")}${th("indice","Índice")}${th("estrategia","Estratégia")}${th("dias","Dias",1)}${th("resultado","Resultado",1)}<th class="num">€</th></tr></thead><tbody>
+    <div class="scroll"><table class="t"><thead><tr>${th("entrada","Entrada")}${th("saida","Saída")}${th("indice","Índice")}${th("estrategia","Estratégia")}${th("dias","Dias",1)}${th("resultado","Resultado",1)}<th class="num">$</th></tr></thead><tbody>
       ${vis.map(t=>`<tr class="click" onclick="S.cal.y=${+t[1].slice(0,4)};S.cal.m=${+t[1].slice(5,7)-1};S.cal.mode='mes';S.cal.sel='${t[1]}';location.hash='#calendario'"><td>${fdate(t[0])}</td><td>${fdate(t[1])}</td><td>${esc(nm(t[2]))}</td><td><code>${esc(t[3])}</code></td><td class="num">${Math.round((pd(t[1])-pd(t[0]))/864e5)}</td><td class="num"><b class="${cls(t[4])}">${pc(t[4],2)}</b></td><td class="num ${cls(t[4])}">${eur(t[4]/100*S.acc)}</td></tr>`).join("")||`<tr><td colspan="7"><div class="empty">Sem trades com estes filtros.</div></td></tr>`}
     </tbody></table></div>
     <div class="pager"><span>${L.length?F.page*per+1:0}–${Math.min(L.length,F.page*per+per)} de ${L.length}</span><button class="btn icon" ${F.page?"":"disabled"} onclick="S.tr.page--;render()">‹</button><span>página ${F.page+1} de ${pages}</span><button class="btn icon" ${F.page<pages-1?"":"disabled"} onclick="S.tr.page++;render()">›</button></div></div>`;
@@ -480,7 +480,7 @@ function vIndices(){
   const by=(f)=>{const g={}; for(const t of T){const k=f(t); (g[k]=g[k]||[]).push(t);} return Object.entries(g).map(([k,l])=>({k,...stats(l),ano:l.reduce((a,t)=>a+t[4],0)/nyears})).sort((a,b)=>b.ano-a.ano);};
   const mk=by(t=>t[2]), id=by(t=>t[3]), both=by(t=>t[2]+"|"+t[3]);
   const maxA=Math.max(...both.map(r=>Math.abs(r.ano)))||1;
-  const tbl=(rows,lab)=>`<div class="scroll"><table class="t"><thead><tr><th>${lab}</th><th class="num">Trades</th><th class="num">Ganhas</th><th class="num">Por trade</th><th class="num">% por ano</th><th class="num hide-sm">€ por ano</th></tr></thead><tbody>
+  const tbl=(rows,lab)=>`<div class="scroll"><table class="t"><thead><tr><th>${lab}</th><th class="num">Trades</th><th class="num">Ganhas</th><th class="num">Por trade</th><th class="num">% por ano</th><th class="num hide-sm">$ por ano</th></tr></thead><tbody>
     ${rows.map(r=>`<tr><td>${lab==="Estratégia"?`<code>${esc(r.k)}</code>`:esc(nm(r.k))}</td><td class="num">${r.n}</td><td class="num">${nf(r.wr,0)}%</td><td class="num ${cls(r.avg)}">${pc(r.avg,3)}</td><td class="num"><b class="${cls(r.ano)}">${pc(r.ano,2)}</b></td><td class="num hide-sm ${cls(r.ano)}">${eur(r.ano/100*S.acc)}</td></tr>`).join("")}</tbody></table></div>`;
   return `<div class="grid2"><div class="card"><h2>Por índice</h2><p class="hint">Quanto cada índice deu à carteira, depois das regras de risco.</p>${tbl(mk,"Índice")}</div>
     <div class="card"><h2>Por estratégia</h2><p class="hint">Quanto cada estratégia deu, somando todos os índices.</p>${tbl(id,"Estratégia")}</div></div>
@@ -585,18 +585,18 @@ function vDemo(){
       <polyline fill="none" stroke="var(--accent)" stroke-width="2" points="${E.map((e,i)=>x(i).toFixed(1)+","+y(+e.equity).toFixed(1)).join(" ")}"/></svg>`;}
   const row=p=>{const cur=p.status==="open"?px[p.coin]:+p.exit_price; const pnl=p.status==="open"?(cur?(+p.qty)*(cur-(+p.entry_price))-(+p.fee_eur):null):+p.pnl_eur;
     return `<tr><td>${CN[p.coin]||p.coin}</td><td><code>${esc(p.strategy)}</code></td><td>${new Date(p.entry_time).toLocaleString("pt-PT",{dateStyle:"short",timeStyle:"short"})}</td>
-      <td class="num">${nf(+p.entry_price,2)} €</td><td class="num">${nf(+p.stop,2)} €</td><td class="num">${cur?nf(cur,2)+" €":"—"}</td>
-      <td class="num ${cls(pnl)}"><b>${pnl==null?"—":(pnl>=0?"+":"−")+nf(Math.abs(pnl),2)+" €"}</b>${p.r!=null?`<div class="small muted">${rr(+p.r)}</div>`:""}</td>
+      <td class="num">${nf(+p.entry_price,2)} $</td><td class="num">${nf(+p.stop,2)} $</td><td class="num">${cur?nf(cur,2)+" $":"—"}</td>
+      <td class="num ${cls(pnl)}"><b>${pnl==null?"—":(pnl>=0?"+":"−")+nf(Math.abs(pnl),2)+" $"}</b>${p.r!=null?`<div class="small muted">${rr(+p.r)}</div>`:""}</td>
       <td>${p.status==="open"?"aberta":esc(p.exit_reason||"")}</td></tr>`;};
-  return `<div class="kpis">${kpi("Saldo (com trades abertas)",nf(eq,2)+" €",`começou com ${nf(+a.start_balance,0)} €`, cls(eq-(+a.start_balance)))}
+  return `<div class="kpis">${kpi("Saldo (com trades abertas)",nf(eq,2)+" $",`começou com ${nf(+a.start_balance,0)} $`, cls(eq-(+a.start_balance)))}
     ${kpi("Rentabilidade",pc(ret,2),"desde o início da demo",cls(ret))}
     ${kpi("Trades fechadas",closed.length,closed.length?`${wins} ganhas (${Math.round(wins/closed.length*100)}%)`:"ainda nenhuma")}
     ${kpi("Abertas agora",open.length,`máximo 1 por moeda · última verificação ${last}`)}</div>
-    <div class="card"><h2>Preços ao vivo</h2><p class="hint">Kraken, em euros. Atualiza de 5 em 5 segundos${D.pxAt?" · "+D.pxAt.toLocaleTimeString("pt-PT"):""}. Variação desde a abertura do dia.</p>
-      <div class="kpis sm" style="margin:0">${["btc","eth","sol"].map(c=>{const o=open.find(p=>p.coin===c); return `<div class="kpi"><div class="k">${CN[c]}</div><div class="v">${px[c]?nf(px[c],2)+" €":"—"}</div><div class="s"><span class="${cls((D.chg||{})[c])}">${pc((D.chg||{})[c],2)}</span>${o?` · em posição, stop ${nf(+o.stop,2)} €`:" · sem posição"}</div></div>`;}).join("")}</div></div>
+    <div class="card"><h2>Preços ao vivo</h2><p class="hint">Kraken, em dólares. Atualiza de 5 em 5 segundos${D.pxAt?" · "+D.pxAt.toLocaleTimeString("pt-PT"):""}. Variação desde a abertura do dia.</p>
+      <div class="kpis sm" style="margin:0">${["btc","eth","sol"].map(c=>{const o=open.find(p=>p.coin===c); return `<div class="kpi"><div class="k">${CN[c]}</div><div class="v">${px[c]?nf(px[c],2)+" $":"—"}</div><div class="s"><span class="${cls((D.chg||{})[c])}">${pc((D.chg||{})[c],2)}</span>${o?` · em posição, stop ${nf(+o.stop,2)} $`:" · sem posição"}</div></div>`;}).join("")}</div></div>
     ${sigCard(D,open)}
     <div class="card"><h2>Como funciona</h2><div class="small" style="color:var(--text-2)">
-      <p style="margin-top:0">De hora a hora (quando fecha cada vela) o bot lê os <b>preços reais da Kraken</b> (BTC, ETH, SOL em euros) e aplica as estratégias de tendência <b>K1</b>: compra quando o preço rompe máximos ou fica acima da média, e vende quando a tendência acaba ou o stop é tocado (o stop é vigiado a cada minuto). <b>Nenhuma ordem real é enviada</b>: as trades são simuladas aqui, com a comissão da Kraken (0,26% por lado).</p>
+      <p style="margin-top:0">De hora a hora (quando fecha cada vela) o bot lê os <b>preços reais da Kraken</b> (BTC, ETH, SOL em dólares) e aplica as estratégias de tendência <b>K1</b>: compra quando o preço rompe máximos ou fica acima da média, e vende quando a tendência acaba ou o stop é tocado (o stop é vigiado a cada minuto). <b>Nenhuma ordem real é enviada</b>: as trades são simuladas aqui, com a comissão da Kraken (0,26% por lado).</p>
       <p style="margin-bottom:0">Risco de 1% do saldo por trade, stop a 3 ATR, no máximo 1 posição por moeda e 1/3 do saldo por moeda (sem alavancagem). Cada compra e venda chega também ao Telegram.</p></div></div>
     ${chart?`<div class="card"><h2>Evolução do saldo</h2>${chart}</div>`:""}
     <div class="card"><h2>Posições abertas</h2>${open.length?`<div class="scroll"><table class="t"><thead><tr><th>Moeda</th><th>Estratégia</th><th>Entrada</th><th class="num">Preço entrada</th><th class="num">Stop</th><th class="num">Preço atual</th><th class="num">Resultado</th><th>Estado</th></tr></thead><tbody>${open.map(row).join("")}</tbody></table></div>`:`<div class="empty">Sem posições abertas. O bot está à espera de uma tendência de subida em BTC, ETH ou SOL.</div>`}</div>
@@ -607,11 +607,11 @@ function sigCard(D,open){
   const G=D.sig; if(!G) return "";
   const px=D.px||{};
   const cell=(lvl,cur,up)=>{const ok=up?cur>lvl:cur<lvl; const d=(lvl/cur-1)*100;
-    return `<td class="num">${ok?`<span class="badge ${up?"ok":"bad"}">${up?"long ✓":"short ✓"}</span>`:`<span class="muted">${up?"subir":"descer"}</span> <b>${pc(Math.abs(d),1).replace(/^[+−]/,"")}</b>`}<div class="small muted">${up?"fecho >":"fecho <"} ${nf(lvl,2)} €</div></td>`;};
+    return `<td class="num">${ok?`<span class="badge ${up?"ok":"bad"}">${up?"long ✓":"short ✓"}</span>`:`<span class="muted">${up?"subir":"descer"}</span> <b>${pc(Math.abs(d),1).replace(/^[+−]/,"")}</b>`}<div class="small muted">${up?"fecho >":"fecho <"} ${nf(lvl,2)} $</div></td>`;};
   const rows=(up)=>["btc","eth","sol"].map(c=>{const g=G[c]; if(!g) return ""; const p=px[c]||g.c4; const o=open.find(x=>x.coin===c);
     const L=up?[g.hi20,g.sma100,g.hi55,g.sma200]:[g.lo20,g.sma100,g.lo55,g.sma200];
     const n=L.filter(l=>up?p>l:p<l).length;
-    return `<tr><td><b>${CN[c]}</b><div class="small muted">${nf(p,2)} €${o?" · em posição":""}</div></td>${L.map(l=>cell(l,p,up)).join("")}<td class="num"><b>${n}/4</b></td></tr>`;}).join("");
+    return `<tr><td><b>${CN[c]}</b><div class="small muted">${nf(p,2)} $${o?" · em posição":""}</div></td>${L.map(l=>cell(l,p,up)).join("")}<td class="num"><b>${n}/4</b></td></tr>`;}).join("");
   const head=(up)=>`<thead><tr><th>Moeda</th><th class="num">${up?"Máximo":"Mínimo"} 20 dias</th><th class="num">Média 100 dias</th><th class="num">${up?"Máximo":"Mínimo"} 55 velas 4h</th><th class="num">Média 200 velas 4h</th><th class="num">Sinais</th></tr></thead>`;
   const dir=["btc","eth","sol"].map(c=>{const g=G[c]; if(!g) return ""; const p=px[c]||g.c4; const up=(p>g.sma100)+(p>g.sma200), dn=(p<g.sma100)+(p<g.sma200);
     return `<span class="badge ${up===2?"ok":dn===2?"bad":"mid"}">${c.toUpperCase()}: ${up===2?"tendência de subida":dn===2?"tendência de descida":"sem tendência clara"}</span>`;}).join(" ");
@@ -625,7 +625,7 @@ function sigCard(D,open){
     <div class="scroll"><table class="t">${head(false)}<tbody>${rows(false)}</tbody></table></div></div>`;
 }
 async function loadSig(){
-  const pairs={btc:"XBTEUR",eth:"ETHEUR",sol:"SOLEUR"}, sig={};
+  const pairs={btc:"XBTUSD",eth:"ETHUSD",sol:"SOLUSD"}, sig={};
   const get=async(p,i)=>{const j=await fetch(`https://api.kraken.com/0/public/OHLC?pair=${p}&interval=${i}`,{cache:"no-store"}).then(r=>r.json()); const k=Object.keys(j.result).find(x=>x!=="last"); return j.result[k].slice(0,-1).map(r=>[+r[2],+r[3],+r[4]]);};
   try{ for(const [c,p] of Object.entries(pairs)){ const d=await get(p,1440), h=await get(p,240);
       const avg=a=>a.reduce((s,x)=>s+x[2],0)/a.length;
@@ -643,7 +643,7 @@ async function loadDemo(){
 /* precos ao vivo da Kraken de 5 em 5 segundos (so no browser; o bot vigia os stops de minuto a minuto) */
 async function livePx(){
   if(document.hidden) return;
-  try{const r=await fetch("https://api.kraken.com/0/public/Ticker?pair=XBTEUR,ETHEUR,SOLEUR",{cache:"no-store"}).then(r=>r.json());
+  try{const r=await fetch("https://api.kraken.com/0/public/Ticker?pair=XBTUSD,ETHUSD,SOLUSD",{cache:"no-store"}).then(r=>r.json());
     const px={},chg={};
     for(const [k,v] of Object.entries(r.result||{})){const c=k.includes("XBT")?"btc":k.includes("ETH")?"eth":k.includes("SOL")?"sol":null; if(c){px[c]=+v.c[0]; chg[c]=(+v.c[0]/(+v.o)-1)*100;}}
     S.demo={...(S.demo||{}),px,chg,pxAt:new Date()}; if(S.route==="demo"&&S.demo.acc) render();

@@ -1,13 +1,13 @@
 // Conta demo (paper trading) do Bottrading. Le precos publicos da Kraken, aplica as estrategias de tendencia K1
 // (so long) a BTC/ETH/SOL e regista trades simuladas no Supabase. Nenhuma ordem real e enviada.
-// 1% de risco por trade, 1 posicao por moeda, stop de 3 ATR, comissao Kraken 0.26%/lado.
+// Tudo em dolares (pares USD da Kraken; pedido do Antonio). 1% de risco por trade, 1 posicao por moeda, stop de 3 ATR, comissao Kraken 0.26%/lado.
 // Dois modos (pg_cron):
 //   ?mode=stops  (cada minuto)  -> so le o preco atual (1 pedido) e fecha posicoes cujo stop foi tocado
 //   sem mode     (de hora a hora) -> sinais de entrada/saida nas velas fechadas (como no backtest)
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
 const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
-const COINS: Record<string, string> = { btc: "XBTEUR", eth: "ETHEUR", sol: "SOLEUR" };
+const COINS: Record<string, string> = { btc: "XBTUSD", eth: "ETHUSD", sol: "SOLUSD" };
 const FEE = 0.0026;
 type Bar = { t: number; o: number; h: number; l: number; c: number };
 type Strat = { name: string; tf: 1440 | 240; kind: "donchian" | "sma"; a: number; b?: number };
@@ -58,7 +58,7 @@ function exitSignal(s: Strat, b: Bar[]) {
   const prev = b.slice(-s.b! - 1, -1);
   return last.c < Math.min(...prev.map((x) => x.l));
 }
-const eur = (x: number) => `${x >= 0 ? "+" : ""}${x.toFixed(2)} €`;
+const eur = (x: number) => `${x >= 0 ? "+" : ""}${x.toFixed(2)} $`;
 async function tg(text: string) { await sb.rpc("paper_notify", { p_text: text }); }
 
 async function closePos(open: any, exitPx: number, reason: string, balance: number) {
@@ -70,7 +70,7 @@ async function closePos(open: any, exitPx: number, reason: string, balance: numb
   const { data: upd } = await sb.from("paper_positions").update({ status: "closed", exit_time: new Date().toISOString(),
     exit_price: exitPx, exit_reason: reason, pnl_eur: pnl, r, fee_eur: fee }).eq("id", open.id).eq("status", "open").select("id");
   if (!upd?.length) return null; // outra corrida ja fechou esta posicao
-  await tg(`${pnl >= 0 ? "✅" : "❌"} <b>Demo: fechou ${NAMES[open.coin]}</b> (${open.strategy})\n• Motivo: ${reason}\n• Entrada ${entry.toFixed(2)} → saida ${exitPx.toFixed(2)} €\n• Resultado: <b>${eur(pnl)}</b> (${r >= 0 ? "+" : ""}${r.toFixed(2)}R)\n• Saldo: ${balance.toFixed(2)} €`);
+  await tg(`${pnl >= 0 ? "✅" : "❌"} <b>Demo: fechou ${NAMES[open.coin]}</b> (${open.strategy})\n• Motivo: ${reason}\n• Entrada ${entry.toFixed(2)} → saida ${exitPx.toFixed(2)} $\n• Resultado: <b>${eur(pnl)}</b> (${r >= 0 ? "+" : ""}${r.toFixed(2)}R)\n• Saldo: ${balance.toFixed(2)} $`);
   return { balance, pnl };
 }
 
@@ -133,7 +133,7 @@ async function runHourly() {
       const fee = qty * price * FEE;
       await sb.from("paper_positions").insert({ coin, strategy: s.name, entry_price: price, stop: price - stopDist, qty,
         risk_eur: risk, fee_eur: fee });
-      await tg(`🟢 <b>Demo: comprou ${NAMES[coin]}</b> (${s.name})\n• Preco: ${price.toFixed(2)} €\n• Stop: ${(price - stopDist).toFixed(2)} € (${(stopDist / price * 100).toFixed(1)}% abaixo)\n• Quantidade: ${qty.toPrecision(4)} (${(qty * price).toFixed(2)} €)\n• Risco: ${risk.toFixed(2)} € (${(risk / balance * 100).toFixed(2)}% do saldo)`);
+      await tg(`🟢 <b>Demo: comprou ${NAMES[coin]}</b> (${s.name})\n• Preco: ${price.toFixed(2)} $\n• Stop: ${(price - stopDist).toFixed(2)} $ (${(stopDist / price * 100).toFixed(1)}% abaixo)\n• Quantidade: ${qty.toPrecision(4)} (${(qty * price).toFixed(2)} $)\n• Risco: ${risk.toFixed(2)} $ (${(risk / balance * 100).toFixed(2)}% do saldo)`);
       log.push(`${coin}: entrou ${s.name}`);
       break;
     }

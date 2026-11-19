@@ -13,7 +13,7 @@ Decisao do Antonio: o laboratorio de indices foi arquivado (Supabase schema `arq
 - JA TESTADO EM CRIPTO (2017-2024, nao repetir igual): rsi2-dip-d, ibs-dip-d, down3-d, double7-d, pullback20-d -> win rate 56-71% mas ~0R
   depois de custos; rsi2-dip-4h negativo (-0.1R/trade). K1 com alvo fixo: 1R -> win rate 49% e +0.10R/trade; 2R -> 35%, +0.21R; sem alvo 25%, +0.91R.
 - Conta demo: Edge Function Supabase `paper-bot` (supabase/functions/paper-bot; sinais de hora a hora, stops a cada minuto com ?mode=stops)
-  simula a K1 com precos reais da Kraken em 100 000 EUR (pedido do Antonio: tudo como se a conta fosse de 100k); pagina "Conta demo" no dashboard; avisos no Telegram. Nenhuma ordem real.
+  simula a K1 com precos reais da Kraken em 100 000 USD (pedido do Antonio: tudo em dolares, conta de 100k; pares XBTUSD/ETHUSD/SOLUSD); pagina "Conta demo" no dashboard; avisos no Telegram. Nenhuma ordem real.
   So troca de estrategia na demo uma variante que tenha PASSADO dev + pre + holdout, e com o OK do Antonio.
 
 ## MISSAO NOTURNA (pedido do Antonio, 2026-11-18): AUMENTAR O WIN RATE SEM MATAR O RESULTADO
@@ -24,7 +24,7 @@ com variantes NOVAS registadas antes de correr. Caminhos com fundamento (escolhe
 - entradas em tendencia mas com recuo (compra em pullback dentro da tendencia da K1 em vez de na rutura), filtros de regime
   (BTC acima da media de 200 dias, volatilidade), confirmacao entre moedas;
 - menos custos por trade: menos trades com alvos maiores (custo ~0.57% ida e volta; uma ideia com ganho medio < 1% nunca sobrevive).
-Regras para isto nao virar procurar sorte: no maximo 4 ideias por sessao e 12 por noite (pedido do Antonio: mais backtesting) (variantes contam como ideias), parametros
+Regras para isto nao virar procurar sorte: no maximo 4 ideias por sessao e 20 por noite (pedido do Antonio: mais testes; ha sessoes as :00 e as :30) (variantes contam como ideias), parametros
 fixos (nada de grelhas), cada ideia escrita em IDEAS.md com hipotese ANTES de correr e commit desse registo primeiro; nunca afinar
 depois de ver o pre ou o holdout; no SUMMARY.md diz quantas ideias cripto ja foram testadas no total (mais testes = mais desconfianca).
 Proibido: martingale, sem stop, grid, alavancagem, mexer em custos/periodos/criterio, usar dados de 2025-2026 fora do holdout unico.
