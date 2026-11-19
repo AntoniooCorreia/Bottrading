@@ -19,18 +19,22 @@
 | #113 | 2026-11-19 | k-sma100-d-bull-tp1 (acima da media 100 dias + regime BTC, alvo 1R repetido) | +4.78 | 53% | +0.24 | +10.0%, 0.0% | **PASSA dev** (conf. 4/5); pre 1 trade -0.26R: REPROVADA no pre |
 | #114 | 2026-11-19 | k-pb-d-bull-tp1 (recuo de 5 dias na tendencia, alvo 1R) | +1.82 | 66% | +0.12 | +3.0%, -3.2% | REPROVADA |
 | #115 | 2026-11-19 | k-dc20-d-own-be (#112 sem alvo, breakeven em +1R) | +1.93 | 50% | +1.74 | +19.7%, -7.3% | REPROVADA (20-25 trades por moeda) |
+| #116 | 2026-11-19 | k-sma100-d-b100-tp1 (#113 com regime BTC > media 100 dias) | +4.63 | 53% | +0.23 | +10.0%, -4.9% | PASSA dev + pre (~0); holdout +0.04R, win rate 46%: REPROVADA |
+| #117 | 2026-11-19 | k-sma600-4h-bull-tp1 (#113 em 4h) | +3.78 | 40% | +0.14 | +4.4%, 0.0% | PASSA dev; pre 1 trade -0.66R: REPROVADA no pre |
+| #118 | 2026-11-19 | k-sma100-d-bull-bracket (#113 sem saida pelo sinal: so alvo 1R ou stop) | +4.87 | **68%** | +0.33 | +10.3%, -2.0% | REPROVADA (SOL 54 trades < 60); confirmacao 5/5 |
+| #119 | 2026-11-19 | k-sma100-d-slope-tp1 (#113 so com media 100 a subir) | +4.10 | 53% | +0.23 | +8.1%, 0.0% | REPROVADA (SOL 58 trades < 60) |
 
-Leitura honesta cripto (2026-11-19, sessao das :30 n.o 4):
-1. Ideias cripto testadas no total: 28 (K1 = 4, 6 compras de quedas, 2 diagnosticos de alvo, #100-#115). Mais testes = mais desconfianca.
-2. Melhor win rate com resultado positivo: 66% (#114, +0.12R, t 1.82: fraco); melhor equilibrio: #113 (53%, +0.24R, +10%/ano, pior ano 0%, pior mes -2.8%).
-3. #113 e a primeira que junta win rate > 50%, ~+10%/ano e nenhum ano negativo no dev, com 247 trades e confirmacao 4/5. Reprovou so no pre (1 trade).
-4. Mecanismo que funciona: alvo = stop (1R, stop 3 ATR diario ~10-15%) em regime de alta do BTC, repetido enquanto a tendencia dura. A deriva positiva faz o alvo ganhar > 50%.
-5. Regime da propria moeda (#112) da MENOS trades que o do BTC: hipotese errada. Recuo com alvo (#114) sobe o win rate para 66% mas o ganho por trade cai para +0.12R.
-6. Sem alvo + breakeven (#115) da +1.7R/trade mas 2021 vale +95% e 2023 -7.3%: resultado concentrado num ano, nao serve o objetivo de consistencia.
-7. PROBLEMA ESTRUTURAL: com filtro de media de 200 dias o pre 2017-18 tem 0-2 trades (dados desde 2017-08; media so existe em 2018, ano de baixa). #104, #106 e #113 passaram o dev e cairam no pre por 1-2 trades.
-8. Decisao pendente do Antonio: aceitar "pre sem trades / quase vazio" como neutro, ou exigir outro teste de confirmacao. Sem isso nenhuma ideia com regime BTC chega ao holdout.
-9. Nenhuma carteira K2 criada. Conta demo continua na K1. Holdouts abertos: so K1 e #100.
-10. Proximo: limite da noite (20) quase atingido (16). Proxima noite: variantes da #113 (outra media/timeframe so com hipotese nova) e carteira #106 + #113 se o Antonio decidir o pre.
+Leitura honesta cripto (2026-11-19, sessao das :00 n.o 5):
+1. Ideias cripto testadas no total: 32 (K1 = 4, 6 compras de quedas, 2 diagnosticos de alvo, #100-#119). Mais testes = mais desconfianca. Limite da noite (20) atingido.
+2. Melhor win rate com resultado positivo: 68% (#118: +0.33R/trade, +10.3%/ano, pior ano -2.0%, pior mes -4.1%, confirmacao 5/5) - cumpre o objetivo da carteira no dev, mas a SOL so tem 54 trades (< 60): reprovada pelo criterio.
+3. Porque o #118 sobe o win rate: sem a saida no fecho abaixo da media, cada trade e +1R ou -1R; as saidas pelo sinal eram perdas pequenas que contavam como perdas. Custo: perdas inteiras quando a tendencia acaba (2022 -2.0% em vez de 0%).
+4. #116 (regime BTC de 100 dias) foi ao holdout 2025-26: +0.04R/trade, win rate 46%. A aposta simetrica (alvo = stop) so ganha com deriva forte; em 2025-26 quase nao ganhou. Aviso para toda a familia #113.
+5. 4h (#117) piora o win rate (40%) pelas serras na media; inclinacao da media (#119) corta trades sem subir o win rate.
+6. Familia #113 no dev: win rate 53-68%, +8 a +10%/ano, pior ano entre 0% e -5%. Nenhuma passou o pre/holdout de forma convincente.
+7. PROBLEMA ESTRUTURAL mantem-se: com media de 200 dias o pre 2017-18 fica quase vazio; e o holdout (~2 anos) nunca chega a 60 trades por moeda.
+8. Decisao pendente do Antonio: aceitar "pre quase vazio" como neutro? Mesmo assim a #118 nao vai ao holdout: falha os 60 trades na SOL (criterio fixo, nao se mexe).
+9. Nenhuma carteira K2 criada. Conta demo continua na K1. Holdouts abertos: K1, #100 e #116.
+10. Proximo (proxima noite, hipotese registada antes): o mecanismo da #118 (saida so por alvo/stop) com entradas mais frequentes que cheguem a 60 trades na SOL; e medir o win rate da #118 por ano para ver se 2025-26 seria fraco como na #116.
 
 # Resumo indices (ARQUIVO, custos CFD incluidos)
 

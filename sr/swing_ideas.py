@@ -192,7 +192,7 @@ def sma_long(n: int):
 
 
 # ---- cripto 2026-11-19 (registadas em IDEAS.md antes de correr) ----
-def btc_bull_regime(index: pd.DatetimeIndex, btc_daily: pd.DataFrame | None = None) -> pd.Series:
+def btc_bull_regime(index: pd.DatetimeIndex, btc_daily: pd.DataFrame | None = None, n: int = 200) -> pd.Series:
     """True quando o BTC FECHOU o dia (UTC) anterior acima da media de 200 dias. So usa dias ja fechados:
     o valor do dia D vale a partir das 00:00 de D+1. Fora do intervalo dos dados do BTC (ex.: velas sinteticas dos testes)
     devolve None para a ideia usar o regime da propria serie."""
@@ -204,17 +204,17 @@ def btc_bull_regime(index: pd.DatetimeIndex, btc_daily: pd.DataFrame | None = No
             btc_daily = load_tf("btc", "1d", None)
         except Exception:
             return None
-    if index.tz is None or len(btc_daily) < 201 or index[-1] < btc_daily.index[0] + pd.Timedelta(days=200):
+    if index.tz is None or len(btc_daily) < n + 1 or index[-1] < btc_daily.index[0] + pd.Timedelta(days=n):
         return None
     c = btc_daily["close"]
-    bull = (c > c.rolling(200).mean()).astype(float).where(c.rolling(200).mean().notna())
+    bull = (c > c.rolling(n).mean()).astype(float).where(c.rolling(n).mean().notna())
     bull.index = bull.index + pd.Timedelta(days=1)          # conhecido so no fim do dia -> vale no dia seguinte
     out = bull.reindex(bull.index.union(index)).ffill().reindex(index)
     return out.fillna(0).astype(bool)
 
 
-def _regime(b: pd.DataFrame, n_own: int) -> pd.Series:
-    r = btc_bull_regime(b.index)
+def _regime(b: pd.DataFrame, n_own: int, n_btc: int = 200) -> pd.Series:
+    r = btc_bull_regime(b.index, n=n_btc)
     if r is None:   # sem dados do BTC para estas datas: regime da propria serie (so passado)
         c = b["close"]
         r = (c > c.rolling(n_own).mean()).shift(1).fillna(False).astype(bool)
@@ -289,12 +289,32 @@ def donchian_long_own(n_in: int, n_out: int, n_reg: int):
     return f
 
 
-def sma_long_bull(n: int):
-    """Entra ao fechar acima da media de n velas com o BTC acima da media de 200 dias; sai ao fechar abaixo da media."""
+def sma_long_bull(n: int, n_btc: int = 200):
+    """Entra ao fechar acima da media de n velas com o BTC acima da media de n_btc dias; sai ao fechar abaixo da media."""
     def f(b: pd.DataFrame) -> pd.Series:
         c = b["close"]
         sma = c.rolling(n).mean()
-        return _enter_exit((c > sma) & sma.notna() & _regime(b, 200), c < sma)
+        return _enter_exit((c > sma) & sma.notna() & _regime(b, n_btc, n_btc), c < sma)
+    return f
+
+
+def sma_slope_bull(n: int, k: int):
+    """sma_long_bull, mas so entra com a media de n velas a subir (media de hoje acima da de ha k velas). Saida igual."""
+    def f(b: pd.DataFrame) -> pd.Series:
+        c = b["close"]
+        sma = c.rolling(n).mean()
+        up = sma > sma.shift(k)
+        return _enter_exit((c > sma) & sma.notna() & up & _regime(b, 200), c < sma)
+    return f
+
+
+def sma_bull_entry(n: int):
+    """Condicao de entrada da #113 (moeda acima da media de n velas e BTC acima da media de 200 dias), vela a vela.
+    Usada com signal_exit=False: so serve para entrar; a saida e so por alvo/stop."""
+    def f(b: pd.DataFrame) -> pd.Series:
+        c = b["close"]
+        sma = c.rolling(n).mean()
+        return ((c > sma) & sma.notna() & _regime(b, 200)).astype(int)
     return f
 
 
@@ -556,6 +576,11 @@ IDEAS = {
     "k-sma100-d-bull-tp1": (sma_long_bull(100), "1d", 3.0, 1.0, 0),
     "k-pb-d-bull-tp1": (pullback_bull(100, 5, 20), "1d", 3.0, 1.0, 0),
     "k-dc20-d-own-be": (donchian_long_own(20, 10, 200), "1d", 3.0, 1.0, 0),
+    # cripto sessao 5 (2026-11-19 :00): variantes da #113 (registadas em IDEAS.md antes de correr)
+    "k-sma100-d-b100-tp1": (sma_long_bull(100, 100), "1d", 3.0, 1.0, 0),
+    "k-sma600-4h-bull-tp1": (sma_long_bull(600), "4h", 6.0, 1.0, 0),
+    "k-sma100-d-bull-bracket": (sma_bull_entry(100), "1d", 3.0, 1.0, 0),
+    "k-sma100-d-slope-tp1": (sma_slope_bull(100, 20), "1d", 3.0, 1.0, 0),
 }
 
 # saidas extra por ideia (argumentos de run_positions): partial = fracao fechada no alvo tp_r (resto com stop em breakeven);
@@ -565,4 +590,5 @@ EXITS = {
     "k-dc20-4h-bw-half": {"partial": 0.5},
     "k-dc20-4h-bw-be": {"be": True},
     "k-dc20-d-own-be": {"be": True},
+    "k-sma100-d-bull-bracket": {"signal_exit": False},
 }

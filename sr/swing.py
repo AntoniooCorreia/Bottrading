@@ -72,8 +72,9 @@ def atr(b: pd.DataFrame, n: int = 14) -> np.ndarray:
 def run_positions(b: pd.DataFrame, pos: pd.Series, stop_atr: float, cfd_cost: float, fut_cost: float,
                   tp_r: float = 0.0, max_hold: int = 0, min_risk_cost: float = 4.0,
                   cost_pct: float = 0.0, financing: bool = True, return_open: bool = False,
-                  partial: float = 0.0, be: bool = False):
-    """partial > 0 (com tp_r > 0): fecha essa fracao no alvo e o resto continua (stop do resto em breakeven se be=True).
+                  partial: float = 0.0, be: bool = False, signal_exit: bool = True):
+    """signal_exit=False: o sinal so serve para ENTRAR; a trade so sai no stop, no alvo ou no tempo maximo.
+    partial > 0 (com tp_r > 0): fecha essa fracao no alvo e o resto continua (stop do resto em breakeven se be=True).
     be=True sem partial e com tp_r > 0: nao fecha nada no alvo, so passa o stop para breakeven quando toca o alvo.
     Breakeven = entrada x (1 + cost_pct) (o resto ja nao perde depois de custos). Sem partial/be: igual ao de sempre."""
     o, h, l, c = (b[k].to_numpy() for k in ("open", "high", "low", "close"))
@@ -126,7 +127,7 @@ def run_positions(b: pd.DataFrame, pos: pd.Series, stop_atr: float, cfd_cost: fl
         w = int(np.sign(want[i]))
         if cur is not None:
             held = i - cur["i"]
-            if w != cur["d"] or (max_hold and held >= max_hold):
+            if (signal_exit and w != cur["d"]) or (max_hold and held >= max_hold):
                 close_trade(i, c[i])   # sai no fecho da vela i (~ abertura da seguinte)
         if cur is None and w != 0 and np.isfinite(a[i]) and a[i] > 0:
             entry = o[i + 1]

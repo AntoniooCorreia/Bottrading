@@ -207,5 +207,7 @@ Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --p
   -> REPROVADA (< 60 trades; efeito quase nulo). Holdout gasto
 - [x] #117: k-sma600-4h-bull-tp1 -> PASSA dev (t +3.78; BTC +0.190R/121, ETH +0.077R/133, SOL +0.170R/98; win rate 40%; confirmacao 5/5;
   carteira +4.4%/ano, pior ano 0.0%, pior mes -2.7%). Pre 2017-18: 1 trade (ETH -0.66R) -> REPROVADA no pre. Holdout NAO aberto
-- [ ] #118: k-sma100-d-bull-bracket (#113 sem saida pelo sinal: so alvo 1R ou stop)
-- [ ] #119: k-sma100-d-slope-tp1 (#113 so com a media de 100 dias a subir vs ha 20 dias)
+- [x] #118: k-sma100-d-bull-bracket -> REPROVADA (SOL 54 trades < 60); t +4.87, BTC +0.393R/63, ETH +0.225R/72, SOL +0.390R/54; win rate 68%;
+  confirmacao 5/5 (win rate 62%); carteira +10.3%/ano, pior ano -2.0% (2022), pior mes -4.1%. Pre/holdout NAO corridos (falhou o dev)
+- [x] #119: k-sma100-d-slope-tp1 -> REPROVADA (SOL 58 trades < 60); t +4.10, BTC +0.238R/75, ETH +0.199R/77, SOL +0.263R/58; win rate 53%;
+  confirmacao 4/5; carteira +8.1%/ano, pior ano 0.0%, pior mes -2.7% (pior que a #113: menos trades, mesmo win rate)

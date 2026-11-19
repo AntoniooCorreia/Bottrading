@@ -168,3 +168,17 @@ def test_partial_and_breakeven_accounting():
     assert abs(tr["gross_R"][0]) < 1e-9 and tr["exit"][0] == idx[21]
     tr = run_positions(b, pos, 3.0, 0.0, 0.0, 1.0, 0, 0.0)
     assert abs(tr["gross_R"][0] - 1.0) < 1e-9
+
+
+def test_signal_exit_false_ignores_signal():
+    """signal_exit=False: o sinal a 0 nao fecha a trade; so o stop/alvo. Com o sinal ligado sai no sinal."""
+    idx = pd.date_range("2020-01-01", periods=40, freq="D", tz="UTC")
+    c = np.full(40, 100.0)
+    b = pd.DataFrame({"open": c, "high": c + 1, "low": c - 1, "close": c}, index=idx)   # ATR(14) = 2, risco 6
+    b.iloc[30, b.columns.get_loc("high")] = 110.0     # toca o alvo de 1R (106) na vela 30
+    pos = pd.Series(0, index=idx)
+    pos.iloc[16:20] = 1                               # entra na abertura da vela 17; sinal desliga no fecho da vela 20
+    tr = run_positions(b, pos, 3.0, 0.0, 0.0, 1.0, 0, 0.0)
+    assert tr["exit"][0] == idx[20] and abs(tr["gross_R"][0]) < 1e-9
+    tr = run_positions(b, pos, 3.0, 0.0, 0.0, 1.0, 0, 0.0, signal_exit=False)
+    assert len(tr) == 1 and tr["exit"][0] == idx[30] and abs(tr["gross_R"][0] - 1.0) < 1e-9
