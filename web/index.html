@@ -671,6 +671,7 @@ function evalPf(P){
   const add=(nome,ok,val,hard)=>C.push({nome,ok,val,hard});
   const of=P.oficial_passa, ofTxt=(P.oficial||[]).filter(o=>!o.passa).map(o=>o.ideia+": "+o.motivos.join(", ")).join(" · ");
   add("Estratégias validadas (critério oficial)",of===undefined?null:of,of===undefined?"não registado":of?"todas passam":ofTxt||"não passa",true);
+  add("Confirmação 2017–18 (pre) ≥ 0",P.pre_ok===undefined?null:P.pre_ok,P.pre_ok===undefined?"não corrido":P.pre_ok?"positivo":"negativo / quase vazio",true);
   add("Holdout 2025–26 positivo",P.holdout_ok===undefined?null:P.holdout_ok,P.holdout_txt||(P.holdout_ok===undefined?"ainda não aberto":""),true);
   add("Média ≥ +14% por ano",P.media>=14,pc(P.media),false);
   add("Pior ano acima de −10%",P.pior_ano>-10,pc(P.pior_ano),false);
@@ -693,7 +694,7 @@ function vCarteiras(){
   const B={aprovada:["ok","Aprovada"],quase:["mid","Quase"],reprovada:["bad","Reprovada"]};
   const ic=v=>v===true?"✅":v===false?"❌":"⚪";
   return `<div class="kpis">${kpi("Carteiras testadas",L.length,"cada teste do agente é uma carteira")}${kpi("Aprovadas",cnt("aprovada"),"cumprem todos os objetivos",cnt("aprovada")?"pos":"")}${kpi("Quase",cnt("quase"),"falham 1 ou 2 objetivos")}${kpi("Reprovadas",cnt("reprovada"),"falham objetivos ou a validação",cnt("reprovada")?"neg":"")}</div>
-  <div class="card"><div class="card-head"><div><h2>Ranking de carteiras</h2><p class="hint">As melhores em cima. Objetivos: estratégias validadas, holdout positivo, ≥ +14%/ano, pior ano > −10%, pior mês > −5%, win rate ≥ 50%, 2–3 trades/semana. ⚪ = ainda não medido. Toca no nome para abrir a carteira no resto do painel.</p></div>
+  <div class="card"><div class="card-head"><div><h2>Ranking de carteiras</h2><p class="hint">As melhores em cima. Objetivos: estratégias validadas, pre 2017–18 ≥ 0, holdout positivo, ≥ +14%/ano, pior ano > −10%, pior mês > −5%, win rate ≥ 50%, 2–3 trades/semana. ⚪ = ainda não medido. Toca no nome para abrir a carteira no resto do painel.</p></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">${seg([["all","Todas"],["aprovada","Aprovadas"],["quase","Quase"],["reprovada","Reprovadas"]],f,"(v=>{S.pfF=v;render()})")}${seg([["all","Tudo"],["crypto","Cripto"],["idx","Índices (arquivo)"]],m,"(v=>{S.pfM=v;render()})")}</div></div>
   ${vis.map(({p,e})=>`<div class="pfc ${B[e.st][0]}"><div class="hd"><span class="rk">#${L.indexOf(L.find(x=>x.p===p))+1}</span><a class="nm" href="#inicio" onclick="setPf('${esc(p.id)}')">${esc(pfName(p))}</a><span class="badge ${B[e.st][0]}">${B[e.st][1]}</span>${p.id===(curPf()||{}).id?`<span class="badge neu">escolhida</span>`:""}<span class="small muted" style="margin-left:auto">${esc(p.criado||"")}${p.period?" · período "+esc(p.period):""}</span></div>
     <div class="why">${esc(e.why)}${p.nota?`<div class="small muted" style="margin-top:3px">${esc(p.nota)}</div>`:""}</div>
