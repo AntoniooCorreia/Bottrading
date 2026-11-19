@@ -71,7 +71,11 @@ def atr(b: pd.DataFrame, n: int = 14) -> np.ndarray:
 
 def run_positions(b: pd.DataFrame, pos: pd.Series, stop_atr: float, cfd_cost: float, fut_cost: float,
                   tp_r: float = 0.0, max_hold: int = 0, min_risk_cost: float = 4.0,
-                  cost_pct: float = 0.0, financing: bool = True, return_open: bool = False):
+                  cost_pct: float = 0.0, financing: bool = True, return_open: bool = False,
+                  partial: float = 0.0, be: bool = False):
+    """partial > 0 (com tp_r > 0): fecha essa fracao no alvo e o resto continua (stop do resto em breakeven se be=True).
+    be=True sem partial e com tp_r > 0: nao fecha nada no alvo, so passa o stop para breakeven quando toca o alvo.
+    Breakeven = entrada x (1 + cost_pct) (o resto ja nao perde depois de custos). Sem partial/be: igual ao de sempre."""
     o, h, l, c = (b[k].to_numpy() for k in ("open", "high", "low", "close"))
     want = pos.reindex(b.index).fillna(0).to_numpy()
     a = atr(b)
@@ -84,6 +88,8 @@ def run_positions(b: pd.DataFrame, pos: pd.Series, stop_atr: float, cfd_cost: fl
         nonlocal cur
         d = cur["d"]
         g = (px - cur["entry"]) * d / cur["risk"]
+        if cur.get("done") is not None:        # parte ja fechada no alvo
+            g = cur["frac"] * cur["done"] + (1 - cur["frac"]) * g
         nights = int(len(np.unique(nyday[cur["i"]:i + 1])) - 1)
         rf = RF.get(idx[i].year, 2.0) / 100
         rate = (rf + CFD_MARKUP) if d == 1 else (CFD_MARKUP - rf)
@@ -102,8 +108,18 @@ def run_positions(b: pd.DataFrame, pos: pd.Series, stop_atr: float, cfd_cost: fl
                 close_trade(i, o[i])
             elif (d == 1 and l[i] <= st) or (d == -1 and h[i] >= st):
                 close_trade(i, st)
-            elif tp_r > 0 and ((d == 1 and h[i] >= cur["tp"]) or (d == -1 and l[i] <= cur["tp"])):
-                close_trade(i, cur["tp"])
+            elif tp_r > 0 and not cur.get("hit") and ((d == 1 and h[i] >= cur["tp"]) or (d == -1 and l[i] <= cur["tp"])):
+                if partial > 0 or be:
+                    cur["hit"] = True
+                    if partial > 0:
+                        cur["done"], cur["frac"] = tp_r, partial
+                    if be or partial > 0:
+                        bel = cur["entry"] * (1 + d * cost_pct)
+                        cur["stop"] = bel
+                        if (d == 1 and l[i] <= bel) or (d == -1 and h[i] >= bel):   # conservador: tocou os dois na mesma vela
+                            close_trade(i, bel)
+                else:
+                    close_trade(i, cur["tp"])
         # 2) sinal no fecho da vela i: sair no fecho, entrar na abertura de i+1
         if i + 1 >= n:
             break

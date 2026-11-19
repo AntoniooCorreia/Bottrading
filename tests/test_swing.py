@@ -3,7 +3,7 @@ import pandas as pd
 import pytest
 
 from sr.swing import run_positions
-from sr.swing_ideas import IDEAS
+from sr.swing_ideas import EXITS, IDEAS
 
 
 # Ideias de calendario com datas fixas (ex.: FOMC desde 2012) precisam de velas sinteticas nesses anos e mais longas
@@ -32,7 +32,7 @@ def test_swing_random_walk_no_edge(name):
     for s in range(6):
         st0, n0 = CAL.get(name, ("2000-01-03", 3000))
         b = synth_d(n=n0, seed=s, tf=tf, start=st0)
-        tr = run_positions(b, fn(b), st, 0.0, 0.0, tp, mh, min_risk_cost=0.0)
+        tr = run_positions(b, fn(b), st, 0.0, 0.0, tp, mh, min_risk_cost=0.0, **EXITS.get(name, {}))
         rs.append(tr["gross_R"].to_numpy())
     r = np.concatenate(rs)
     assert len(r) > 50
@@ -46,9 +46,9 @@ def test_swing_no_lookahead(name):
     st0, n0 = CAL.get(name, ("2000-01-03", 3000))
     b = synth_d(n=n0, seed=9, tf=tf, start=st0)
     cut = b.index[len(b) // 2]
-    a = run_positions(b, fn(b), st, 1.0, 1.0, tp, mh, 0.0)
+    a = run_positions(b, fn(b), st, 1.0, 1.0, tp, mh, 0.0, **EXITS.get(name, {}))
     bb = b[b.index <= cut]
-    c = run_positions(bb, fn(bb), st, 1.0, 1.0, tp, mh, 0.0)
+    c = run_positions(bb, fn(bb), st, 1.0, 1.0, tp, mh, 0.0, **EXITS.get(name, {}))
     lim = cut - pd.Timedelta(days=5)
     a, c = a[a["exit"] < lim].reset_index(drop=True), c[c["exit"] < lim].reset_index(drop=True)
     assert len(a) > 3
@@ -150,3 +150,21 @@ def test_btc_bull_regime_no_lookahead():
     c = d["close"]
     exp = bool(c.loc[day - pd.Timedelta(days=1)] > c.rolling(200).mean().loc[day - pd.Timedelta(days=1)])
     assert bool(full[idx >= day].iloc[0]) == exp
+
+
+def test_partial_and_breakeven_accounting():
+    """Metade no alvo de 1R e resto parado em breakeven -> +0.5R bruto; so breakeven -> 0R; sem nada -> sai no sinal."""
+    idx = pd.date_range("2020-01-01", periods=40, freq="D", tz="UTC")
+    c = np.full(40, 100.0)
+    b = pd.DataFrame({"open": c, "high": c + 1, "low": c - 1, "close": c}, index=idx)   # ATR(14) = 2
+    b.iloc[20, b.columns.get_loc("high")] = 110.0     # toca +1R (risco = 3 x 2 = 6 -> alvo 106)
+    b.iloc[20, b.columns.get_loc("low")] = 105.0      # sem tocar o breakeven na mesma vela
+    b.iloc[22, b.columns.get_loc("low")] = 95.0       # (as velas normais ja tocam 99 < entrada 100: o resto sai na vela 21)
+    pos = pd.Series(0, index=idx)
+    pos.iloc[16:30] = 1                               # entra na abertura da vela 17
+    tr = run_positions(b, pos, 3.0, 0.0, 0.0, 1.0, 0, 0.0, partial=0.5)
+    assert abs(tr["gross_R"][0] - 0.5) < 1e-9
+    tr = run_positions(b, pos, 3.0, 0.0, 0.0, 1.0, 0, 0.0, be=True)
+    assert abs(tr["gross_R"][0]) < 1e-9 and tr["exit"][0] == idx[21]
+    tr = run_positions(b, pos, 3.0, 0.0, 0.0, 1.0, 0, 0.0)
+    assert abs(tr["gross_R"][0] - 1.0) < 1e-9

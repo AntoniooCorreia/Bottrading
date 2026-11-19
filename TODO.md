@@ -182,7 +182,11 @@ Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --p
 
 ## Ideias do agente (2026-11-19, cripto sessao 3 :00)
 Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --period dev` (e `--period pre` se passar dev + confirmacao).
-- [ ] #108: k-persist-bw-half (saida parcial: metade em 1R, resto em breakeven)
-- [ ] #109: k-dc20-4h-bw-tp1 (rutura 20 velas de 4h + regime BTC + stop 6 ATR + alvo 1R)
-- [ ] #110: k-dc20-4h-bw-half (#109 com saida parcial)
-- [ ] #111: k-dc20-4h-bw-be (#109 sem alvo, stop para breakeven em +1R)
+- [x] #108: k-persist-bw-half -> REPROVADA (t +2.59; BTC +0.876R/45, ETH +0.507R/47, SOL +0.889R/32 < 60; confirmacao 5/5; win rate 42%).
+  Carteira +13.6%/ano, pior ano -6.0% (2023), pior mes -2.8%. Parcial: R/trade +0.74 (vs +0.22 da #106) mas win rate 42% (vs 54%)
+- [x] #109: k-dc20-4h-bw-tp1 -> REPROVADA (t +2.67; BTC +0.093R/157, ETH +0.048R/166, SOL +0.102R/123; confirmacao 4/5; win rate 41%).
+  Carteira +3.2%/ano, pior ano 0.0%, pior mes -4.0%
+- [x] #110: k-dc20-4h-bw-half -> REPROVADA (t +2.54; BTC +0.138R/104, ETH +0.107R/120, SOL +0.148R/89; confirmacao 4/5; win rate 36%).
+  Carteira +6.8%/ano, pior ano 0.0%, pior mes -4.9%
+- [x] #111: k-dc20-4h-bw-be -> REPROVADA por pouco (t +2.96 < 3.0; BTC +0.266R/104, ETH +0.203R/120, SOL +0.205R/89; confirmacao 5/5; win rate 35%).
+  Carteira +11.9%/ano, pior ano 0.0% (sem ano negativo), pior mes -4.9%

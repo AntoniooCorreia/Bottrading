@@ -508,4 +508,17 @@ IDEAS = {
     "k-persist-bw": (sma_persist_bull(200, 6), "4h", 6.0, 0.0, 0),
     "k-persist-bw-tp1": (sma_persist_bull(200, 6), "4h", 6.0, 1.0, 0),
     "k-dc20-d-bull-tp1": (donchian_long_bull(20, 10), "1d", 3.0, 1.0, 0),
+    # cripto sessao 3 (2026-11-19 :00): saida parcial / breakeven e rutura 20 velas de 4h (registadas em IDEAS.md antes de correr)
+    "k-persist-bw-half": (sma_persist_bull(200, 6), "4h", 6.0, 1.0, 0),
+    "k-dc20-4h-bw-tp1": (donchian_long_bull(20, 10), "4h", 6.0, 1.0, 0),
+    "k-dc20-4h-bw-half": (donchian_long_bull(20, 10), "4h", 6.0, 1.0, 0),
+    "k-dc20-4h-bw-be": (donchian_long_bull(20, 10), "4h", 6.0, 1.0, 0),
+}
+
+# saidas extra por ideia (argumentos de run_positions): partial = fracao fechada no alvo tp_r (resto com stop em breakeven);
+# be = so passa o stop para breakeven ao tocar tp_r (nao fecha nada)
+EXITS = {
+    "k-persist-bw-half": {"partial": 0.5},
+    "k-dc20-4h-bw-half": {"partial": 0.5},
+    "k-dc20-4h-bw-be": {"be": True},
 }

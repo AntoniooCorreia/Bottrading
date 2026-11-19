@@ -11,18 +11,22 @@
 | #105 | 2026-11-19 | k-persist-bw (#100 + regime BTC + stop 6 ATR) | +2.74 | 38% | +1.70 | +31.7%, -6.5% | REPROVADA (31-42 trades por moeda) |
 | #106 | 2026-11-19 | k-persist-bw-tp1 (#105 + alvo 1R) | +4.64 | 54% | +0.22 | +3.5%, -2.3% | PASSA dev; pre negativo (2 trades): REPROVADA no pre |
 | #107 | 2026-11-19 | k-dc20-d-bull-tp1 (rutura 20 dias + regime BTC + alvo 1R) | +4.43 | 60% | +0.28 | +8.6%, 0.0% | REPROVADA (SOL 57 trades < 60) |
+| #108 | 2026-11-19 | k-persist-bw-half (#105 + metade em 1R, resto em breakeven) | +2.59 | 42% | +0.74 | +13.6%, -6.0% | REPROVADA (SOL 32 trades < 60) |
+| #109 | 2026-11-19 | k-dc20-4h-bw-tp1 (#107 em 4h, stop 6 ATR, alvo 1R) | +2.67 | 41% | +0.08 | +3.2%, 0.0% | REPROVADA |
+| #110 | 2026-11-19 | k-dc20-4h-bw-half (#109 com saida parcial) | +2.54 | 36% | +0.13 | +6.8%, 0.0% | REPROVADA |
+| #111 | 2026-11-19 | k-dc20-4h-bw-be (#109 sem alvo, stop para breakeven em +1R) | +2.96 | 35% | +0.23 | +11.9%, 0.0% | REPROVADA por pouco (t < 3.0) |
 
-Leitura honesta cripto (2026-11-19, sessao das :30):
-1. Ideias cripto testadas no total: 20 (K1 = 4, 6 compras de quedas, 2 diagnosticos de alvo, #100-#107). Mais testes = mais desconfianca.
-2. Win rate >= 50% COM resultado positivo ja aparece: regime BTC (> media 200 dias) + stop largo + alvo 1R. #107 60% (+0.28R), #106 54% (+0.22R).
-3. O preco: o alvo de 1R corta o ganho por trade (#105 sem alvo +1.70R; #106 com alvo +0.22R) -> % ao ano cai de ~32% para ~3.5%.
-4. O regime BTC e o que corta os anos maus: 2022 fica a 0% (fora do mercado). Pior ano: #107 0.0%, #106 -2.3%, #105 -6.5% (#100 -20.8%).
-5. Problema do pre 2017-18: o BTC so tem media de 200 dias desde 2018-03 e esteve acima dela 9 dias -> 1-2 trades, ambos negativos. Pela regra, REPROVADA no pre; na pratica o pre nao mede estas ideias. Holdout nao foi aberto.
-6. Problema do numero de trades: com o filtro de regime a SOL (dados so desde 2020-08) fica abaixo de 60 trades (#101 53, #105 31, #107 57).
-7. Corrigido: crypto_lab.py ignorava anos sem trades na media anual (2022 com o filtro BTC); #101 passa de +32% para +26.6%/ano.
-8. Melhor win rate com resultado positivo: 60% (#107, +0.28R, nao cumpre trades na SOL); entre as que passaram o dev: 54% (#106).
-9. Nenhuma carteira cumpre ainda tudo (pre e trades). Nao se criou K2. Conta demo continua na K1.
-10. Proximo: decisao do Antonio sobre o pre (pouco informativo com filtro BTC); ideias com mais trades na SOL (ex.: 4h em vez de diario) mantendo regime + alvo.
+Leitura honesta cripto (2026-11-19, sessao das :00 n.o 3):
+1. Ideias cripto testadas no total: 24 (K1 = 4, 6 compras de quedas, 2 diagnosticos de alvo, #100-#111). Mais testes = mais desconfianca.
+2. Melhor win rate com resultado positivo: 60% (#107, +0.28R, falha trades na SOL); entre as que passaram o dev: 54% (#106, +0.22R).
+3. Saida parcial (#108, #110) e breakeven (#111) medidos: sobem o ganho por trade (2-3x o do alvo inteiro) mas NAO sobem o win rate.
+4. Causa provavel: a #106 tem ~100 trades por moeda e a #105 (mesmas entradas) ~40; o win rate de 54% vem sobretudo das RE-ENTRADAS depois do alvo (tendencia forte -> novo alvo rapido). Com metade a correr nao ha re-entrada.
+5. Em 4h a rutura de 20 velas (#109) e pior que no diario (#107): a saida de 10 velas de 4h e curta e corta as trades antes do alvo (win rate 41% vs 60%).
+6. O regime BTC continua a apagar 2022: #109-#111 nao tem nenhum ano negativo no dev. #111 (+11.9%/ano, pior ano 0%) falhou so por t 2.96.
+7. Escolha clara: win rate >= 50% (alvo inteiro, ~+3-9%/ano) OU mais % ao ano (parcial/breakeven/sem alvo, win rate 35-42%). Ainda nada da as duas coisas.
+8. Pre 2017-18 continua quase vazio com o filtro BTC (BTC acima da media de 200 dias so 9 dias em 2018): decisao do Antonio pendente.
+9. Nenhuma carteira K2 criada. Conta demo continua na K1. Holdouts abertos: so K1 e #100.
+10. Proximo: rutura no DIARIO com mais sinais (ex.: rutura de 20 dias com alvo 1R e saida de 10 dias, mas com o regime da propria moeda em vez do BTC) para a SOL passar 60 trades.
 
 # Resumo indices (ARQUIVO, custos CFD incluidos)
 
