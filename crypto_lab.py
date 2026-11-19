@@ -126,7 +126,7 @@ def main():
         doc = {"label": label, "ideas": a.ideas.split(","), "period": a.period, "mercado": "crypto",
                "criado": pd.Timestamp.now(tz="Europe/Lisbon").strftime("%Y-%m-%d %H:%M"), "nota": a.nota,
                "oficial": oficial, "oficial_passa": bool(oficial) and all(o["passa"] for o in oficial),
-               "win": round(float(100 * (p["R"] > 0).mean()), 1),
+               "win": round(float(100 * (p["R"].round(3) > 0).mean()), 1),   # breakeven nao e ganha
                "media": round(float(yearly.mean()), 2), "anos_ok": int((yearly >= 14).sum()), "anos": int(len(yearly)),
                "dd": round(dd, 2), "trades_ano": round(len(p) / max(len(yearly), 1), 1),
                "pior_mes": round(float(monthly.min()), 2), "pior_ano": round(float(yearly.min()), 2),
@@ -142,6 +142,9 @@ def main():
                 json.dump(doc, f)
             print("ficheiro:", a.out)
         if a.push:
+            os.makedirs("results/carteiras", exist_ok=True)
+            with open(f"results/carteiras/{label}.json", "w") as f:   # copia no repo (best.py le daqui)
+                json.dump(doc, f)
             # cada teste e uma carteira no painel (separador Backtesting), aprovada ou reprovada
             print(f"carteira {label} no painel:", supa.set_state("portfolio_" + label, doc))
             if a.ref:

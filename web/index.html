@@ -666,7 +666,7 @@ async function livePx(){
 }
 /* ---------- carteiras de backtesting: avaliar contra os objetivos do Antonio ---------- */
 function evalPf(P){
-  const T=P.trades||[], s=stats(T), wr=P.win??(s.n?s.wr:null), tps=P.trades_ano/52;
+  const T=P.trades||[], s=stats(T), wr=s.n?s.wr:(P.win??null), tps=P.trades_ano/52;
   const C=[];
   const add=(nome,ok,val,hard)=>C.push({nome,ok,val,hard});
   const of=P.oficial_passa, ofTxt=(P.oficial||[]).filter(o=>!o.passa).map(o=>o.ideia+": "+o.motivos.join(", ")).join(" · ");
@@ -686,19 +686,30 @@ function evalPf(P){
   const score=({aprovada:3,quase:2,reprovada:1})[st]*1e6+C.filter(c=>c.ok).length*1e4+Math.max(-9999,Math.min(9999,P.media||0));
   return {C,st,why,score,wr};
 }
+/* pontuacao pedida pelo Antonio: win rate + % total acumulado + melhor ano (percentil entre testes do mesmo periodo) */
+function pfMetrics(P){const T=P.trades||[]; const tot=T.reduce((a,t)=>a+t[4],0); const ys=Object.values(P.por_ano||{}).map(Number);
+  return {win:T.length?T.filter(t=>t[4]>0).length/T.length*100:(P.win||0),tot,best:ys.length?Math.max(...ys):0};}
+function scoreAll(L){const pool=L.filter(x=>x.p.mercado==="crypto"&&x.p.period==="dev");
+  const ks=["win","tot","best"]; pool.forEach(x=>x.m=pfMetrics(x.p));
+  pool.forEach(x=>{x.sc=Math.round(100*ks.reduce((a,k)=>a+pool.filter(y=>y.m[k]<x.m[k]).length/Math.max(1,pool.length-1),0)/3);});
+  L.forEach(x=>{if(!x.m) x.m=pfMetrics(x.p);}); return pool;}
 function vCarteiras(){
   const f=S.pfF||"all", m=S.pfM||"all";
-  const L=portfolios().map(p=>({p,e:evalPf(p)})).sort((a,b)=>b.e.score-a.e.score);
+  const L=portfolios().map(p=>({p,e:evalPf(p)})); const pool=scoreAll(L); const by=S.pfS||"pont";
+  L.sort(by==="pont"?(a,b)=>(b.sc??-1)-(a.sc??-1)||b.e.score-a.e.score:(a,b)=>b.e.score-a.e.score);
+  const top=[...pool].sort((a,b)=>b.sc-a.sc)[0];
   const cnt=k=>L.filter(x=>x.e.st===k).length;
   const vis=L.filter(x=>(f==="all"||x.e.st===f)&&(m==="all"||(m==="crypto"?x.p.mercado==="crypto":x.p.mercado!=="crypto")));
   const B={aprovada:["ok","Aprovada"],quase:["mid","Quase"],reprovada:["bad","Reprovada"]};
   const ic=v=>v===true?"✅":v===false?"❌":"⚪";
-  return `<div class="kpis">${kpi("Carteiras testadas",L.length,"cada teste do agente é uma carteira")}${kpi("Aprovadas",cnt("aprovada"),"cumprem todos os objetivos",cnt("aprovada")?"pos":"")}${kpi("Quase",cnt("quase"),"falham 1 ou 2 objetivos")}${kpi("Reprovadas",cnt("reprovada"),"falham objetivos ou a validação",cnt("reprovada")?"neg":"")}</div>
-  <div class="card"><div class="card-head"><div><h2>Ranking de carteiras</h2><p class="hint">As melhores em cima. Objetivos: estratégias validadas, pre 2017–18 ≥ 0, holdout positivo, ≥ +14%/ano, pior ano > −10%, pior mês > −5%, win rate ≥ 50%, 2–3 trades/semana. ⚪ = ainda não medido. Toca no nome para abrir a carteira no resto do painel.</p></div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">${seg([["all","Todas"],["aprovada","Aprovadas"],["quase","Quase"],["reprovada","Reprovadas"]],f,"(v=>{S.pfF=v;render()})")}${seg([["all","Tudo"],["crypto","Cripto"],["idx","Índices (arquivo)"]],m,"(v=>{S.pfM=v;render()})")}</div></div>
-  ${vis.map(({p,e})=>`<div class="pfc ${B[e.st][0]}"><div class="hd"><span class="rk">#${L.indexOf(L.find(x=>x.p===p))+1}</span><a class="nm" href="#inicio" onclick="setPf('${esc(p.id)}')">${esc(pfName(p))}</a><span class="badge ${B[e.st][0]}">${B[e.st][1]}</span>${p.id===(curPf()||{}).id?`<span class="badge neu">escolhida</span>`:""}<span class="small muted" style="margin-left:auto">${esc(p.criado||"")}${p.period?" · período "+esc(p.period):""}</span></div>
+  return `${top?`<div class="card" style="border-left:4px solid var(--accent)"><div class="card-head"><div><h2>🏆 Melhor teste: ${esc(top.p.label)} · pontuação ${top.sc}/100</h2><p class="hint">Pontuação = média do lugar em <b>win rate</b>, <b>% total acumulado</b> e <b>melhor ano</b>, entre os ${pool.length} testes cripto de 2019–2024 (100 = o melhor nos três). É esta a base que o agente usa para tentar melhorar.</p></div><a class="btn" href="#inicio" onclick="setPf('${esc(top.p.id)}')" style="text-decoration:none">Abrir</a></div>
+    <div class="kpis sm" style="margin-bottom:6px">${kpi("Win rate",nf(top.m.win,0)+"%","")}${kpi("Total acumulado",pc(top.m.tot,0),"",cls(top.m.tot))}${kpi("Melhor ano",pc(top.m.best),"",cls(top.m.best))}${kpi("Trades por semana",nf(top.p.trades_ano/52,1),"objetivo 2–3")}</div>
+    <div class="small muted">${esc(top.p.nota||"")} · ${esc(top.e.why)}</div></div>`:""}<div class="kpis">${kpi("Carteiras testadas",L.length,"cada teste do agente é uma carteira")}${kpi("Aprovadas",cnt("aprovada"),"cumprem todos os objetivos",cnt("aprovada")?"pos":"")}${kpi("Quase",cnt("quase"),"falham 1 ou 2 objetivos")}${kpi("Reprovadas",cnt("reprovada"),"falham objetivos ou a validação",cnt("reprovada")?"neg":"")}</div>
+  <div class="card"><div class="card-head"><div><h2>Ranking de carteiras</h2><p class="hint">Ordena por pontuação (win rate + total acumulado + melhor ano) ou pelos objetivos. Objetivos: estratégias validadas, pre 2017–18 ≥ 0, holdout positivo, ≥ +14%/ano, pior ano > −10%, pior mês > −5%, win rate ≥ 50%, 2–3 trades/semana. ⚪ = ainda não medido. Toca no nome para abrir a carteira no resto do painel.</p></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">${seg([["pont","Por pontuação"],["obj","Por objetivos"]],by,"(v=>{S.pfS=v;render()})")}${seg([["all","Todas"],["aprovada","Aprovadas"],["quase","Quase"],["reprovada","Reprovadas"]],f,"(v=>{S.pfF=v;render()})")}${seg([["all","Tudo"],["crypto","Cripto"],["idx","Índices (arquivo)"]],m,"(v=>{S.pfM=v;render()})")}</div></div>
+  ${vis.map(({p,e})=>`<div class="pfc ${B[e.st][0]}"><div class="hd"><span class="rk">#${L.indexOf(L.find(x=>x.p===p))+1}</span><a class="nm" href="#inicio" onclick="setPf('${esc(p.id)}')">${esc(pfName(p))}</a><span class="badge ${B[e.st][0]}">${B[e.st][1]}</span>${(()=>{const x=L.find(y=>y.p===p);return x&&x.sc!=null?`<span class="badge neu">${x.sc} pts</span>`:"";})()}${p.id===(curPf()||{}).id?`<span class="badge neu">escolhida</span>`:""}<span class="small muted" style="margin-left:auto">${esc(p.criado||"")}${p.period?" · período "+esc(p.period):""}</span></div>
     <div class="why">${esc(e.why)}${p.nota?`<div class="small muted" style="margin-top:3px">${esc(p.nota)}</div>`:""}</div>
-    <div class="mt"><span>Média <b class="${cls(p.media)}">${pc(p.media)}</b>/ano</span><span>Pior ano <b>${pc(p.pior_ano)}</b></span><span>Pior mês <b>${pc(p.pior_mes)}</b></span><span>Pior queda <b>${pc(p.dd)}</b></span><span>Win rate <b>${e.wr==null?"—":nf(e.wr,0)+"%"}</b></span><span><b>${nf(p.trades_ano/52,1)}</b> trades/sem</span></div>
+    <div class="mt"><span>Média <b class="${cls(p.media)}">${pc(p.media)}</b>/ano</span><span>Pior ano <b>${pc(p.pior_ano)}</b></span><span>Pior mês <b>${pc(p.pior_mes)}</b></span><span>Pior queda <b>${pc(p.dd)}</b></span><span>Win rate <b>${e.wr==null?"—":nf(e.wr,0)+"%"}</b></span><span>Total <b class="${cls(L.find(y=>y.p===p).m.tot)}">${pc(L.find(y=>y.p===p).m.tot,0)}</b></span><span>Melhor ano <b>${pc(L.find(y=>y.p===p).m.best)}</b></span><span><b>${nf(p.trades_ano/52,1)}</b> trades/sem</span></div>
     <div class="small muted" style="margin-top:6px">${esc((p.ideas||[]).join(" + "))}</div>
     <div class="crit">${e.C.map(c=>`<div><span>${ic(c.ok)}</span><span>${esc(c.nome)}</span><span class="v">${esc(c.val)}</span></div>`).join("")}</div></div>`).join("")||`<div class="empty">Nenhuma carteira neste filtro.</div>`}
   </div>`;

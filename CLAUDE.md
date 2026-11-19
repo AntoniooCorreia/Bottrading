@@ -21,7 +21,25 @@ Decisao do Antonio: o laboratorio de indices foi arquivado (Supabase schema `arq
   simula a K1 com precos reais da Kraken em 100 000 USD (pedido do Antonio: tudo em dolares, conta de 100k; pares XBTUSD/ETHUSD/SOLUSD); pagina "Conta demo" no dashboard; avisos no Telegram. Nenhuma ordem real.
   So troca de estrategia na demo uma variante que tenha PASSADO dev + pre + holdout, e com o OK do Antonio.
 
-## MISSAO NOTURNA (pedido do Antonio, 2026-11-18): AUMENTAR O WIN RATE SEM MATAR O RESULTADO
+## MISSAO NOTURNA ATUAL (pedido do Antonio, 2026-11-19): PEGAR NO MELHOR TESTE, PERCEBER O QUE FALHA, MELHORAR E ABRIR MAIS TRADES
+1. No inicio de CADA sessao: `python best.py`. O 1.o da lista (pontuacao = win rate + % total acumulado + melhor ano, a mesma
+   do painel Backtesting > Carteiras) e a BASE. `python best.py --label Kn` mostra o diagnostico de qualquer carteira.
+2. Le o diagnostico e escreve no IDEAS.md, ANTES de correr, o que falha na base (por moeda, por ano, por duracao das trades,
+   dias sem trade) e 4 variantes NOVAS da base, cada uma com UMA mudanca e a hipotese de porque melhora.
+3. Obrigatorio em cada sessao: pelo menos 2 das 4 variantes tem de ABRIR MAIS TRADES (o Antonio quer 2-3 por semana; a base
+   faz ~0.3-0.6/semana e reprova por < 60 trades por moeda). Caminhos com fundamento: reentrada quando a tendencia continua
+   depois de uma saida, timeframe mais curto (4h/1h) com o mesmo filtro de regime, 2.a estrategia pouco correlacionada na
+   mesma carteira (ideias separadas com virgula no --ideas), entradas em recuo dentro da tendencia alem da rutura,
+   menos filtros que cortam trades. As outras 2 atacam o que o diagnostico mostra (ex.: perdas em trades de 1-7 dias, ano negativo).
+4. Corre cada variante com `--push --nota "#1xx (base Kn): o que muda"` -> carteira nova no painel. No `--log teste` compara
+   SEMPRE com a base: win rate, % total, melhor ano, pior ano, trades/semana (antes -> depois) e "O que aprendemos".
+5. Se uma variante tiver pontuacao maior que a base, passa a ser a base da sessao seguinte (o best.py faz isso sozinho).
+   Melhor pontuacao NAO e aprovacao: so vai ao pre e ao holdout quem passar o criterio oficial (>= 60 trades por moeda, etc.).
+6. No `--log fim`: base usada, o que falhava, o que melhorou (numeros antes -> depois), nova base e proximo passo.
+Os limites e proibicoes de baixo continuam (4 ideias por sessao, 20 por noite, parametros fixos, registar antes de correr,
+nada de grelhas, nada de afinar depois do pre/holdout).
+
+## MISSAO ANTERIOR (2026-11-18): AUMENTAR O WIN RATE SEM MATAR O RESULTADO
 O Antonio quer win rate alto E bom resultado, e NAO quer anos muito negativos (prioridade: pior ano o mais perto possivel de 0, nunca abaixo de -10%). Objetivo de uma carteira cripto: win rate >= 50%, positiva em 2019-2024 e em 2017-2018,
 pior ano > -10%, pior mes > -5%, e o mais % ao ano possivel com 1% de risco por trade. Estuda, testa, analisa o porque, e volta a testar
 com variantes NOVAS registadas antes de correr. Caminhos com fundamento (escolhe e justifica no IDEAS.md):
