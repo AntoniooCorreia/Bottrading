@@ -456,3 +456,23 @@ Fasquia (criterio oficial cripto, fixo): >= 60 trades em CADA uma de BTC/ETH/SOL
 positiva em >= 3/5 moedas extra; depois --period pre >= 0. Reportar sempre win rate e R por trade, pior ano e pior mes da carteira.
 Nota: com qualquer filtro de media de 200 dias o pre 2017-18 fica quase vazio (os dados comecam em 2017-08; a media so existe
 a partir de ~2018-03, ja em mercado de baixa). Isto e conhecido antes de correr.
+
+## 2026-11-19 cripto - sessao 5 (:00) (ate 4 ideias; ideias cripto testadas antes: 28; hoje: 16 de 20 antes desta sessao) - registadas antes de correr
+Leitura das sessoes 1-4: a #113 (moeda acima da media de 100 dias + BTC acima da media de 200 dias, alvo 1R = stop 3 ATR(14) diario,
+volta a entrar depois de cada alvo enquanto a tendencia dura) e a unica com win rate > 50%, ~+10%/ano e nenhum ano negativo no
+dev (247 trades, t +4.78, confirmacao 4/5). Mecanismo: aposta simetrica com deriva positiva a favor. Duas perguntas, uma mudanca
+de cada vez contra a #113, parametros fixos ja usados no projeto (100, 200, 600 = 100 dias em 4h, 6 ATR de 4h, 1R).
+Primeiro lote (2 ideias); o segundo lote (ate 2) so e registado depois de ler estes resultados, tambem antes de correr.
+- **#116 k-sma100-d-b100-tp1** (1d): a #113 com o regime do BTC MAIS RAPIDO: BTC fechou o dia anterior acima da sua media de
+  100 dias (em vez de 200). Resto igual (entra: moeda fecha acima da media de 100 dias; sai: fecha abaixo; stop 3 ATR(14) diario;
+  alvo 1R; volta a entrar). Hipotese: a media de 200 dias liga tarde nas recuperacoes (2019 T2, 2020 T2, 2023 T1), que sao
+  precisamente as fases de deriva forte; a de 100 liga mais cedo -> mais trades boas. Risco: liga tambem nas subidas de alivio
+  de 2022 (mar-abr e jul-ago) -> pior ano pode ficar negativo. Efeito conhecido antes de correr: o pre 2017-18 passa a ter
+  algumas trades (media de 100 dias existe desde ~dez 2017), quase todas em mercado de baixa.
+- **#117 k-sma600-4h-bull-tp1** (4h): a #113 em velas de 4h: entra ao fechar acima da media de 600 velas de 4h (= 100 dias)
+  com o BTC acima da media de 200 dias; sai ao fechar abaixo; stop 6 ATR(14) de 4h (~2.5 ATR diario, o stop largo de 4h ja
+  usado); alvo 1R. Hipotese: o mesmo mecanismo, mas depois de cada alvo volta a entrar 4h depois em vez de no dia seguinte,
+  e o alvo fica mais perto (~6-8%) -> mais ciclos e mais trades com a mesma deriva. Risco: serras a volta da media em 4h
+  (o problema das trades curtas da k-sma200-4h) e custos maiores em R (~0.08R).
+Fasquia (criterio oficial cripto, fixo): >= 60 trades em CADA uma de BTC/ETH/SOL, meanR > 0 em cada, t junto >= 3.0, CONFIRMACAO
+positiva em >= 3/5 moedas extra; depois --period pre >= 0. Reportar sempre win rate e R por trade, pior ano e pior mes da carteira.

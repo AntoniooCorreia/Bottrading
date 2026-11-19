@@ -198,3 +198,8 @@ Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --p
   carteira +10.0%/ano, pior ano 0.0%, pior mes -2.8%). Pre 2017-18: 1 trade (ETH -0.26R) -> REPROVADA no pre (regra: pre >= 0). Holdout NAO aberto
 - [x] #114: k-pb-d-bull-tp1 -> REPROVADA (t +1.82; +0.12R/trade; win rate 66%; SOL 33 trades; pior ano -3.2%, pior mes -5.1%)
 - [x] #115: k-dc20-d-own-be -> REPROVADA (20-25 trades por moeda; t +1.93; +1.74R/trade; win rate 50%; +19.7%/ano mas 2021 +95% e 2023 -7.3%)
+
+## Ideias do agente (2026-11-19, cripto sessao 5 :00)
+Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --period dev` (e `--period pre` se passar dev + confirmacao).
+- [ ] #116: k-sma100-d-b100-tp1 (#113 com regime BTC > media de 100 dias)
+- [ ] #117: k-sma600-4h-bull-tp1 (#113 em 4h: media 600 velas, stop 6 ATR de 4h, alvo 1R)
