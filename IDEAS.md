@@ -476,3 +476,21 @@ Primeiro lote (2 ideias); o segundo lote (ate 2) so e registado depois de ler es
   (o problema das trades curtas da k-sma200-4h) e custos maiores em R (~0.08R).
 Fasquia (criterio oficial cripto, fixo): >= 60 trades em CADA uma de BTC/ETH/SOL, meanR > 0 em cada, t junto >= 3.0, CONFIRMACAO
 positiva em >= 3/5 moedas extra; depois --period pre >= 0. Reportar sempre win rate e R por trade, pior ano e pior mes da carteira.
+Resultado do primeiro lote (antes de registar o segundo): #116 passa dev (t +4.63, win rate 53%) mas 2022 fica -4.9% (o risco
+previsto) e o pre e ~0 (+0.11R em 20 trades); holdout 2025-26 +0.04R/trade, win rate 46%: o efeito quase desaparece. #117 (4h)
+passa o dev com win rate so 40%: as saidas no cruzamento da media em 4h sao muitas perdas pequenas (serras). Leitura: o win rate
+> 50% vem da deriva forte (2020-21, 2023-24); onde a tendencia e fraca ou lateral (2025-26) a aposta simetrica e moeda ao ar, e
+as saidas pelo sinal (fecho abaixo da media) transformam trades em perdas pequenas que contam como perdas.
+Segundo lote (2 ideias, ultimas da noite: 20 de 20), uma mudanca de cada vez contra a #113:
+- **#118 k-sma100-d-bull-bracket** (1d): entradas iguais a #113 (moeda fecha acima da media de 100 dias, BTC acima da media de
+  200 dias), mas SEM saida pelo sinal: a trade so sai no alvo de 1R ou no stop de 3 ATR(14) diario (aposta simetrica pura).
+  Depois de sair, so volta a entrar se a condicao de entrada ainda estiver ativa. Hipotese: o fecho abaixo da media corta trades
+  que, com deriva positiva, chegariam ao alvo; sem essa saida cada trade e +1R ou -1R e o win rate mede diretamente a deriva
+  -> win rate > 53%. Risco: perdas de -1R inteiras quando a tendencia acaba (2022) em vez de perdas pequenas.
+  Mudanca no motor: run_positions ganha 'signal_exit' (True = como sempre; False = o sinal so serve para entrar).
+- **#119 k-sma100-d-slope-tp1** (1d): a #113 so com entradas quando a media de 100 dias da moeda esta a SUBIR (media de hoje
+  acima da de ha 20 dias). Saida, stop e alvo iguais. Hipotese: preco acima de uma media plana e lateral (tipo 2025-26 ou 2019 T3),
+  onde a aposta simetrica e moeda ao ar; media a subir = deriva real -> win rate maior e pior ano melhor. Risco: menos trades
+  (a SOL tinha 69 na #113; pode cair abaixo de 60).
+Fasquia (criterio oficial cripto, fixo): >= 60 trades em CADA uma de BTC/ETH/SOL, meanR > 0 em cada, t junto >= 3.0, CONFIRMACAO
+positiva em >= 3/5 moedas extra; depois --period pre >= 0. Reportar sempre win rate e R por trade, pior ano e pior mes da carteira.

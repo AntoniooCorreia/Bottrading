@@ -201,5 +201,11 @@ Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --p
 
 ## Ideias do agente (2026-11-19, cripto sessao 5 :00)
 Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --period dev` (e `--period pre` se passar dev + confirmacao).
-- [ ] #116: k-sma100-d-b100-tp1 (#113 com regime BTC > media de 100 dias)
-- [ ] #117: k-sma600-4h-bull-tp1 (#113 em 4h: media 600 velas, stop 6 ATR de 4h, alvo 1R)
+- [x] #116: k-sma100-d-b100-tp1 -> PASSA dev (t +4.63; BTC +0.267R/89, ETH +0.180R/93, SOL +0.264R/73; win rate 53%; confirmacao 4/5;
+  carteira +10.0%/ano, pior ano -4.9% (2022), pior mes -2.8%). Pre 2017-18: 20 trades, +0.006R/trade (BTC -0.05R/12, ETH +0.09R/8) -> >= 0, passa por um fio.
+  Holdout 2025-26 (UMA vez): +0.044R/trade (BTC -0.02R/17, ETH +0.19R/17, SOL -0.02R/22), win rate 46%, confirmacao 3/5, 2025 +4.3%, 2026 -1.8%
+  -> REPROVADA (< 60 trades; efeito quase nulo). Holdout gasto
+- [x] #117: k-sma600-4h-bull-tp1 -> PASSA dev (t +3.78; BTC +0.190R/121, ETH +0.077R/133, SOL +0.170R/98; win rate 40%; confirmacao 5/5;
+  carteira +4.4%/ano, pior ano 0.0%, pior mes -2.7%). Pre 2017-18: 1 trade (ETH -0.66R) -> REPROVADA no pre. Holdout NAO aberto
+- [ ] #118: k-sma100-d-bull-bracket (#113 sem saida pelo sinal: so alvo 1R ou stop)
+- [ ] #119: k-sma100-d-slope-tp1 (#113 so com a media de 100 dias a subir vs ha 20 dias)

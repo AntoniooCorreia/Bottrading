@@ -32,3 +32,9 @@
   Leitura: positiva nas 3 moedas principais (a K1 deu -10.9% em 2025), mas falha nas moedas de confirmacao -> sinal misto, nao
   conta como robusta. Win rate continua baixo (~30%) e o pior ano no dev e -20.8%. Aquecimento: a media de 200 velas de 4h so
   existe a partir de ~fev/2025 (o laboratorio carrega so 2025+). Nao se afina nada depois disto; o holdout desta variante fica gasto.
+- 2026-11-19 cripto #116 `k-sma100-d-b100-tp1` (a #113 com regime BTC > media de 100 dias; PASSA no dev: t 4.63, win rate 53%,
+  confirmacao 4/5; pre 2017-18 +0.006R/trade em 20 trades, >= 0) -> holdout 2025-01-01 ate ao fim dos dados, UMA vez, custos Kraken:
+  BTC -0.016R/17, ETH +0.185R/17, SOL -0.019R/22; junto 56 trades +0.044R, t 0.37, win rate 46%. Confirmacao 3/5 (XRP +0.07,
+  ADA -0.14, DOGE -0.11, LINK +0.06, AVAX +0.04). Carteira: 2025 +4.3%, 2026 -1.8%, pior mes -4.6%, pior queda -6.9%.
+  Veredicto automatico REPROVADA (< 60 trades por moeda). Leitura: positiva mas quase zero; o win rate cai de 53% para 46%.
+  A aposta simetrica precisa de deriva forte, que 2025-26 nao teve. Holdout gasto; nada se afina depois disto.
