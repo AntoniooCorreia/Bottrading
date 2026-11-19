@@ -196,6 +196,8 @@ def btc_bull_regime(index: pd.DatetimeIndex, btc_daily: pd.DataFrame | None = No
     """True quando o BTC FECHOU o dia (UTC) anterior acima da media de 200 dias. So usa dias ja fechados:
     o valor do dia D vale a partir das 00:00 de D+1. Fora do intervalo dos dados do BTC (ex.: velas sinteticas dos testes)
     devolve None para a ideia usar o regime da propria serie."""
+    if len(index) == 0:      # moeda sem dados no periodo (ex.: SOL em 2017-2018)
+        return pd.Series(False, index=index, dtype=bool)
     if btc_daily is None:
         try:
             from .swing import load_tf
@@ -256,6 +258,17 @@ def dip_hold(n_trend: int, n_low: int, hold: int):
                 pos[i] = 1
                 left = hold   # posicao vive da vela i+1 a i+hold; sai no fecho da vela i+hold
         return pd.Series(pos, index=b.index)
+    return f
+
+
+def sma_persist_bull(n: int, k: int):
+    """sma_persist, mas so ENTRA com o BTC acima da media de 200 dias (dia anterior fechado). Saida igual (k fechos abaixo)."""
+    def f(b: pd.DataFrame) -> pd.Series:
+        c = b["close"]
+        sma = c.rolling(n).mean()
+        above = (c > sma).astype(int).rolling(k).sum() == k
+        below = (c < sma).astype(int).rolling(k).sum() == k
+        return _enter_exit(above & sma.notna() & _regime(b, 200), below)
     return f
 
 
@@ -490,4 +503,9 @@ IDEAS = {
     "k-dc55-4h-btcbull": (donchian_long_bull(55, 20), "4h", 3.0, 0.0, 0),
     "k-dc55-4h-wide": (donchian_long(55, 20), "4h", 6.0, 0.0, 0),
     "k-dip-hold-4h": (dip_hold(600, 30, 42), "4h", 6.0, 0.0, 0),
+    # cripto sessao 2 (2026-11-19 :30): regime BTC + stop largo + alvo 1R (registadas em IDEAS.md antes de correr)
+    "k-dc55-4h-bw-tp1": (donchian_long_bull(55, 20), "4h", 6.0, 1.0, 0),
+    "k-persist-bw": (sma_persist_bull(200, 6), "4h", 6.0, 0.0, 0),
+    "k-persist-bw-tp1": (sma_persist_bull(200, 6), "4h", 6.0, 1.0, 0),
+    "k-dc20-d-bull-tp1": (donchian_long_bull(20, 10), "1d", 3.0, 1.0, 0),
 }

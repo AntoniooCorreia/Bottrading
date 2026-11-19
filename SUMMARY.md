@@ -4,21 +4,25 @@
 |---|---|---|---|---|---|---|---|
 | K1 | 2026-11-18 | k-donchian20-d + k-sma100-d + k-donchian55-4h + k-sma200-4h | - | 21% | - | +52%, -21.0% | holdout 2025 -10.9%: nao robusta |
 | #100 | 2026-11-19 | k-sma200-4h-persist (6 fechos de 4h seguidos acima/abaixo da media 200) | +3.06 | 28% | +2.04 | +70%, -20.8% | **PASSA dev + pre**; holdout BTC/ETH/SOL +0.79R mas confirmacao 1/5: misto |
-| #101 | 2026-11-19 | k-dc55-4h-btcbull (rutura 55 velas so com BTC > media 200 dias) | +3.02 | 34% | +0.77 | +32%, sem ano negativo | REPROVADA (SOL 53 trades < 60) |
+| #101 | 2026-11-19 | k-dc55-4h-btcbull (rutura 55 velas so com BTC > media 200 dias) | +3.02 | 34% | +0.77 | +26.6% (corrigido: 2022 = 0%), sem ano negativo | REPROVADA (SOL 53 trades < 60) |
 | #102 | 2026-11-19 | k-dc55-4h-wide (rutura 55 velas, stop 6 ATR) | +3.44 | 42% | +0.44 | +17%, -4.9% | REPROVADA (SOL 59 trades < 60) |
 | #103 | 2026-11-19 | k-dip-hold-4h (minimo de 5 dias em tendencia, segura 7 dias) | +0.77 | 49% | +0.04 | +1.6%, -4.0% | REPROVADA |
+| #104 | 2026-11-19 | k-dc55-4h-bw-tp1 (#101 + stop 6 ATR + alvo 1R) | +3.05 | 47% | +0.14 | +2.2%, -0.5% | PASSA dev; pre negativo (1 trade): REPROVADA no pre |
+| #105 | 2026-11-19 | k-persist-bw (#100 + regime BTC + stop 6 ATR) | +2.74 | 38% | +1.70 | +31.7%, -6.5% | REPROVADA (31-42 trades por moeda) |
+| #106 | 2026-11-19 | k-persist-bw-tp1 (#105 + alvo 1R) | +4.64 | 54% | +0.22 | +3.5%, -2.3% | PASSA dev; pre negativo (2 trades): REPROVADA no pre |
+| #107 | 2026-11-19 | k-dc20-d-bull-tp1 (rutura 20 dias + regime BTC + alvo 1R) | +4.43 | 60% | +0.28 | +8.6%, 0.0% | REPROVADA (SOL 57 trades < 60) |
 
-Leitura honesta cripto (2026-11-19):
-1. Ideias cripto testadas no total: 16 (K1 = 4, 6 compras de quedas, 2 diagnosticos de alvo, #100-#103). Mais testes = mais desconfianca.
-2. O win rate baixo da K1 vem das "serras": 431 de 974 trades duram <= 1 dia e perdem todas.
-3. #100 (persistencia de 1 dia) corta as serras: win rate 16% -> 28%, R/trade x2.6. Passou dev e pre; holdout bom nas 3 moedas, fraco nas de confirmacao.
-4. #102 (stop largo) tem o melhor perfil de risco: win rate 42%, pior ano -4.9%, pior mes -5.0%; reprovou por 1 trade na SOL.
-5. #101 (filtro BTC > media 200 dias) apaga 2022 (sem ano negativo no dev), mas corta trades a mais para o criterio.
-6. Win rate perto de 50% so aparece com saidas curtas ou compras de quedas (#103, K1 com alvo 1R) e ai o ganho ~0 depois de custos.
-7. Melhor win rate com resultado positivo: 49% (K1 com alvo 1R, +0.10R; #103 +0.04R ~0). Entre ideias que passaram: 28% (#100).
-8. Nenhuma carteira cumpre ainda o objetivo (win rate >= 50%, pior ano > -10%). Nao se criou K2 (so #100 passou e nao melhora o pior ano).
-9. Proximo: juntar as tres mudancas que funcionaram (persistencia, stop largo, regime BTC) numa variante NOVA registada antes, sem afinar.
-10. Conta demo continua na K1; nada muda sem uma variante que passe dev + pre + holdout e o OK do Antonio.
+Leitura honesta cripto (2026-11-19, sessao das :30):
+1. Ideias cripto testadas no total: 20 (K1 = 4, 6 compras de quedas, 2 diagnosticos de alvo, #100-#107). Mais testes = mais desconfianca.
+2. Win rate >= 50% COM resultado positivo ja aparece: regime BTC (> media 200 dias) + stop largo + alvo 1R. #107 60% (+0.28R), #106 54% (+0.22R).
+3. O preco: o alvo de 1R corta o ganho por trade (#105 sem alvo +1.70R; #106 com alvo +0.22R) -> % ao ano cai de ~32% para ~3.5%.
+4. O regime BTC e o que corta os anos maus: 2022 fica a 0% (fora do mercado). Pior ano: #107 0.0%, #106 -2.3%, #105 -6.5% (#100 -20.8%).
+5. Problema do pre 2017-18: o BTC so tem media de 200 dias desde 2018-03 e esteve acima dela 9 dias -> 1-2 trades, ambos negativos. Pela regra, REPROVADA no pre; na pratica o pre nao mede estas ideias. Holdout nao foi aberto.
+6. Problema do numero de trades: com o filtro de regime a SOL (dados so desde 2020-08) fica abaixo de 60 trades (#101 53, #105 31, #107 57).
+7. Corrigido: crypto_lab.py ignorava anos sem trades na media anual (2022 com o filtro BTC); #101 passa de +32% para +26.6%/ano.
+8. Melhor win rate com resultado positivo: 60% (#107, +0.28R, nao cumpre trades na SOL); entre as que passaram o dev: 54% (#106).
+9. Nenhuma carteira cumpre ainda tudo (pre e trades). Nao se criou K2. Conta demo continua na K1.
+10. Proximo: decisao do Antonio sobre o pre (pouco informativo com filtro BTC); ideias com mais trades na SOL (ex.: 4h em vez de diario) mantendo regime + alvo.
 
 # Resumo indices (ARQUIVO, custos CFD incluidos)
 

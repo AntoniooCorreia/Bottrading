@@ -84,6 +84,7 @@ def main():
         keep.append(i)
     p = allt.loc[keep].sort_values("t")
     yearly = p.groupby(p["t"].dt.year)["R"].sum()
+    yearly = yearly.reindex(range(int(yearly.index.min()), int(yearly.index.max()) + 1), fill_value=0.0)   # anos sem trades contam 0%
     rng = pd.period_range(p["t"].min(), p["t"].max(), freq="M")
     mg = p.groupby([p["t"].dt.year, p["t"].dt.month])["R"].sum()
     monthly = pd.Series([float(mg.get((q.year, q.month), 0.0)) for q in rng], index=[str(q) for q in rng])
