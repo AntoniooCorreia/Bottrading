@@ -162,3 +162,10 @@ Registada em IDEAS.md antes de correr. Fasquia t >= 3.0 (custos de futuros). Cor
 
 ## Cripto (2026-11-18, missao noturna: aumentar o win rate sem matar o resultado)
 Sem itens [ ]: o agente entra em modo ideias (ver CLAUDE.md, seccao MISSAO NOTURNA). Cada ideia nova entra aqui antes de correr.
+
+## Ideias do agente (2026-11-19, cripto sessao 1)
+Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --period dev` (e `--period pre` se passar dev + confirmacao).
+- [ ] #100: k-sma200-4h-persist (persistencia de 1 dia contra as serras)
+- [ ] #101: k-dc55-4h-btcbull (rutura de 55 velas so com BTC acima da media de 200 dias)
+- [ ] #102: k-dc55-4h-wide (rutura de 55 velas com stop de 6 ATR)
+- [ ] #103: k-dip-hold-4h (minimo de 5 dias em tendencia, segura 7 dias)

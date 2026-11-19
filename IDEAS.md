@@ -353,3 +353,30 @@ Custos Kraken spot 0.26% por lado + 0.05% slippage. Mercados: BTC, ETH, SOL.
 Pergunta: quanto win rate se ganha e quanto resultado se perde se a K1 fechar com alvo fixo em vez de deixar correr.
 Variantes: as 4 estrategias da K1 iguais (entrada, stop 3 ATR, saida por sinal) + alvo fixo de 1R (k1-tp1) e de 2R (k1-tp2).
 Periodo: so dev 2019-2024 (holdout da K1 ja foi visto: nao conta como validacao). E um diagnostico, nao uma ideia nova para operar.
+
+## 2026-11-19 cripto - sessao 1 (4 ideias; ideias cripto testadas antes: ~12 (K1 = 4, 6 compras de quedas, 2 diagnosticos de alvo); hoje: 4 de 12) - registadas antes de correr
+Diagnostico previo (so dev 2019-2024, trades da K1 ja conhecidas): 431 das 974 trades da K1 duram <= 1 dia e TODAS perdem
+(-0.45R em media): sao "serras" (entra e sai logo). 315 delas sao da k-sma200-4h (cruza a media para cima e para baixo).
+Sem as trades curtas o win rate das restantes seria ~44%. Na k-donchian55-4h, 64 trades sao paradas pelo stop no 1.o dia
+(3 ATR de 4h e apertado para o ruido da rutura). Trades com BTC abaixo da media de 200 dias: positivas em media, mas 2022 (-50R)
+e quase todo desse regime. Daqui saem 4 ideias (parametros fixos, uma mudanca de cada vez contra a K1):
+- **#100 k-sma200-4h-persist** (4h): a k-sma200-4h com PERSISTENCIA contra as serras. Hipotese: um cruzamento da media que dura
+  um dia inteiro e uma mudanca de tendencia; um que dura 1-2 velas e ruido. Entrada: os ultimos 6 fechos de 4h (1 dia) todos
+  acima da media de 200 velas de 4h. Saida: os ultimos 6 fechos todos abaixo. Stop 3 ATR(14) de 4h, sem alvo, sem tempo maximo.
+  Espera-se: muito menos trades curtas, win rate a subir de 16% para 30%+, R por trade igual ou maior.
+- **#101 k-dc55-4h-btcbull** (4h): a k-donchian55-4h so com ENTRADAS quando o BTC fechou o dia anterior acima da media de 200 dias
+  (filtro de regime; as moedas seguem o BTC). Saida igual (fecho abaixo do minimo de 20 velas) e stop 3 ATR(14) de 4h.
+  Hipotese: as ruturas em mercado de baixa (2018, 2022) sao subidas de alivio que falham; cortar o pior ano (2022) sem perder muito.
+- **#102 k-dc55-4h-wide** (4h): a k-donchian55-4h com stop de 6 ATR(14) de 4h em vez de 3 (~1 dia de volatilidade).
+  Hipotese: logo a seguir a uma rutura o preco volta muitas vezes a testar o nivel; 3 ATR de 4h e apanhado por esse ruido.
+  Stop mais largo -> menos stops no 1.o dia (win rate maior) e custos menores em R (posicao mais pequena). R por trade vai baixar
+  mecanicamente (o mesmo movimento vale menos R): reportar os dois.
+- **#103 k-dip-hold-4h** (4h): COMPRAR RECUO DENTRO DA TENDENCIA e segurar 7 dias. Entrada: BTC fechou o dia anterior acima da
+  media de 200 dias E a moeda fecha acima da sua media de 600 velas de 4h (~100 dias) E o fecho de 4h e o mais baixo das ultimas
+  30 velas (minimo de 5 dias). Saida: ao fim de 42 velas de 4h (7 dias) ou stop de 6 ATR(14) de 4h; sem alvo.
+  Hipotese: em regime de alta a cripto sobe em media (deriva forte); comprar um minimo de 5 dias e segurar 7 dias apanha essa
+  deriva -> win rate > 50%. Diferente das compras de quedas ja testadas (saiam ao fim de 1-3 dias com ganho medio < custos):
+  aqui o tempo de posse e longo para o ganho medio passar bem os ~0.57% de custos. Nota do motor: se o stop for tocado e o
+  sinal ainda estiver ativo, o motor volta a entrar (regra comum a todas as ideias).
+Fasquia (criterio oficial cripto): >= 60 trades em CADA uma de BTC/ETH/SOL, meanR > 0 em cada, t junto >= 3.0, CONFIRMACAO
+positiva em >= 3/5 moedas extra; depois --period pre >= 0. Reportar sempre win rate e R por trade.
