@@ -46,6 +46,19 @@ nav a{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8p
 nav a:hover{background:var(--surface-2);color:var(--text)}
 nav a.on{background:var(--accent-soft);color:var(--accent);font-weight:600}
 nav a svg{width:17px;height:17px;flex:none}
+nav .grp{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3);font-weight:600;padding:14px 10px 4px}
+nav .grp:first-child{padding-top:4px}
+.mob-nav .sep{flex:none;width:1px;background:var(--border);margin:4px 4px}
+.pfc{border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:10px;background:var(--surface)}
+.pfc.ok{border-left:4px solid var(--pos)}.pfc.mid{border-left:4px solid var(--warn)}.pfc.bad{border-left:4px solid var(--neg)}
+.pfc .hd{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pfc .rk{font-weight:700;color:var(--text-3);min-width:26px}
+.pfc .nm{font-weight:650;font-size:15px}
+.pfc .why{font-size:13px;margin:6px 0 8px;color:var(--text-2)}
+.pfc .mt{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--text-2);font-variant-numeric:tabular-nums}
+.pfc .mt b{color:var(--text)}
+.crit{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:4px 14px;margin-top:8px;font-size:12px}
+.crit div{display:flex;gap:6px}.crit .v{margin-left:auto;font-variant-numeric:tabular-nums;color:var(--text-2)}
 .side-foot{margin-top:auto;font-size:12px;color:var(--text-3);padding:0 10px;display:flex;flex-direction:column;gap:8px}
 main{min-width:0;padding:22px 28px 60px}
 .top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
@@ -241,29 +254,31 @@ const S={data:null,pf:store("bt_pf")||"ref",acc:+(store("bt_acc")||100000),route
   j:"all"};
 
 const ROUTES=[
-  ["demo","Conta demo",'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>'],
+  ["demo","Conta demo",'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>',"Demo"],
+  ["carteiras","Carteiras",'<rect x="3" y="6" width="18" height="14" rx="2"/><path d="M3 10h18M16 15h2M8 6V4h8v2"/>',"Backtesting"],
   ["inicio","Visão geral",'<path d="M3 12l9-8 9 8M5 10v10h14V10"/>'],
   ["calendario","Calendário",'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>'],
   ["periodos","Meses e semanas",'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'],
   ["trades","Trades",'<path d="M4 6h16M4 12h16M4 18h10"/>'],
   ["indices","Índices e estratégias",'<circle cx="12" cy="12" r="9"/><path d="M12 3v9l6 5"/>'],
   ["testes","Testes",'<path d="M9 3h6M10 3v6l-5 9a2 2 0 002 3h10a2 2 0 002-3l-5-9V3"/>'],
-  ["diario","Diário do agente",'<path d="M5 4h11a3 3 0 013 3v13H8a3 3 0 01-3-3z"/><path d="M9 9h6M9 13h6"/>'],
+  ["diario","Diário do agente",'<path d="M5 4h11a3 3 0 013 3v13H8a3 3 0 01-3-3z"/><path d="M9 9h6M9 13h6"/>',"Agente"],
   ["plano","Plano e ideias",'<path d="M9 6h11M9 12h11M9 18h11M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"/>'],
 ];
 function renderNav(){
   const ic=p=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
-  document.getElementById("nav").innerHTML=ROUTES.map(([k,l,p])=>`<a href="#${k}" class="${S.route===k?"on":""}">${ic(p)}${l}</a>`).join("");
-  document.getElementById("mnav").innerHTML=ROUTES.map(([k,l])=>`<a href="#${k}" class="${S.route===k?"on":""}">${l}</a>`).join("");
+  document.getElementById("nav").innerHTML=ROUTES.map(([k,l,p,g])=>`${g?`<div class="grp">${g}</div>`:""}<a href="#${k}" class="${S.route===k?"on":""}">${ic(p)}${l}</a>`).join("");
+  document.getElementById("mnav").innerHTML=ROUTES.map(([k,l,p,g],i)=>`${g&&i?`<span class="sep"></span>`:""}<a href="#${k}" class="${S.route===k?"on":""}">${l}</a>`).join("");
 }
 function setTheme(v){ if(v) document.documentElement.setAttribute("data-theme",v); else document.documentElement.removeAttribute("data-theme"); store("bt_theme",v); if(S.data) render(); }
 function setPf(v){S.pf=v;store("bt_pf",v);S.cal.y=null;S.per.y=null;S.tr.page=0;render();}
 function setAcc(v){S.acc=Math.max(100,+v||100000);store("bt_acc",S.acc);render();}
 
 /* ---------- dados da carteira ---------- */
-function portfolios(){const d=S.data; if(!d) return []; return [d.portfolio?{id:"ref",...d.portfolio,ref:true}:null,...d.extra.map(p=>({id:p.label,...p}))].filter(Boolean);}
+function portfolios(){const d=S.data; if(!d) return []; return [d.portfolio?{id:"ref",...d.portfolio,ref:true}:null,...d.extra.map(p=>({id:p.label,...p})),...(S.arq||[]).map(p=>({id:"arq_"+p.label,...p,arquivo:true}))].filter(Boolean);}
 function curPf(){const L=portfolios(); return L.find(p=>p.id===S.pf)||L[0]||null;}
-function pfName(P){return (P.aviso?"⚠ ":"")+(P.label?P.label+" · ":"")+(P.ref?"Referência":"Carteira")+" ("+(P.markets&&P.markets.length?P.markets.length:new Set(P.por_indice.map(r=>r.indice)).size)+" índices)";}
+function pfName(P){const n=P.markets&&P.markets.length?P.markets.length:new Set((P.por_indice||[]).map(r=>r.indice)).size;
+  return (P.aviso?"⚠ ":"")+(P.label?P.label+" · ":"")+(P.ref?"Referência · demo":P.arquivo?"Arquivo índices":"Carteira")+" ("+n+(P.mercado==="crypto"?" moedas":" índices")+")";}
 /* agrega trades por dia de saida: {date:{r,n,w,list}} */
 function dayMap(trades){const m={}; for(const t of trades){const k=t[1]; const o=m[k]||(m[k]={r:0,n:0,w:0,list:[]}); o.r+=t[4]; o.n++; if(t[4]>0)o.w++; o.list.push(t);} return m;}
 function filtTrades(P,mk,idea){return (P.trades||[]).filter(t=>(mk==="all"||t[2]===mk)&&(idea==="all"||t[3]===idea));}
@@ -649,15 +664,53 @@ async function livePx(){
     S.demo={...(S.demo||{}),px,chg,pxAt:new Date()}; if(S.route==="demo"&&S.demo.acc) render();
   }catch(e){}
 }
+/* ---------- carteiras de backtesting: avaliar contra os objetivos do Antonio ---------- */
+function evalPf(P){
+  const T=P.trades||[], s=stats(T), wr=P.win??(s.n?s.wr:null), tps=P.trades_ano/52;
+  const C=[];
+  const add=(nome,ok,val,hard)=>C.push({nome,ok,val,hard});
+  const of=P.oficial_passa, ofTxt=(P.oficial||[]).filter(o=>!o.passa).map(o=>o.ideia+": "+o.motivos.join(", ")).join(" · ");
+  add("Estratégias validadas (critério oficial)",of===undefined?null:of,of===undefined?"não registado":of?"todas passam":ofTxt||"não passa",true);
+  add("Holdout 2025–26 positivo",P.holdout_ok===undefined?null:P.holdout_ok,P.holdout_txt||(P.holdout_ok===undefined?"ainda não aberto":""),true);
+  add("Média ≥ +14% por ano",P.media>=14,pc(P.media),false);
+  add("Pior ano acima de −10%",P.pior_ano>-10,pc(P.pior_ano),false);
+  add("Pior mês acima de −5%",P.pior_mes>-5,pc(P.pior_mes),false);
+  add("Win rate ≥ 50%",wr==null?null:wr>=50,wr==null?"—":nf(wr,0)+"%",false);
+  add("2–3 trades por semana",tps>=2,nf(tps,1)+"/semana",false);
+  if(P.aviso) add("Números corretos",false,"inflacionados (erro corrigido)",true);
+  const fails=C.filter(c=>c.ok===false), hard=fails.some(c=>c.hard)||P.media<=0;
+  const st=!fails.length?"aprovada":(!hard&&fails.length<=2)?"quase":"reprovada";
+  const why=st==="aprovada"?"Cumpre todos os objetivos"+(C.some(c=>c.ok===null)?" medidos até agora":"")+".":
+    (st==="quase"?"Quase: falha só ":"Reprovada: ")+fails.map(c=>c.nome.toLowerCase()+" ("+c.val+")").join("; ")+".";
+  const score=({aprovada:3,quase:2,reprovada:1})[st]*1e6+C.filter(c=>c.ok).length*1e4+Math.max(-9999,Math.min(9999,P.media||0));
+  return {C,st,why,score,wr};
+}
+function vCarteiras(){
+  const f=S.pfF||"all", m=S.pfM||"all";
+  const L=portfolios().map(p=>({p,e:evalPf(p)})).sort((a,b)=>b.e.score-a.e.score);
+  const cnt=k=>L.filter(x=>x.e.st===k).length;
+  const vis=L.filter(x=>(f==="all"||x.e.st===f)&&(m==="all"||(m==="crypto"?x.p.mercado==="crypto":x.p.mercado!=="crypto")));
+  const B={aprovada:["ok","Aprovada"],quase:["mid","Quase"],reprovada:["bad","Reprovada"]};
+  const ic=v=>v===true?"✅":v===false?"❌":"⚪";
+  return `<div class="kpis">${kpi("Carteiras testadas",L.length,"cada teste do agente é uma carteira")}${kpi("Aprovadas",cnt("aprovada"),"cumprem todos os objetivos",cnt("aprovada")?"pos":"")}${kpi("Quase",cnt("quase"),"falham 1 ou 2 objetivos")}${kpi("Reprovadas",cnt("reprovada"),"falham objetivos ou a validação",cnt("reprovada")?"neg":"")}</div>
+  <div class="card"><div class="card-head"><div><h2>Ranking de carteiras</h2><p class="hint">As melhores em cima. Objetivos: estratégias validadas, holdout positivo, ≥ +14%/ano, pior ano > −10%, pior mês > −5%, win rate ≥ 50%, 2–3 trades/semana. ⚪ = ainda não medido. Toca no nome para abrir a carteira no resto do painel.</p></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">${seg([["all","Todas"],["aprovada","Aprovadas"],["quase","Quase"],["reprovada","Reprovadas"]],f,"(v=>{S.pfF=v;render()})")}${seg([["all","Tudo"],["crypto","Cripto"],["idx","Índices (arquivo)"]],m,"(v=>{S.pfM=v;render()})")}</div></div>
+  ${vis.map(({p,e})=>`<div class="pfc ${B[e.st][0]}"><div class="hd"><span class="rk">#${L.indexOf(L.find(x=>x.p===p))+1}</span><a class="nm" href="#inicio" onclick="setPf('${esc(p.id)}')">${esc(pfName(p))}</a><span class="badge ${B[e.st][0]}">${B[e.st][1]}</span>${p.id===(curPf()||{}).id?`<span class="badge neu">escolhida</span>`:""}<span class="small muted" style="margin-left:auto">${esc(p.criado||"")}${p.period?" · período "+esc(p.period):""}</span></div>
+    <div class="why">${esc(e.why)}${p.nota?`<div class="small muted" style="margin-top:3px">${esc(p.nota)}</div>`:""}</div>
+    <div class="mt"><span>Média <b class="${cls(p.media)}">${pc(p.media)}</b>/ano</span><span>Pior ano <b>${pc(p.pior_ano)}</b></span><span>Pior mês <b>${pc(p.pior_mes)}</b></span><span>Pior queda <b>${pc(p.dd)}</b></span><span>Win rate <b>${e.wr==null?"—":nf(e.wr,0)+"%"}</b></span><span><b>${nf(p.trades_ano/52,1)}</b> trades/sem</span></div>
+    <div class="small muted" style="margin-top:6px">${esc((p.ideas||[]).join(" + "))}</div>
+    <div class="crit">${e.C.map(c=>`<div><span>${ic(c.ok)}</span><span>${esc(c.nome)}</span><span class="v">${esc(c.val)}</span></div>`).join("")}</div></div>`).join("")||`<div class="empty">Nenhuma carteira neste filtro.</div>`}
+  </div>`;
+}
 /* ---------- render ---------- */
-const VIEWS={demo:vDemo,inicio:vInicio,calendario:vCalendario,periodos:vPeriodos,trades:vTrades,indices:vIndices,testes:vTestes,diario:vDiario,plano:vPlano};
-const SUBS={demo:"Bot em paper trading na Kraken (crypto): trades simuladas com preços reais",inicio:"Resumo da carteira escolhida",calendario:"Resultado de cada dia, semana e mês",periodos:"Todos os meses e todas as semanas",trades:"Lista completa, com filtros",indices:"De onde vem o resultado",testes:"Catálogo numerado de todas as estratégias testadas",diario:"O que o agente fez",plano:"Conclusões, plano e ideias"};
+const VIEWS={demo:vDemo,carteiras:vCarteiras,inicio:vInicio,calendario:vCalendario,periodos:vPeriodos,trades:vTrades,indices:vIndices,testes:vTestes,diario:vDiario,plano:vPlano};
+const SUBS={demo:"Bot em paper trading na Kraken (crypto): trades simuladas com preços reais",carteiras:"Todas as carteiras testadas, as melhores em cima, e porquê",inicio:"Resumo da carteira escolhida",calendario:"Resultado de cada dia, semana e mês",periodos:"Todos os meses e todas as semanas",trades:"Lista completa, com filtros",indices:"De onde vem o resultado",testes:"Catálogo numerado de todas as estratégias testadas",diario:"O que o agente fez",plano:"Conclusões, plano e ideias"};
 function render(){
   S.route=(location.hash.slice(1)||"demo"); if(!VIEWS[S.route]) S.route="demo";
   renderNav();
   const lab=ROUTES.find(r=>r[0]===S.route)[1];
   document.getElementById("ttl").innerHTML=`${lab}<span class="sub">${SUBS[S.route]}</span>`;
-  document.getElementById("pfCtl").style.display=["testes","diario","plano","demo"].includes(S.route)?"none":"";
+  document.getElementById("pfCtl").style.display=["testes","diario","plano","demo","carteiras"].includes(S.route)?"none":"";
   if(!S.data){document.getElementById("view").innerHTML=`<div class="card"><div class="empty">A carregar dados…</div></div>`; return;}
   const L=portfolios(); document.getElementById("pfSel").innerHTML=L.map(p=>`<option value="${p.id}" ${p.id===(curPf()||{}).id?"selected":""}>${esc(pfName(p))}</option>`).join("");
   document.getElementById("acc").value=S.acc;
@@ -680,8 +733,10 @@ function status(log){
   else {dot.className="dot"; txt.innerHTML=`<b>Agente em pausa</b> · próxima corrida às ${nextRun()}${last?` · última atividade ${when}`:""}`;}
 }
 function load(){
-  Promise.all([q("runs?select=*&order=created_at.desc"),q("state?select=key,value,updated_at"),q("agent_log?select=*&order=at.desc&limit=300")])
-  .then(([runs,state,log])=>{
+  Promise.all([q("runs?select=*&order=created_at.desc"),q("state?select=key,value,updated_at&key=not.like.arq_*"),q("agent_log?select=*&order=at.desc&limit=300"),
+    S.arq?Promise.resolve(null):q("state?select=key,value&key=like.arq_portfolio_*").catch(()=>[])])
+  .then(([runs,state,log,arq])=>{
+    if(arq) S.arq=arq.map(r=>({label:r.key.slice(14),...r.value})).sort((a,b)=>a.label.localeCompare(b.label,undefined,{numeric:true}));
     const st=Object.fromEntries(state.map(r=>[r.key,r.value]));
     S.data={runs,log,todo:st.todo||[],summary:st.summary||"",holdoutLog:st.holdout_log||"",ideas:st.ideas||"",portfolio:st.portfolio||null,
       extra:Object.keys(st).filter(k=>k.startsWith("portfolio_")).sort((a,b)=>a.localeCompare(b,undefined,{numeric:true})).map(k=>({label:k.slice(10),...st[k]}))};

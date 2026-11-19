@@ -4,6 +4,11 @@ Decisao do Antonio: o laboratorio de indices foi arquivado (Supabase schema `arq
 (COST_PCT em crypto_lab.py: NAO mexer). Spot = so long, sem alavancagem.
 - Backtest: `python crypto_lab.py --ideas a,b --period dev|pre|holdout [--label K2 --push]`. Imprime por ideia/moeda, a linha
   `VEREDICTO <ideia>: PASSA|REPROVADA` e a carteira (1 posicao por moeda, 1% de risco por trade, win rate, pior mes/ano/queda).
+- CARTEIRAS DE BACKTESTING (pedido do Antonio, 2026-11-19): CADA teste e uma carteira no painel, PASSE OU NAO.
+  Corre sempre `python crypto_lab.py --ideas ... --period dev --push --nota "#1xx nome: o que muda"` (sem --label usa o proximo K livre:
+  K6, K7, ...). Isto grava `portfolio_Kn` no Supabase e aparece no separador Backtesting > Carteiras, ordenada contra os objetivos
+  (validada, holdout, >= 14%/ano, pior ano > -10%, pior mes > -5%, win rate >= 50%, 2-3 trades/semana) com o porque.
+  NUNCA uses --ref (troca a carteira da conta demo) sem o OK do Antonio. Uma ideia testada sem carteira no painel conta como nao feita.
 - CRITERIO OFICIAL CRIPTO (fixo): por ideia, no dev 2019-2024, >= 60 trades em CADA moeda, meanR > 0 em CADA moeda, t junto >= 3.0.
   E CONFIRMACAO (pedido do Antonio, mais backtesting): a linha `CONFIRMACAO` tem de ser positiva em >= 3 das 5 moedas extra
   (XRP, ADA, DOGE, LINK, AVAX; dados em data/crypto desde 2018-2020). Depois `--period pre` (2017-2018, confirmacao, tem de ser >= 0) e, se passar, UMA vez `--period holdout` (2025-2026), registado em HOLDOUT_LOG.md.
