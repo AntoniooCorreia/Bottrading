@@ -21,6 +21,10 @@ Decisao do Antonio: o laboratorio de indices foi arquivado (Supabase schema `arq
   simula a K1 com precos reais da Kraken em 100 000 USD (pedido do Antonio: tudo em dolares, conta de 100k; pares XBTUSD/ETHUSD/SOLUSD); pagina "Conta demo" no dashboard; avisos no Telegram. Nenhuma ordem real.
   So troca de estrategia na demo uma variante que tenha PASSADO dev + pre + holdout, e com o OK do Antonio.
 
+FREQUENCIA E DURACAO (pedido do Antonio, 2026-11-21): quer 3 a 4 trades por semana na carteira e NAO quer ficar dias em trade.
+Scalping 5m/15m (#120-#127) e intraday 1h (#129-#132) ja testados: vantagem antes de custos existe, mas os custos de spot Kraken a matam.
+Nao repetir scalping em spot. Pendente decisao do Antonio: passar para perpetuos da Kraken (custos mais baixos e shorts).
+
 ## MISSAO NOTURNA ATUAL (pedido do Antonio, 2026-11-19): PEGAR NO MELHOR TESTE, PERCEBER O QUE FALHA, MELHORAR E ABRIR MAIS TRADES
 1. No inicio de CADA sessao: `python best.py`. O 1.o da lista (pontuacao = win rate + % total acumulado + melhor ano, a mesma
    do painel Backtesting > Carteiras) e a BASE. `python best.py --label Kn` mostra o diagnostico de qualquer carteira.

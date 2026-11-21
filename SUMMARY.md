@@ -26,11 +26,14 @@
 | #120-#127 | 2026-11-21 | SCALPING 5m/15m long e short (Bollinger 5m, 1.a hora de NY, RSI(2) 15m, explosao 15m); K22-K29 | -50 a -8 | 15-35% | -0.4 a -1.8 | -300% a -770%/ano | REPROVADAS: os custos (0.57%) valem 0.3-1.4R por trade |
 | K1 short | 2026-11-21 | as 4 da K1 ao espelho (so shorts); K30 | -1.9 a -0.7 | 22% | -0.07 a -0.15 | -4.6%, -17.9% (so 2022 positivo) | REPROVADA |
 | #128 | 2026-11-21 | shorts da K1 so com BTC < media 200 dias; K31 | -0.9 a 0.0 | 27% | -0.06 | -0.8%, -15.5% | REPROVADA |
+| #129-#132 | 2026-11-21 | INTRADAY 1h, max 24h, so long, regime BTC (RSI(2) 1h, minimo 12h + alvo 1R, rutura maximo 24h, squeeze); K32-K35 | -16.6 a -2.8 | 35-47% | -0.09 a -0.32 | -6% a -42%/ano | REPROVADAS; #131 rutura 24h tem +0.13R antes de custos (t ~2.7 nas 3 moedas) e ficaria +0.08 a +0.11R com custos de futuros |
 
 Scalping (2026-11-21): ANTES de custos ha uma vantagem pequena (RSI(2) 15m long: win rate 69%, +0.05R; Bollinger 5m BTC +0.08R),
 mas o stop de um scalp e 0.4-1.7% do preco e os custos da Kraken (0.57% ida e volta) valem 0.3-1.4R por trade. Nem com custos de maker
 (0.32%) passa. So com custos de futuros com ordens limit (~0.04% ida e volta) ficam perto de zero (+0.035R no ORB long). Conclusao:
 scalping em spot e impossivel com estes custos; shorts da K1 perdem (so ganham em 2022). Ideias cripto testadas no total: 42.
+Intraday 1h (#129-#132, 2026-11-21): 3-5 trades por semana como o Antonio quer, mas os custos de spot (0.2-0.3R por trade) apagam
+a vantagem. A unica com vantagem clara antes de custos e a rutura do maximo de 24h (#131). Total de ideias cripto: 46.
 
 Leitura honesta cripto (2026-11-19, sessao das :00 n.o 5):
 1. Ideias cripto testadas no total: 32 (K1 = 4, 6 compras de quedas, 2 diagnosticos de alvo, #100-#119). Mais testes = mais desconfianca. Limite da noite (20) atingido.
