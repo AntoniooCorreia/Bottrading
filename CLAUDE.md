@@ -23,7 +23,11 @@ Decisao do Antonio: o laboratorio de indices foi arquivado (Supabase schema `arq
 
 FREQUENCIA E DURACAO (pedido do Antonio, 2026-11-21): quer 3 a 4 trades por semana na carteira e NAO quer ficar dias em trade.
 Scalping 5m/15m (#120-#127) e intraday 1h (#129-#132) ja testados: vantagem antes de custos existe, mas os custos de spot Kraken a matam.
-Nao repetir scalping em spot. Pendente decisao do Antonio: passar para perpetuos da Kraken (custos mais baixos e shorts).
+Nao repetir scalping em spot. Perpetuos (`--venue perp`: 0.14% ida e volta + funding 0.01%/8h) testados em #133-#137: nada passou
+(#133 rutura 24h long: t 2.16). ATENCAO: a tabela da Kraken de jul-2026 subiu o spot tier 1 para 0.40% maker / 0.80% taker; o COST_PCT
+de spot (0.57% ida e volta) esta OTIMISTA. Nao mexer sem o Antonio, mas diz-lo quando falares de spot.
+TESTES (pedido do Antonio, 2026-11-21): QUALQUER teste tem de aparecer no separador Testes. crypto_lab.py faz isso sozinho para
+--period dev|pre|holdout (results/runs/<variante>__<periodo>.json + tabela runs com --push). Usa sempre --num "#1xx".
 
 ## MISSAO NOTURNA ATUAL (pedido do Antonio, 2026-11-19): PEGAR NO MELHOR TESTE, PERCEBER O QUE FALHA, MELHORAR E ABRIR MAIS TRADES
 1. No inicio de CADA sessao: `python best.py`. O 1.o da lista (pontuacao = win rate + % total acumulado + melhor ano, a mesma
