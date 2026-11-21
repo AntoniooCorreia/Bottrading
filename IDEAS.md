@@ -548,3 +548,18 @@ afinado depois disso. Ideias cripto testadas antes: 46. Hoje: 5 (#133-#137).
   ou 24h. Stop 3 ATR.
 - **#137 s-orb-us-15m-long (perp)**: igual ao #122 (rutura da 1.a hora de NY em 15m, alvo 2R), o scalp mais perto de zero.
 Depois: carteira com as que tiverem R/trade > 0 nas 3 moedas (long + short juntas) para medir trades por semana.
+
+## 2026-11-21 cripto - sessao :00 (19h UTC) (1 ideia; ideias cripto testadas antes: 51; hoje: 19 de 20 antes desta sessao) - registada antes de correr
+Base (best.py): K20 = #118 k-sma100-d-bull-bracket (pontuacao 82: win rate 68%, total +62%, melhor ano +17.7%, pior ano -2.0%, pior mes -4.1%).
+O que falha na base: SOL so 54 trades (< 60); 0.6 trades por semana (objetivo 2-3); mediana de 13 dias sem trade entre entradas;
+as trades duram muito (75 de 199 entre 8 e 30 dias, 32 acima de 30 dias com so +0.11R); 2022 quase sem trades (regime BTC fechado, -2%).
+Limite da noite: so cabe 1 ideia (19 de 20 ja usadas hoje), por isso escolho a que ABRE MAIS TRADES.
+- **#138 k-sma600-4h-bull-bracket** (4h): a mesma regra da #118 (moeda acima da sua media de 100 dias = 600 velas de 4h, BTC acima da media
+  de 200 dias, entra na abertura seguinte quando esta sem posicao; sai SO por alvo 1R ou stop, sem saida pelo sinal), mas em velas de 4h
+  com stop 3 ATR(14) de 4h (~0.4x o stop diario da #118). UMA mudanca: timeframe/tamanho do stop. Hipotese: o win rate de uma aposta
+  simetrica 1R/1R com deriva positiva vem da deriva, nao do tamanho do stop; com stop ~2.5x mais curto o alvo e tocado ~2.5x mais
+  depressa -> trades de dias em vez de semanas e ~2-2.5x mais trades (SOL acima de 60), com reentrada 4h depois de cada saida.
+  Risco: o custo (0.57% ida e volta) passa de ~0.05R para ~0.12-0.15R por trade e o ruido intradiario baixa o win rate; a #117
+  (mesma entrada em 4h mas com saida pelo sinal e stop 6 ATR) deu so 40% de win rate e +0.14R.
+Fasquia (criterio oficial cripto, fixo): >= 60 trades em CADA uma de BTC/ETH/SOL, meanR > 0 em cada, t junto >= 3.0, CONFIRMACAO
+positiva em >= 3/5 moedas extra; depois --period pre >= 0. Comparar com a base K20: win rate, % total, melhor ano, pior ano, trades/semana.

@@ -581,6 +581,8 @@ IDEAS = {
     "k-sma600-4h-bull-tp1": (sma_long_bull(600), "4h", 6.0, 1.0, 0),
     "k-sma100-d-bull-bracket": (sma_bull_entry(100), "1d", 3.0, 1.0, 0),
     "k-sma100-d-slope-tp1": (sma_slope_bull(100, 20), "1d", 3.0, 1.0, 0),
+    # cripto 2026-11-21 sessao :00 19h (registada em IDEAS.md antes de correr): #118 em 4h, stop 3 ATR de 4h
+    "k-sma600-4h-bull-bracket": (sma_bull_entry(600), "4h", 3.0, 1.0, 0),
 }
 
 # saidas extra por ideia (argumentos de run_positions): partial = fracao fechada no alvo tp_r (resto com stop em breakeven);
@@ -591,6 +593,7 @@ EXITS = {
     "k-dc20-4h-bw-be": {"be": True},
     "k-dc20-d-own-be": {"be": True},
     "k-sma100-d-bull-bracket": {"signal_exit": False},
+    "k-sma600-4h-bull-bracket": {"signal_exit": False},
 }
 
 

@@ -211,3 +211,7 @@ Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --p
   confirmacao 5/5 (win rate 62%); carteira +10.3%/ano, pior ano -2.0% (2022), pior mes -4.1%. Pre/holdout NAO corridos (falhou o dev)
 - [x] #119: k-sma100-d-slope-tp1 -> REPROVADA (SOL 58 trades < 60); t +4.10, BTC +0.238R/75, ETH +0.199R/77, SOL +0.263R/58; win rate 53%;
   confirmacao 4/5; carteira +8.1%/ano, pior ano 0.0%, pior mes -2.7% (pior que a #113: menos trades, mesmo win rate)
+
+## Ideias do agente (2026-11-21, cripto sessao :00 19h UTC)
+Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --period dev --push --num "#138"` (e `--period pre` se passar).
+- [ ] #138: k-sma600-4h-bull-bracket (#118 em 4h, stop 3 ATR de 4h, so alvo 1R ou stop)
