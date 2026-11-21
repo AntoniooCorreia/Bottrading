@@ -20,6 +20,10 @@ from sr.swing import CONFIRM_COINS, KRAKEN_FEE, MAIN_COINS, load_tf, run_positio
 from sr.swing_ideas import EXITS, IDEAS, NO_MIN_RISK
 
 COST_PCT = 2 * KRAKEN_FEE + 0.0005
+# Perpetuos da Kraken (decisao do Antonio, 2026-11-21): taker 0.05% por lado (tier 1, tabela da Kraken de jul-2026)
+# + 0.02% de slippage por lado = 0.14% ida e volta; funding conservador: paga 0.01% a cada 8h (long E short).
+PERP_COST_PCT = 2 * (0.0005 + 0.0002)
+PERP_FUNDING_8H = 0.0001
 
 
 def main():
@@ -33,7 +37,13 @@ def main():
     ap.add_argument("--ref", action="store_true", help="tambem a torna a carteira de referencia (so com OK do Antonio)")
     ap.add_argument("--nota", default="", help="nota curta que aparece no painel (ex.: '#100 persistencia 1 dia')")
     ap.add_argument("--out", default="", help="escreve a carteira num ficheiro JSON (sem Supabase)")
+    ap.add_argument("--venue", default="spot", choices=["spot", "perp"], help="spot Kraken (so long) ou perpetuos Kraken")
+    ap.add_argument("--num", default="", help="numero do catalogo (#133) para o separador Testes")
     a = ap.parse_args()
+    global COST_PCT
+    if a.venue == "perp":
+        COST_PCT = PERP_COST_PCT
+    runs = {}
     rows, allt, byidea = [], [], {}
     for name in a.ideas.split(","):
         fn, tf, st, tp, mh = IDEAS[name]
@@ -43,6 +53,9 @@ def main():
                                **({'min_risk_cost': 0.0} if name in NO_MIN_RISK else {}), **EXITS.get(name, {}))
             if not len(tr):
                 continue
+            tr = funding(tr, b, a.venue)
+            runs.setdefault(name, {"b": {}, "tr": {}})["tr"][k] = tr
+            runs[name]["b"][k] = b
             yrs = (b.index[-1] - b.index[0]).days / 365.25
             s = summarize(tr, yrs)
             byidea.setdefault(name, {})[k] = tr["R"].to_numpy()
@@ -61,6 +74,7 @@ def main():
             tr = run_positions(b, fn(b), st, 0.0, 0.0, tp, mh, cost_pct=COST_PCT, financing=False,
                                **({'min_risk_cost': 0.0} if name in NO_MIN_RISK else {}), **EXITS.get(name, {}))
             if len(tr):
+                tr = funding(tr, b, a.venue)
                 conf.setdefault(name, {})[k] = tr["R"].to_numpy()
     per = pd.DataFrame(rows)
     print(per.to_string(index=False))
@@ -94,6 +108,7 @@ def main():
                 o["passa"] = False
                 o["motivos"].append(f"confirmacao so {npos}/{len(c)} moedas extra (precisa >= 3)")
         oficial.append(o)
+        save_run(a, name, o, runs.get(name), conf.get(name, {}))
     if not allt:
         return
     allt = pd.concat(allt).sort_values("t0").reset_index(drop=True)
@@ -126,6 +141,7 @@ def main():
     if a.push or a.out:
         label = a.label or (next_label() if a.push else "K?")
         doc = {"label": label, "ideas": a.ideas.split(","), "period": a.period, "mercado": "crypto",
+               "venue": a.venue,
                "criado": pd.Timestamp.now(tz="Europe/Lisbon").strftime("%Y-%m-%d %H:%M"), "nota": a.nota,
                "oficial": oficial, "oficial_passa": bool(oficial) and all(o["passa"] for o in oficial),
                "win": round(float(100 * (p["R"].round(3) > 0).mean()), 1),   # breakeven nao e ganha
@@ -151,6 +167,50 @@ def main():
             print(f"carteira {label} no painel:", supa.set_state("portfolio_" + label, doc))
             if a.ref:
                 print("referencia:", supa.set_state("portfolio", doc))
+
+
+def funding(tr: pd.DataFrame, b: pd.DataFrame, venue: str) -> pd.DataFrame:
+    """Perpetuos: desconta o funding (0.01% a cada 8h, conservador: long e short pagam) em R."""
+    if venue != "perp" or not len(tr):
+        return tr
+    hrs = (pd.DatetimeIndex(tr["exit"]) - pd.DatetimeIndex(tr["time"])).total_seconds().to_numpy() / 3600
+    entry = b["open"].reindex(pd.DatetimeIndex(tr["time"])).to_numpy()
+    return tr.assign(R=tr["R"].to_numpy() - hrs / 8 * PERP_FUNDING_8H * entry / tr["risk_pts"].to_numpy())
+
+
+def save_run(a, name: str, o: dict, rr: dict | None, conf: dict) -> None:
+    """Cada teste vai para o separador Testes (pedido do Antonio, 2026-11-21): results/runs/<variante>__<periodo>.json
+    e, com --push, para a tabela runs do Supabase."""
+    import run as R
+    from sr.stats import by_year
+    if not rr or a.period not in ("dev", "pre", "holdout"):
+        return
+    fn, tf, st, tp, mh = IDEAS[name]
+    variant = name + ("-perp" if a.venue == "perp" else "")
+    per, yearly, curves, periods, allt = {}, {}, {}, {}, []
+    for k, tr in rr["tr"].items():
+        b = rr["b"][k]
+        tr = tr.assign(time=pd.DatetimeIndex(tr["time"]).tz_localize(None))
+        yrs = max((b.index[-1] - b.index[0]).days / 365.25, 0.1)
+        per[k] = summarize(tr, yrs)
+        yearly[k] = {str(y): float(v) for y, v in by_year(tr).items()}
+        curves[k] = R.equity_curve(tr)
+        periods[k] = R.period_tables(tr)
+        allt.append(tr)
+    pooled = summarize(pd.concat(allt), 1.0)
+    periods["all"] = R.period_tables(pd.concat(allt))
+    vd = "PASSA" if o["passa"] else "REPROVADA (" + "; ".join(o["motivos"]) + ")"
+    doc = {"id": f"{variant}__{a.period}", "variant": variant, "period": a.period, "verdict": vd,
+           "params": {"play": "crypto", "levels": name, "tf": tf, "stop_atr": st, "tp_r": tp, "max_hold": mh,
+                      "custos": a.venue, "num": a.num, "nota": a.nota,
+                      "date": pd.Timestamp.now(tz="Europe/Lisbon").strftime("%Y-%m-%d")},
+           "pooled": pooled, "markets": per, "yearly": yearly, "equity": curves, "periods": periods,
+           "fut": {"confirmacao": {k: {"n": int(len(v)), "meanR": round(float(v.mean()), 3)} for k, v in conf.items()}}}
+    os.makedirs(R.RUNS_DIR, exist_ok=True)
+    with open(os.path.join(R.RUNS_DIR, f"{variant}__{a.period}.json"), "w") as f:
+        json.dump(doc, f)
+    if a.push:
+        supa.report_run(doc)
 
 
 def next_label() -> str:

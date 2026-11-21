@@ -766,3 +766,30 @@ IDEAS.update(INTRADAY)
 for _n in ("h-low12-tp-1h", "h-dc24-1h", "h-squeeze-1h"):
     EXITS[_n] = {"signal_exit": False}      # pulsos: so servem para entrar
 NO_MIN_RISK |= set(INTRADAY)
+
+
+# ---------------- PERPETUOS: SHORTS INTRADAY (2026-11-21) ----------------
+def _bear_1h(b):
+    c = b["close"]
+    bull = _regime(b, 200).reindex(b.index).fillna(True).astype(bool)
+    return (c < _ema(c, 200)) & ~bull
+
+
+def h_dc24_short():
+    def f(b):
+        c = b["close"]
+        return -((c < b["low"].rolling(24).min().shift(1)) & _bear_1h(b)).astype(float)
+    return f
+
+
+def h_rsi2_short():
+    def f(b):
+        r = _rsi(b["close"], 2)
+        return -_enter_exit((r > 90) & _bear_1h(b), r < 30).astype(float)
+    return f
+
+
+IDEAS["h-dc24-1h-short"] = (h_dc24_short(), "1h", 3.0, 2.0, 24)
+IDEAS["h-rsi2-1h-short"] = (h_rsi2_short(), "1h", 3.0, 0.0, 24)
+EXITS["h-dc24-1h-short"] = {"signal_exit": False}
+NO_MIN_RISK |= {"h-dc24-1h-short", "h-rsi2-1h-short"}

@@ -250,7 +250,7 @@ const S={data:null,pf:store("bt_pf")||"ref",acc:+(store("bt_acc")||100000),route
   cal:{y:null,m:null,mode:"mes",mk:"all",idea:"all",sel:null},
   per:{y:null,view:"semanas"},
   tr:{y:"all",m:"all",mk:"all",idea:"all",res:"all",sort:"saida",dir:-1,page:0},
-  tests:{f:"all",sel:null,mk:"nq",cal:{y:null,m:null,mode:"mes",sel:null}},
+  tests:{f:"all",m:"crypto",sel:null,mk:"btc",cal:{y:null,m:null,mode:"mes",sel:null}},
   j:"all"};
 
 const ROUTES=[
@@ -509,8 +509,13 @@ function catalog(){const m={}; for(const l of (S.data.summary||"").split("\n")){
 const PER={dev:"2019–2024",pre:"2012–2018 (às cegas)",holdout:"Holdout 2025–26"};
 function vTestes(){
   const cat=catalog(); const runs=S.data.runs;
-  const by={}; for(const r of runs){(by[r.variant]=by[r.variant]||{})[r.period]=r;}
-  let vars=Object.keys(by).map(v=>({v,c:cat[v.replace(/ \(.*\)$/,"")],...by[v]})).sort((a,b)=>(b.c?.n||0)-(a.c?.n||0));
+  const TM=S.tests.m||"crypto", isC=r=>r&&r.params&&r.params.play==="crypto";
+  const MK=TM==="crypto"?["btc","eth","sol"]:["nq","es","dow"];
+  const by={}; for(const r of runs){ if(isC(r)!==(TM==="crypto")) continue; (by[r.variant]=by[r.variant]||{})[r.period]=r;}
+  const numOf=x=>{const r=x.dev||x.pre||x.holdout; const n=r&&r.params&&r.params.num; return n?{n:parseInt(String(n).replace(/\D/g,""))||0,date:r.params.date||String(r.created_at||"").slice(0,10)}:null;};
+  let vars=Object.keys(by).map(v=>({v,c:cat[v.replace(/ \(.*\)$/,"")]||numOf(by[v]),...by[v]})).sort((a,b)=>(b.c?.n||0)-(a.c?.n||0)||String((b.dev||b.pre||{}).created_at).localeCompare(String((a.dev||a.pre||{}).created_at)));
+  const CU={spot:"custos Kraken spot",perp:"custos de perpétuos Kraken (com funding)",fut:"custos de micro-futuros",cfd:"custos de CFD"};
+  const PL={dev:"2019–2024",pre:TM==="crypto"?"2017–2018":"2012–2018 (às cegas)",holdout:"Holdout 2025–26"};
   const f=S.tests.f;
   if(f==="pass") vars=vars.filter(x=>x.dev&&x.dev.verdict.startsWith("PASSA"));
   if(f==="port") vars=vars.filter(x=>/rsi2-dip-d|ibs-dip-d|down3-d|ibs-bear-d/.test(x.v));
@@ -519,25 +524,25 @@ function vTestes(){
   const mc=m=>m&&m.n?`<span class="${cls(m.meanR)}">${rr(m.meanR,3)}</span><div class="small muted">${m.n} trades</div>`:`<span class="muted">—</span>`;
   let det="";
   const X=S.tests.sel&&by[S.tests.sel];
-  if(X){ const r=(S.tests.per&&X[S.tests.per])||X.dev||X.pre||X.holdout; const mkk=S.tests.mk;
+  if(X){ const r=(S.tests.per&&X[S.tests.per])||X.dev||X.pre||X.holdout; const mkk=MK.includes(S.tests.mk)?S.tests.mk:MK[0];
     const pers=["dev","pre","holdout"].filter(p=>X[p]);
     const mm=r.markets[mkk]||{};
     const days=(r.periods&&r.periods[mkk]&&r.periods[mkk].day)||[];
     const dm=Object.fromEntries(days.map(d=>[d[0],{r:d[1],n:d[2],w:d[3]}]));
-    const CC={nq:"var(--c1)",es:"var(--c2)",dow:"var(--c3)"}; const ser=["nq","es","dow"].filter(k=>r.equity&&r.equity[k]&&r.equity[k].length).map(k=>({name:nm(k),color:CC[k],pts:r.equity[k]}));
+    const CC={[MK[0]]:"var(--c1)",[MK[1]]:"var(--c2)",[MK[2]]:"var(--c3)"}; const ser=MK.filter(k=>r.equity&&r.equity[k]&&r.equity[k].length).map(k=>({name:nm(k),color:CC[k],pts:r.equity[k]}));
     det=`<div class="card" id="tdet"><div class="card-head"><div><h2>${cat[S.tests.sel.replace(/ \(.*\)$/,"")]?"#"+cat[S.tests.sel.replace(/ \(.*\)$/,"")].n+" · ":""}<code style="font-size:14px">${esc(S.tests.sel)}</code></h2>
-      <p class="hint">Período mostrado: ${PER[r.period]}. Resultados em R (1R = 1% da conta), já com custos de CFD.</p></div>
-      ${seg(pers.map(p=>[p,PER[p].split(" ")[0]]),r.period,"(v=>{S.tests.per=v;S.tests.cal.y=null;render()})")}<button class="btn" onclick="S.tests.sel=null;render()">Fechar</button></div>
-      <div class="kpis sm">${["nq","es","dow"].map(k=>{const m=r.markets[k]||{}; return kpi(nm(k)+(k==="nq"?" (o teu)":""),m.n?rr(m.meanR,3):"—",m.n?`${m.n} trades · ${nf(m["win%"],0)}% ganhas · t ${nf(m.t,2)} · ${rr(m["R/mes"],2)}/mês`:"",cls(m.meanR));}).join("")}${kpi("Juntos",nf(r.pooled.t,2),"t-stat conjunto · fasquia 3,0")}</div>
+      <p class="hint">Período mostrado: ${PL[r.period]}. Resultados em R (1R = 1% da conta), já com ${CU[(r.params||{}).custos]||"custos"}.${r.params&&r.params.nota?" "+esc(r.params.nota):""}${r.verdict.startsWith("PASSA")?"":"<br>"+esc(r.verdict)}</p></div>
+      ${seg(pers.map(p=>[p,PL[p].split(" ")[0]]),r.period,"(v=>{S.tests.per=v;S.tests.cal.y=null;render()})")}<button class="btn" onclick="S.tests.sel=null;render()">Fechar</button></div>
+      <div class="kpis sm">${MK.map(k=>{const m=r.markets[k]||{}; return kpi(nm(k)+(k==="nq"?" (o teu)":""),m.n?rr(m.meanR,3):"—",m.n?`${m.n} trades · ${nf(m["win%"],0)}% ganhas · t ${nf(m.t,2)} · ${rr(m["R/mes"],2)}/mês`:"",cls(m.meanR));}).join("")}${kpi("Juntos",nf(r.pooled.t,2),"t-stat conjunto · fasquia 3,0")}</div>
       <h2 style="margin-top:6px">Curva acumulada</h2>${lineChart("teq",ser,{unit:"R",h:230,fmt:v=>rr(v,1)})}
-      <div class="card-head" style="margin-top:16px"><div><h2>Calendário diário</h2><p class="hint">R por dia em que fecharam trades.</p></div>${seg([["nq","NQ"],["es","S&P"],["dow","Dow"]],mkk,"(v=>{S.tests.mk=v;S.tests.cal.y=null;render()})")}</div>
+      <div class="card-head" style="margin-top:16px"><div><h2>Calendário diário</h2><p class="hint">R por dia em que fecharam trades.</p></div>${seg(MK.map(k=>[k,k.toUpperCase()]),mkk,"(v=>{S.tests.mk=v;S.tests.cal.y=null;render()})")}</div>
       ${calendar(dm,S.tests.cal,"tcal","R")}</div>`;
   }
-  return `<div class="kpis">${kpi("Variantes testadas",Object.keys(by).length,"estratégias com número no catálogo")}${kpi("Passaram",npass,"no critério oficial (2019–2024)",npass?"pos":"")}${kpi("Na carteira",4,"rsi2-dip-d, ibs-dip-d, down3-d, ibs-bear-d")}${kpi("Melhor t",nf(Math.max(...runs.filter(r=>r.period==="dev").map(r=>r.pooled.t)),2),"fasquia 3,0")}</div>
+  return `<div class="kpis">${kpi("Variantes testadas",Object.keys(by).length,"estratégias com número no catálogo")}${kpi("Passaram",npass,"no critério oficial (2019–2024)",npass?"pos":"")}${TM==="crypto"?kpi("Conta demo","K1","4 estratégias de tendência"):kpi("Na carteira",4,"rsi2-dip-d, ibs-dip-d, down3-d, ibs-bear-d")}${kpi("Melhor t",nf(Math.max(0,...Object.values(by).filter(x=>x.dev).map(x=>x.dev.pooled.t)),2),"fasquia 3,0")}</div>
   ${det}
-  <div class="card"><div class="card-head"><div><h2>Catálogo de testes</h2><p class="hint">Toca numa linha para ver curva e calendário. NQ primeiro; S&P e Dow servem de confirmação.</p></div>${seg([["all","Todos"],["pass","Passaram"],["port","Na carteira"]],f,"(v=>{S.tests.f=v;render()})")}</div>
-  <div class="scroll"><table class="t"><thead><tr><th>#</th><th>Data</th><th>Variante</th><th>2019–24</th><th class="num">t</th><th class="num">NQ</th><th class="num hide-sm">S&amp;P</th><th class="num hide-sm">Dow</th><th>2012–18</th><th class="hide-sm">Holdout</th></tr></thead><tbody>
-  ${vars.map(x=>{const r=x.dev||x.pre; return `<tr class="click ${S.tests.sel===x.v?"sel":""}" onclick="S.tests.sel='${esc(x.v)}';S.tests.per=null;S.tests.cal={y:null,m:null,mode:'mes',sel:null};render();setTimeout(()=>document.getElementById('tdet')?.scrollIntoView({behavior:'smooth'}),30)"><td class="muted">${x.c?"#"+x.c.n:""}</td><td class="small">${x.c?fdate(x.c.date):esc((r.date||"").slice(0,10))}</td><td><code>${esc(x.v)}</code></td><td>${vb(x.dev)}</td><td class="num">${x.dev?nf(x.dev.pooled.t,2):"—"}</td><td class="num">${mc(r&&r.markets.nq)}</td><td class="num hide-sm">${mc(r&&r.markets.es)}</td><td class="num hide-sm">${mc(r&&r.markets.dow)}</td><td>${vb(x.pre)}</td><td class="hide-sm">${vb(x.holdout)}</td></tr>`;}).join("")}
+  <div class="card"><div class="card-head"><div><h2>Catálogo de testes</h2><p class="hint">Todos os testes, com o veredicto oficial. Toca numa linha para ver curva e calendário.</p></div><div style="display:flex;gap:8px;flex-wrap:wrap">${seg([["crypto","Cripto"],["idx","Índices (arquivo)"]],TM,"(v=>{S.tests.m=v;S.tests.sel=null;S.tests.mk=v==='crypto'?'btc':'nq';render()})")}${seg([["all","Todos"],["pass","Passaram"],["port","Na carteira"]],f,"(v=>{S.tests.f=v;render()})")}</div></div>
+  <div class="scroll"><table class="t"><thead><tr><th>#</th><th>Data</th><th>Variante</th><th>2019–24</th><th class="num">t</th><th class="num">${MK[0].toUpperCase().replace("ES","S&amp;P")}</th><th class="num hide-sm">${MK[1].toUpperCase().replace("ES","S&amp;P")}</th><th class="num hide-sm">${MK[2].toUpperCase().replace("DOW","Dow")}</th><th>${PL.pre.split(" ")[0]}</th><th class="hide-sm">Holdout</th></tr></thead><tbody>
+  ${vars.map(x=>{const r=x.dev||x.pre; return `<tr class="click ${S.tests.sel===x.v?"sel":""}" onclick="S.tests.sel='${esc(x.v)}';S.tests.per=null;S.tests.cal={y:null,m:null,mode:'mes',sel:null};render();setTimeout(()=>document.getElementById('tdet')?.scrollIntoView({behavior:'smooth'}),30)"><td class="muted">${x.c?"#"+x.c.n:""}</td><td class="small">${x.c?fdate(x.c.date):esc((r.date||"").slice(0,10))}</td><td><code>${esc(x.v)}</code></td><td>${vb(x.dev)}</td><td class="num">${x.dev?nf(x.dev.pooled.t,2):"—"}</td><td class="num">${mc(r&&r.markets[MK[0]])}</td><td class="num hide-sm">${mc(r&&r.markets[MK[1]])}</td><td class="num hide-sm">${mc(r&&r.markets[MK[2]])}</td><td>${vb(x.pre)}</td><td class="hide-sm">${vb(x.holdout)}</td></tr>`;}).join("")}
   </tbody></table></div></div>`;
 }
 

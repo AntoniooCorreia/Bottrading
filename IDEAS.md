@@ -534,3 +534,17 @@ Objetivo de frequencia: a carteira (BTC+ETH+SOL, 1 posicao por moeda) com 3-4 tr
 - **#132 h-squeeze-1h**: largura das Bollinger (20, 2) de 1h no minimo das ultimas 120 velas e fecho acima da banda de cima.
   Alvo 2R, stop 3 ATR, max 24h. Hipotese: depois de compressao de volatilidade a saida tende a continuar.
 Fasquia: criterio oficial cripto (>= 60 trades por moeda, positiva em cada, t junto >= 3.0, confirmacao >= 3/5).
+
+## 2026-11-21 PERPETUOS KRAKEN (decisao do Antonio: "avanca", quer a demo com mais trades: minimo 1/semana, idealmente 3) - registadas antes de correr
+Custos novos (so com --venue perp; o spot fica igual): taker 0.05% por lado (tier 1 da tabela da Kraken de jul-2026) + 0.02% de
+slippage por lado = 0.14% ida e volta, mais funding conservador de 0.01% a cada 8h pago tanto por long como por short.
+Nota de honestidade: antes de registar isto corri UMA vez o #133 no dev para verificar o codigo novo (t +2.16, REPROVADA). Nada foi
+afinado depois disso. Ideias cripto testadas antes: 46. Hoje: 5 (#133-#137).
+- **#133 h-dc24-1h (perp, long)**: igual ao #131 (rutura do maximo de 24h, regime de alta, alvo 2R, stop 3 ATR, max 24h).
+- **#134 h-dc24-1h-short (perp)**: espelho: fecho abaixo do minimo das ultimas 24 velas de 1h, fecho < EMA 200 de 1h e BTC ABAIXO da
+  media de 200 dias. Alvo 2R, stop 3 ATR, max 24h. Hipotese: em mercado de baixa as quebras do minimo do dia continuam.
+- **#135 h-rsi2-1h (perp, long)**: igual ao #129 (RSI(2) 1h < 10 na tendencia, sai com RSI > 70 ou 24h).
+- **#136 h-rsi2-1h-short (perp)**: espelho: RSI(2) 1h > 90, fecho < EMA 200 de 1h e BTC abaixo da media de 200 dias; sai com RSI(2) < 30
+  ou 24h. Stop 3 ATR.
+- **#137 s-orb-us-15m-long (perp)**: igual ao #122 (rutura da 1.a hora de NY em 15m, alvo 2R), o scalp mais perto de zero.
+Depois: carteira com as que tiverem R/trade > 0 nas 3 moedas (long + short juntas) para medir trades por semana.
