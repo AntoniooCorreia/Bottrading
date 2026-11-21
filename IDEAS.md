@@ -518,3 +518,19 @@ Fasquia: criterio oficial cripto (>= 60 trades por moeda, positiva em cada, t ju
 - **#128 k1-short-bear (registada depois de ver os shorts da K1, por isso conta como ideia a mais e com desconfianca)**: as 4
   estrategias da K1 ao espelho, mas so com o BTC ABAIXO da media de 200 dias (espelho exato do filtro do #101 dos longs;
   sai tambem quando o regime volta a alta). Hipotese: os shorts so tem vantagem em mercado de baixa; em alta a deriva come-os.
+
+## 2026-11-21 INTRADAY 1h-1 dia (Claude, a pedido do Antonio: 3 a 4 trades por semana, sem ficar dias em trade) - registadas antes de correr
+Ideias cripto testadas antes: 42. Hoje: 4 (#129-#132). Porque 1h: o scalping (#120-#127) mostrou vantagem antes de custos mas stops de
+0.4-1.7% fazem os custos valer 0.3-1.4R. Em 1h com stop de 3 ATR(14) de 1h (~2-3% do preco) os custos descem para ~0.2-0.3R.
+Todas: so long (spot), velas de 1h, tempo maximo 24 velas (1 dia), stop 3 ATR(14) de 1h, so com o BTC acima da media de 200 dias
+(regime de alta, o filtro que mais ajudou nos testes #101-#118), sem filtro de risco minimo (o custo entra todo no resultado).
+Objetivo de frequencia: a carteira (BTC+ETH+SOL, 1 posicao por moeda) com 3-4 trades por semana (~150-200 por ano).
+- **#129 h-rsi2-1h**: RSI(2) de 1h < 10 com fecho > EMA 200 de 1h. Sai com RSI(2) > 70 ou 24h. Hipotese: quedas de 2-3 horas
+  dentro de uma tendencia de alta revertem (Connors), agora em cripto 1h com regime.
+- **#130 h-low12-tp-1h**: fecho de 1h e o mais baixo das ultimas 12 velas com fecho > EMA 200 de 1h. Alvo 1R, stop 3 ATR, max 24h.
+  Hipotese: comprar o minimo de meio dia na tendencia e sair num alvo curto da win rate alto (como #118 mas intraday).
+- **#131 h-dc24-1h**: fecho acima do maximo das ultimas 24 velas de 1h (maximo do dia). Alvo 2R, stop 3 ATR, max 24h.
+  Hipotese: ruturas do maximo de 24h em regime de alta continuam durante horas (momentum intradiario em cripto).
+- **#132 h-squeeze-1h**: largura das Bollinger (20, 2) de 1h no minimo das ultimas 120 velas e fecho acima da banda de cima.
+  Alvo 2R, stop 3 ATR, max 24h. Hipotese: depois de compressao de volatilidade a saida tende a continuar.
+Fasquia: criterio oficial cripto (>= 60 trades por moeda, positiva em cada, t junto >= 3.0, confirmacao >= 3/5).

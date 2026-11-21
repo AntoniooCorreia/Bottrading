@@ -717,3 +717,52 @@ def bear_only(fn):
 for _k in ("k-donchian20-d", "k-sma100-d", "k-donchian55-4h", "k-sma200-4h"):
     _fn, _tf, _st, _tp, _mh = IDEAS[_k + "-short"]
     IDEAS[_k + "-short-bear"] = (bear_only(_fn), _tf, _st, _tp, _mh)
+
+
+# ---------------- INTRADAY 1h-1 DIA (2026-11-21, pedido do Antonio: 3-4 trades por semana, sem ficar dias em trade) ----------------
+def _bull_1h(b):
+    c = b["close"]
+    return (c > _ema(c, 200)) & _regime(b, 200).reindex(b.index).fillna(False).astype(bool)
+
+
+def h_rsi2():
+    def f(b):
+        r = _rsi(b["close"], 2)
+        return _enter_exit((r < 10) & _bull_1h(b), r > 70).astype(float)
+    return f
+
+
+def h_low12():
+    def f(b):
+        c = b["close"]
+        return ((c <= c.rolling(12).min()) & _bull_1h(b)).astype(float)
+    return f
+
+
+def h_dc24():
+    def f(b):
+        c = b["close"]
+        return ((c > b["high"].rolling(24).max().shift(1)) & _bull_1h(b)).astype(float)
+    return f
+
+
+def h_squeeze():
+    def f(b):
+        c = b["close"]
+        m, sd = c.rolling(20).mean(), c.rolling(20).std()
+        w = (4 * sd / m)
+        sq = w.shift(1) <= w.shift(1).rolling(120).min()
+        return ((c > m + 2 * sd) & sq & _bull_1h(b)).astype(float)
+    return f
+
+
+INTRADAY = {
+    "h-rsi2-1h": (h_rsi2(), "1h", 3.0, 0.0, 24),
+    "h-low12-tp-1h": (h_low12(), "1h", 3.0, 1.0, 24),
+    "h-dc24-1h": (h_dc24(), "1h", 3.0, 2.0, 24),
+    "h-squeeze-1h": (h_squeeze(), "1h", 3.0, 2.0, 24),
+}
+IDEAS.update(INTRADAY)
+for _n in ("h-low12-tp-1h", "h-dc24-1h", "h-squeeze-1h"):
+    EXITS[_n] = {"signal_exit": False}      # pulsos: so servem para entrar
+NO_MIN_RISK |= set(INTRADAY)

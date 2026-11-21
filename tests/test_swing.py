@@ -8,7 +8,7 @@ from sr.swing_ideas import EXITS, IDEAS
 
 # Ideias de calendario com datas fixas (ex.: FOMC desde 2012) precisam de velas sinteticas nesses anos e mais longas
 CAL = {"fomc-holiday-1h": ("2019-01-02", 12000), "flush-1h": ("2000-01-03", 40000), "ibs-cash-1h": ("2000-01-03", 30000),
-       "rsi2-cash-1h": ("2000-01-03", 60000)}
+       "rsi2-cash-1h": ("2000-01-03", 60000), "h-squeeze-1h": ("2000-01-03", 30000)}
 
 
 def synth_d(n=3000, seed=0, tf="1d", start="2000-01-03"):
