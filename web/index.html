@@ -744,8 +744,19 @@ function status(log){
   else if(last&&last.kind==="erro"&&ago<720){dot.className="dot err"; txt.innerHTML=`<b>Parou com erro</b> · ${esc(last.message)}`;}
   else {dot.className="dot"; txt.innerHTML=`<b>Agente em pausa</b> · próxima corrida às ${nextRun()}${last?` · última atividade ${when}`:""}`;}
 }
+/* so volta a descarregar as chaves do state que mudaram (as carteiras de scalping tem centenas de KB) */
+S.stc={};
+function stateRows(){
+  return q("state?select=key,updated_at&key=not.like.arq_*").then(meta=>{
+    const ch=meta.filter(r=>!S.stc[r.key]||S.stc[r.key].updated_at!==r.updated_at).map(r=>r.key);
+    const keep=new Set(meta.map(r=>r.key)); Object.keys(S.stc).forEach(k=>{if(!keep.has(k)) delete S.stc[k];});
+    const chunks=[]; for(let i=0;i<ch.length;i+=15) chunks.push(ch.slice(i,i+15));
+    return Promise.all(chunks.map(c=>q("state?select=key,value,updated_at&key=in.("+c.map(k=>'"'+k+'"').join(",")+")")))
+      .then(parts=>{parts.flat().forEach(r=>{S.stc[r.key]=r;}); return Object.values(S.stc);});
+  });
+}
 function load(){
-  Promise.all([q("runs?select=*&order=created_at.desc"),q("state?select=key,value,updated_at&key=not.like.arq_*"),q("agent_log?select=*&order=at.desc&limit=300"),
+  Promise.all([q("runs?select=*&order=created_at.desc"),stateRows(),q("agent_log?select=*&order=at.desc&limit=300"),
     S.arq?Promise.resolve(null):q("state?select=key,value&key=like.arq_portfolio_*").catch(()=>[])])
   .then(([runs,state,log,arq])=>{
     if(arq) S.arq=arq.map(r=>({label:r.key.slice(14),...r.value})).sort((a,b)=>a.label.localeCompare(b.label,undefined,{numeric:true}));
