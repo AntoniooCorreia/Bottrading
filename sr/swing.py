@@ -34,10 +34,13 @@ CONFIRM_COINS = ("xrp", "ada", "doge", "link", "avax")
 KRAKEN_FEE = 0.0026          # taker spot da Kraken por lado (0.26%); ida-e-volta = 0.52% do preco + 0.05% slippage
 
 
-def load_crypto(key: str, period: str | None = None) -> pd.DataFrame:
+def load_crypto(key: str, period: str | None = None, base: str = "1h") -> pd.DataFrame:
     import os
     from .data import PERIODS
-    df = pd.read_csv(os.path.join("data", "crypto", f"{CRYPTO[key]}_1h.csv.gz"))
+    f = os.path.join("data", "crypto", f"{CRYPTO[key]}_{base}.csv.gz")
+    if not os.path.exists(f):
+        raise FileNotFoundError(f"{f} em falta: corre `TF={base} python crypto_download.py {CRYPTO[key]}`")
+    df = pd.read_csv(f, usecols=["ts", "open", "high", "low", "close"])
     idx = pd.DatetimeIndex(pd.to_datetime(df["ts"], unit="ms", utc=True))
     out = df[["open", "high", "low", "close"]].astype(float).set_index(idx)
     if period:
@@ -50,8 +53,11 @@ def load_crypto(key: str, period: str | None = None) -> pd.DataFrame:
 def load_tf(key: str, tf: str, period: str | None = None) -> pd.DataFrame:
     agg = {"open": "first", "high": "max", "low": "min", "close": "last"}
     if key in CRYPTO:
+        if tf in ("5m", "15m", "30m"):      # scalping: velas de 5m da Binance (data/crypto/*_5m.csv.gz)
+            m5 = load_crypto(key, period, "5m")
+            return m5 if tf == "5m" else m5.resample(tf.replace("m", "min"), label="left", closed="left").agg(agg).dropna()
         h1 = load_crypto(key, period)
-        return h1 if tf == "1h" else h1.resample({"4h": "4h", "1d": "1D", "15m": "15min"}[tf], label="left",
+        return h1 if tf == "1h" else h1.resample({"4h": "4h", "1d": "1D"}[tf], label="left",
                                                   closed="left").agg(agg).dropna()
     m5 = load_m5(key, period)
     agg = {"open": "first", "high": "max", "low": "min", "close": "last"}

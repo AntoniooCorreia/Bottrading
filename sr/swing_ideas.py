@@ -592,3 +592,98 @@ EXITS = {
     "k-dc20-d-own-be": {"be": True},
     "k-sma100-d-bull-bracket": {"signal_exit": False},
 }
+
+
+# ---------------- SCALPING CRIPTO (2026-11-21, pedido do Antonio: trades de minutos a poucas horas, varias por semana) ----------------
+# Todas com versao long e short (o Antonio quer shorts). Long = +1, short = -1. Sem filtro de risco minimo (ver SCALP_EXITS):
+# o custo em R aparece todo no resultado.
+
+def _ema(c: pd.Series, n: int) -> pd.Series:
+    return c.ewm(span=n, adjust=False).mean()
+
+
+def _side(sig_long: pd.Series, sig_short: pd.Series, side: str) -> pd.Series:
+    if side == "long":
+        return sig_long.astype(float)
+    return -sig_short.astype(float)
+
+
+def scalp_bb_rev(side: str):
+    """Reversao a media em 5m: fecho fora da banda de Bollinger (20, 2.5 desvios) a favor da tendencia de 1h (EMA 600 de 5m
+    ~ 50h). Long: fecho < banda de baixo e fecho > EMA600. Sai quando volta a media de 20 (sinal desliga) ou ao fim de 2h."""
+    def f(b):
+        c = b["close"]
+        m, sd = c.rolling(20).mean(), c.rolling(20).std()
+        tr = _ema(c, 600)
+        lo = (c < m - 2.5 * sd) & (c > tr)
+        hi = (c > m + 2.5 * sd) & (c < tr)
+        # posicao mantida ate o fecho cruzar a media de 20
+        L = _enter_exit(lo, c >= m)
+        S = _enter_exit(hi, c <= m)
+        return _side(L > 0, S > 0, side)
+    return f
+
+
+def scalp_orb_us(side: str):
+    """Abertura de Nova Iorque em 15m: maximo/minimo das 9:30-10:30 NY. Long no 1.o fecho acima do maximo depois das 10:30,
+    short no 1.o fecho abaixo do minimo. Uma entrada por dia e por lado. Sai no stop, no alvo 2R ou ao fim de 22 velas (~16:00 NY)."""
+    def f(b):
+        ny = b.index.tz_convert("America/New_York")
+        hm = ny.hour * 60 + ny.minute
+        day = pd.Series(ny.normalize(), index=b.index)
+        win = (hm >= 570) & (hm < 630)
+        hi = b["high"].where(win).groupby(day.values).transform("max")
+        lo = b["low"].where(win).groupby(day.values).transform("min")
+        after = (hm >= 630) & (hm < 945)
+        up = after & (b["close"] > hi)
+        dn = after & (b["close"] < lo)
+        first_up = up & (up.groupby(day.values).cumsum() == 1)
+        first_dn = dn & (dn.groupby(day.values).cumsum() == 1)
+        return _side(first_up, first_dn, side)
+    return f
+
+
+def scalp_rsi2(side: str):
+    """RSI(2) em 15m a favor da tendencia (EMA 200 de 15m ~ 2 dias). Long: RSI(2) < 5 e fecho > EMA200; sai com RSI(2) > 60
+    ou ao fim de 16 velas (4h). Short espelho: RSI(2) > 95 e fecho < EMA200; sai com RSI(2) < 40."""
+    def f(b):
+        c = b["close"]
+        r = _rsi(c, 2)
+        tr = _ema(c, 200)
+        L = _enter_exit((r < 5) & (c > tr), r > 60)
+        S = _enter_exit((r > 95) & (c < tr), r < 40)
+        return _side(L > 0, S > 0, side)
+    return f
+
+
+def scalp_burst(side: str):
+    """Explosao de momentum em 15m: vela com amplitude > 2.5x ATR(14) que fecha no quarto de cima (long) ou de baixo (short),
+    a favor da EMA 200. Entra na abertura seguinte; alvo 1.5R, stop 1.5 ATR, maximo 8 velas (2h)."""
+    def f(b):
+        h, l, c = b["high"], b["low"], b["close"]
+        tr = pd.concat([h - l, (h - c.shift()).abs(), (l - c.shift()).abs()], axis=1).max(axis=1)
+        a = tr.rolling(14).mean().shift()
+        rng = h - l
+        pos = (c - l) / rng.replace(0, np.nan)
+        e = _ema(c, 200)
+        up = (rng > 2.5 * a) & (pos > 0.75) & (c > e)
+        dn = (rng > 2.5 * a) & (pos < 0.25) & (c < e)
+        return _side(up, dn, side)
+    return f
+
+
+SCALP = {
+    # nome: (funcao, timeframe, stop em ATR, alvo R, max velas)
+    "s-bb-rev-5m": (scalp_bb_rev, "5m", 2.0, 0.0, 24),
+    "s-orb-us-15m": (scalp_orb_us, "15m", 1.5, 2.0, 22),
+    "s-rsi2-15m": (scalp_rsi2, "15m", 2.0, 0.0, 16),
+    "s-burst-15m": (scalp_burst, "15m", 1.5, 1.5, 8),
+}
+for _n, (_fn, _tf, _st, _tp, _mh) in SCALP.items():
+    for _sd in ("long", "short"):
+        IDEAS[f"{_n}-{_sd}"] = (_fn(_sd), _tf, _st, _tp, _mh)
+        # pulsos (orb, burst) so servem para entrar
+        if _n in ("s-orb-us-15m", "s-burst-15m"):
+            EXITS[f"{_n}-{_sd}"] = {"signal_exit": False}
+# o motor por defeito exige stop >= 4x custos (apagaria quase todos os scalps): nos scalps o custo entra todo no resultado
+NO_MIN_RISK = {f"{_n}-{_sd}" for _n in SCALP for _sd in ("long", "short")}

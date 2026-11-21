@@ -494,3 +494,24 @@ Segundo lote (2 ideias, ultimas da noite: 20 de 20), uma mudanca de cada vez con
   (a SOL tinha 69 na #113; pode cair abaixo de 60).
 Fasquia (criterio oficial cripto, fixo): >= 60 trades em CADA uma de BTC/ETH/SOL, meanR > 0 em cada, t junto >= 3.0, CONFIRMACAO
 positiva em >= 3/5 moedas extra; depois --period pre >= 0. Reportar sempre win rate e R por trade, pior ano e pior mes da carteira.
+
+## 2026-11-21 SCALPING cripto (Claude, a pedido do Antonio: "nao quero estar em trades durante dias, quero varias trades por semana") - registadas antes de correr
+Ideias cripto testadas antes: 32. Hoje: 4 ideias x 2 lados (long e short) = 8 variantes (#120-#127). Mais testes = mais desconfianca.
+Dados novos: velas de 5m da Binance (`TF=5m python crypto_download.py ...`), 15m = 5m agregadas. Custos oficiais iguais (Kraken taker
+0.26% por lado + 0.05% slippage = 0.57% ida e volta). AVISO ANTES DE CORRER: um stop de scalping em BTC e ~0.3-0.8% do preco,
+por isso os custos sozinhos valem ~0.7-2R por trade. Para passar, uma ideia precisa de ganhar MAIS do que isso por trade antes de custos.
+Mostra-se tambem (so como diagnostico, nao conta para o veredicto) o resultado sem custos e com custos de maker (0.16% por lado, limit).
+Shorts: spot na Kraken nao deixa; os shorts sao medidos para saber se valem a pena (precisariam de margem/futuros, com custos extra).
+- **#120/#121 s-bb-rev-5m long/short**: reversao a media em 5m. Fecho fora da Bollinger (20, 2.5 desvios) contra o movimento, mas a favor
+  da EMA 600 de 5m (~50h). Sai quando o fecho volta a media de 20, ou ao fim de 24 velas (2h). Stop 2 ATR(14) de 5m.
+  Hipotese: excessos de poucos minutos dentro da tendencia sao ruido de liquidez que reverte.
+- **#122/#123 s-orb-us-15m long/short**: rutura da 1.a hora de Nova Iorque (9:30-10:30 NY) em 15m. 1.o fecho fora do intervalo depois
+  das 10:30, uma por dia e lado. Stop 1.5 ATR(14) de 15m, alvo 2R, maximo 22 velas (~16:00 NY).
+  Hipotese: a abertura dos EUA traz o fluxo do dia (ETFs, institucionais); a rutura da 1.a hora segue.
+- **#124/#125 s-rsi2-15m long/short**: RSI(2) de 15m < 5 (long) / > 95 (short) a favor da EMA 200 de 15m. Sai com RSI(2) > 60 / < 40
+  ou ao fim de 16 velas (4h). Stop 2 ATR. Hipotese: o mesmo efeito de Connors em prazo curto.
+- **#126/#127 s-burst-15m long/short**: vela de 15m com amplitude > 2.5x ATR que fecha no quarto de cima/baixo, a favor da EMA 200.
+  Entra na abertura seguinte, alvo 1.5R, stop 1.5 ATR, maximo 8 velas (2h). Hipotese: explosoes de volume continuam por minutos.
+Fasquia: criterio oficial cripto (>= 60 trades por moeda, positiva em cada, t junto >= 3.0, confirmacao >= 3/5).
+- **Shorts da K1 (diagnostico para a conta demo)**: as 4 estrategias da K1 ao espelho (preco invertido), dev 2019-2024. So entram na demo
+  se forem positivas e passarem o criterio.

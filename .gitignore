@@ -10,3 +10,4 @@ public/
 live/state.json
 live/diario.log
 live/config.json
+data/crypto/*_5m.csv.gz

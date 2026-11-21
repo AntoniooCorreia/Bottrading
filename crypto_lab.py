@@ -17,7 +17,7 @@ import pandas as pd
 from sr import supa
 from sr.stats import summarize
 from sr.swing import CONFIRM_COINS, KRAKEN_FEE, MAIN_COINS, load_tf, run_positions
-from sr.swing_ideas import EXITS, IDEAS
+from sr.swing_ideas import EXITS, IDEAS, NO_MIN_RISK
 
 COST_PCT = 2 * KRAKEN_FEE + 0.0005
 
@@ -39,7 +39,8 @@ def main():
         fn, tf, st, tp, mh = IDEAS[name]
         for k in a.coins.split(","):
             b = load_tf(k, tf, None if a.period == "completo" else a.period)
-            tr = run_positions(b, fn(b), st, 0.0, 0.0, tp, mh, cost_pct=COST_PCT, financing=False, **EXITS.get(name, {}))
+            tr = run_positions(b, fn(b), st, 0.0, 0.0, tp, mh, cost_pct=COST_PCT, financing=False,
+                               **({'min_risk_cost': 0.0} if name in NO_MIN_RISK else {}), **EXITS.get(name, {}))
             if not len(tr):
                 continue
             yrs = (b.index[-1] - b.index[0]).days / 365.25
@@ -57,7 +58,8 @@ def main():
             b = load_tf(k, tf, None if a.period == "completo" else a.period)
             if len(b) < 300:
                 continue
-            tr = run_positions(b, fn(b), st, 0.0, 0.0, tp, mh, cost_pct=COST_PCT, financing=False, **EXITS.get(name, {}))
+            tr = run_positions(b, fn(b), st, 0.0, 0.0, tp, mh, cost_pct=COST_PCT, financing=False,
+                               **({'min_risk_cost': 0.0} if name in NO_MIN_RISK else {}), **EXITS.get(name, {}))
             if len(tr):
                 conf.setdefault(name, {})[k] = tr["R"].to_numpy()
     per = pd.DataFrame(rows)

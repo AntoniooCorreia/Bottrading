@@ -13,6 +13,13 @@ CAL = {"fomc-holiday-1h": ("2019-01-02", 12000), "flush-1h": ("2000-01-03", 4000
 
 def synth_d(n=3000, seed=0, tf="1d", start="2000-01-03"):
     rng = np.random.default_rng(seed)
+    if tf in ("5m", "15m"):   # scalping cripto: 24/7
+        idx = pd.date_range(start, periods=n, freq=tf.replace("m", "min"), tz="UTC")
+        c = 10000 * np.exp(np.cumsum(rng.standard_normal(n) * 0.002))
+        o = np.r_[c[0], c[:-1]] * (1 + rng.standard_normal(n) * 0.0003)
+        h = np.maximum(o, c) * (1 + np.abs(rng.standard_normal(n)) * 0.0007)
+        l = np.minimum(o, c) * (1 - np.abs(rng.standard_normal(n)) * 0.0007)
+        return pd.DataFrame({"open": o, "high": h, "low": l, "close": c}, index=idx)
     if tf == "1h":   # velas horarias seg-sex (ideias que dependem da hora do dia)
         idx = pd.date_range(start, periods=n * 2, freq="h", tz="America/New_York")
         idx = idx[idx.dayofweek < 5][:n]
@@ -30,7 +37,7 @@ def test_swing_random_walk_no_edge(name):
     fn, tf, st, tp, mh = IDEAS[name]
     rs = []
     for s in range(6):
-        st0, n0 = CAL.get(name, ("2000-01-03", 3000))
+        st0, n0 = CAL.get(name, ("2000-01-03", 12000 if tf in ("5m", "15m") else 3000))
         b = synth_d(n=n0, seed=s, tf=tf, start=st0)
         tr = run_positions(b, fn(b), st, 0.0, 0.0, tp, mh, min_risk_cost=0.0, **EXITS.get(name, {}))
         rs.append(tr["gross_R"].to_numpy())
@@ -43,7 +50,7 @@ def test_swing_random_walk_no_edge(name):
 @pytest.mark.parametrize("name", sorted(IDEAS))
 def test_swing_no_lookahead(name):
     fn, tf, st, tp, mh = IDEAS[name]
-    st0, n0 = CAL.get(name, ("2000-01-03", 3000))
+    st0, n0 = CAL.get(name, ("2000-01-03", 12000 if tf in ("5m", "15m") else 3000))
     b = synth_d(n=n0, seed=9, tf=tf, start=st0)
     cut = b.index[len(b) // 2]
     a = run_positions(b, fn(b), st, 1.0, 1.0, tp, mh, 0.0, **EXITS.get(name, {}))
