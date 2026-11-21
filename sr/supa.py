@@ -20,7 +20,13 @@ def _rpc(fn: str, payload: dict) -> bool:
         with urllib.request.urlopen(req, timeout=30) as r:
             return 200 <= r.status < 300
     except Exception as e:  # o dashboard nunca pode partir um backtest
-        print(f"[supabase] {fn} falhou: {e}")
+        extra = ""
+        if hasattr(e, "read"):
+            try:
+                extra = " | " + e.read().decode()[:300]
+            except Exception:
+                pass
+        print(f"[supabase] {fn} falhou: {e}{extra}")
         return False
 
 

@@ -214,4 +214,5 @@ Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --p
 
 ## Ideias do agente (2026-11-21, cripto sessao :00 19h UTC)
 Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --period dev --push --num "#138"` (e `--period pre` se passar).
-- [ ] #138: k-sma600-4h-bull-bracket (#118 em 4h, stop 3 ATR de 4h, so alvo 1R ou stop)
+- [x] #138: k-sma600-4h-bull-bracket -> REPROVADA (t junto +2.47 < 3.0); BTC +0.097R/246, ETH +0.051R/273, SOL +0.150R/173; win rate 59%;
+  confirmacao 5/5; carteira K41: +5.5%/ano, pior ano -2.1%, pior mes -9.3%, 1.2 trades/semana (base K20: 0.6). Pre/holdout NAO corridos
