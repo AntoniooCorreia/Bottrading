@@ -23,6 +23,14 @@
 | #117 | 2026-11-19 | k-sma600-4h-bull-tp1 (#113 em 4h) | +3.78 | 40% | +0.14 | +4.4%, 0.0% | PASSA dev; pre 1 trade -0.66R: REPROVADA no pre |
 | #118 | 2026-11-19 | k-sma100-d-bull-bracket (#113 sem saida pelo sinal: so alvo 1R ou stop) | +4.87 | **68%** | +0.33 | +10.3%, -2.0% | REPROVADA (SOL 54 trades < 60); confirmacao 5/5 |
 | #119 | 2026-11-19 | k-sma100-d-slope-tp1 (#113 so com media 100 a subir) | +4.10 | 53% | +0.23 | +8.1%, 0.0% | REPROVADA (SOL 58 trades < 60) |
+| #120-#127 | 2026-11-21 | SCALPING 5m/15m long e short (Bollinger 5m, 1.a hora de NY, RSI(2) 15m, explosao 15m); K22-K29 | -50 a -8 | 15-35% | -0.4 a -1.8 | -300% a -770%/ano | REPROVADAS: os custos (0.57%) valem 0.3-1.4R por trade |
+| K1 short | 2026-11-21 | as 4 da K1 ao espelho (so shorts); K30 | -1.9 a -0.7 | 22% | -0.07 a -0.15 | -4.6%, -17.9% (so 2022 positivo) | REPROVADA |
+| #128 | 2026-11-21 | shorts da K1 so com BTC < media 200 dias; K31 | -0.9 a 0.0 | 27% | -0.06 | -0.8%, -15.5% | REPROVADA |
+
+Scalping (2026-11-21): ANTES de custos ha uma vantagem pequena (RSI(2) 15m long: win rate 69%, +0.05R; Bollinger 5m BTC +0.08R),
+mas o stop de um scalp e 0.4-1.7% do preco e os custos da Kraken (0.57% ida e volta) valem 0.3-1.4R por trade. Nem com custos de maker
+(0.32%) passa. So com custos de futuros com ordens limit (~0.04% ida e volta) ficam perto de zero (+0.035R no ORB long). Conclusao:
+scalping em spot e impossivel com estes custos; shorts da K1 perdem (so ganham em 2022). Ideias cripto testadas no total: 42.
 
 Leitura honesta cripto (2026-11-19, sessao das :00 n.o 5):
 1. Ideias cripto testadas no total: 32 (K1 = 4, 6 compras de quedas, 2 diagnosticos de alvo, #100-#119). Mais testes = mais desconfianca. Limite da noite (20) atingido.

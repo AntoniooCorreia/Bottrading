@@ -515,3 +515,6 @@ Shorts: spot na Kraken nao deixa; os shorts sao medidos para saber se valem a pe
 Fasquia: criterio oficial cripto (>= 60 trades por moeda, positiva em cada, t junto >= 3.0, confirmacao >= 3/5).
 - **Shorts da K1 (diagnostico para a conta demo)**: as 4 estrategias da K1 ao espelho (preco invertido), dev 2019-2024. So entram na demo
   se forem positivas e passarem o criterio.
+- **#128 k1-short-bear (registada depois de ver os shorts da K1, por isso conta como ideia a mais e com desconfianca)**: as 4
+  estrategias da K1 ao espelho, mas so com o BTC ABAIXO da media de 200 dias (espelho exato do filtro do #101 dos longs;
+  sai tambem quando o regime volta a alta). Hipotese: os shorts so tem vantagem em mercado de baixa; em alta a deriva come-os.

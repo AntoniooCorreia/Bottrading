@@ -687,3 +687,33 @@ for _n, (_fn, _tf, _st, _tp, _mh) in SCALP.items():
             EXITS[f"{_n}-{_sd}"] = {"signal_exit": False}
 # o motor por defeito exige stop >= 4x custos (apagaria quase todos os scalps): nos scalps o custo entra todo no resultado
 NO_MIN_RISK = {f"{_n}-{_sd}" for _n in SCALP for _sd in ("long", "short")}
+
+
+# ---------------- SHORTS DA K1 (2026-11-21, pedido do Antonio: a demo abrir shorts) ----------------
+def mirror(fn):
+    """Estrategia ao espelho: corre a regra long sobre o preco invertido (1/preco) e devolve -1 onde ela compraria.
+    Rutura de maximo -> rutura de minimo, acima da media -> abaixo da media."""
+    def f(b):
+        inv = pd.DataFrame({"open": 1 / b["open"], "high": 1 / b["low"], "low": 1 / b["high"], "close": 1 / b["close"]},
+                           index=b.index)
+        return -fn(inv).clip(lower=0)
+    return f
+
+
+for _k in ("k-donchian20-d", "k-sma100-d", "k-donchian55-4h", "k-sma200-4h"):
+    _fn, _tf, _st, _tp, _mh = IDEAS[_k]
+    IDEAS[_k + "-short"] = (mirror(_fn), _tf, _st, _tp, _mh)
+
+
+def bear_only(fn):
+    """So mantem o short enquanto o BTC fechou o dia anterior abaixo da media de 200 dias (espelho do regime dos longs)."""
+    def f(b):
+        s = fn(b)
+        bull = _regime(b, 200)
+        return s.where(~bull.reindex(s.index).fillna(True).astype(bool), 0.0)
+    return f
+
+
+for _k in ("k-donchian20-d", "k-sma100-d", "k-donchian55-4h", "k-sma200-4h"):
+    _fn, _tf, _st, _tp, _mh = IDEAS[_k + "-short"]
+    IDEAS[_k + "-short-bear"] = (bear_only(_fn), _tf, _st, _tp, _mh)
