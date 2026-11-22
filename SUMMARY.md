@@ -38,6 +38,10 @@
 | #145 | 2026-11-22 | k-ema100-d-bull-bracket-s2 (#141 com EMA 100 / EMA 200 BTC); K48 | +3.37 | 61% | +0.17 | +10.4%, -4.3% (2022) | PASSA dev (conf. 4/5); pre 47 trades -0.06R, 2018 -7.5%: REPROVADA no pre |
 | #146 | 2026-11-22 | k-sma100-d-bull50-bracket-s2 (#141 + BTC tambem acima da media 50); K49 | +3.88 | 63% | +0.21 | +10.9%, 0.0% (pior mes -5.3%, queda -17%) | PASSA dev (conf. 5/5); pre 1 trade -1R: REPROVADA no pre |
 | #147 | 2026-11-22 | k-sma50-d-bull50-bracket-s2 (#146 com a moeda acima da media 50); K54 | +4.10 | 64% | +0.23 | +11.4%, -0.7% (pior mes -5.3%, queda -18%) | PASSA dev (conf. 5/5); pre 1 trade -1R: REPROVADA no pre. Nova base (pontuacao 86) |
+| #151 | 2026-11-22 | k-sma50-d-btc50-bracket-s2 (#147 com BTC so acima da media 50); K58 | +4.57 | 64% | +0.22 | +14.3%, -13.5% (2022) | PASSA dev (conf. 5/5); pre 50 trades -0.00R, 2018 -9%: REPROVADA no pre. Pontuacao 90 (nova base), mas falha o pior ano |
+| #152 | 2026-11-22 | k-sma50-d-bull50-bracket-s2-lose7 (#147, sai ao 7.o dia se a perder); K59 | +4.30 | 51% | +0.18 | +12.1%, -0.7% | PASSA dev (conf. 5/5); pre 1 trade -1R: REPROVADA no pre |
+| #153 | 2026-11-22 | k-sma50up-d-bull50-bracket-s2 (#147 com a media 50 a subir); K61 | +3.94 | 64% | +0.22 | +10.7%, -1.2% | PASSA dev (conf. 5/5); pre 0 trades: REPROVADA no pre |
+| #154 | 2026-11-22 | k-sma50-d-bull50-bracket-s2-rx (#147, sai quando o regime do BTC desliga); K60 | +4.53 | 60% | +0.21 | +12.3%, 0.0% (pior mes -4.9%, queda -15%) | PASSA dev (conf. 5/5); pre 1 trade -1R: REPROVADA no pre. Melhor carteira no objetivo (sem ano negativo, pior mes > -5%) |
 | #148 | 2026-11-22 | k-sma100-d-bull50-bracket-s2-tp075 (#146 com alvo 0.75R); K55 | +3.48 | 68% | +0.14 | +9.3%, -0.9% (pior mes -6.4%, queda -16%) | PASSA dev (conf. 4/5); pre 1 trade -1R: REPROVADA no pre |
 | #149 | 2026-11-22 | k-sma100-d-bull50-mom7-bracket-s2 (#146 + moeda acima do fecho de 7 dias antes); K56 | +3.96 | 64% | +0.23 | +10.6%, 0.0% (pior mes -4.2%, queda -16%) | PASSA dev (conf. 5/5); pre 0 trades: REPROVADA no pre |
 | #150 | 2026-11-22 | k-sma100-d-bull50-red-bracket-s2 (#146 so depois de um dia vermelho); K57 | +3.27 | 63% | +0.21 | +8.1%, 0.0% (pior mes -4.3%) | REPROVADA (SOL 56 < 60) |
@@ -52,17 +56,17 @@ Perpetuos (#133-#137): mesmo com custos 4x mais baixos nada passa. Os shorts int
 
 #138 (2026-11-21, 19h): a #118 em 4h abre 2x mais trades (1.2/semana, SOL 173) com win rate 59%, mas so +0.09R/trade: t 2.47, REPROVADA.
 
-Leitura honesta cripto (2026-11-22, sessao das :00 01h):
-1. Ideias cripto testadas no total: 64 (#100-#150, K1, scalping, intraday, perpetuos). Mais testes = mais desconfianca.
-2. Melhor win rate com resultado positivo: 68% (#118 +0.33R, reprovada SOL < 60; e #148 +0.14R, passa o dev). Melhor que passa o dev com R alto: 64% (#147/#149).
-3. #147 (media 50 + BTC acima das medias 200 e 50) e a nova base: +11.4%/ano, t +4.10, pior ano -0.7%, mas continua com 1.0 trades/semana.
-4. #149 (moeda a subir nos ultimos 7 dias) e a primeira com pior mes > -5% (-4.2%), pior ano 0.0% e queda -16%: cumpre win rate, pior ano e pior mes; falta % ao ano (10.6 < 14) e trades.
-5. #148 (alvo 0.75R) sobe win rate (68%) e trades (+30%), mas cada trade vale -35%: o custo come a diferenca. Encurtar alvo/stop nao e o caminho.
-6. As trades de 8-30 dias continuam a valer ~0R em todas as variantes: e um efeito de regime (mercados de lado), nao da regra de entrada.
-7. TODAS as variantes desta familia reprovam no pre por terem 0-1 trades (o regime do BTC so existe a partir de mar-2018). Nada mudado nos periodos/criterio: decisao do Antonio.
-8. Painel: K54-K57 gravadas (cuidado: correr --push em paralelo sem --label sobrepoe o mesmo K; corrigido com --label explicito).
-9. Proximo passo: base K54 (#147). Testar #147 + momento 7 dias (juntar o melhor pior mes ao melhor %/ano) e uma 2.a estrategia para quando o BTC esta abaixo da media de 200 (2022 tem 0 trades).
-   Demo experimental: o filtro "BTC acima da media 50" ainda nao existe no engine.ts (familia nova): #146-#149 nao entram na demo sem mexer no engine + testes.
+Leitura honesta cripto (2026-11-22, sessao das :30 01h30):
+1. Ideias cripto testadas no total: 68 (#100-#154, K1, scalping, intraday, perpetuos). Mais testes = mais desconfianca num resultado isolado.
+2. Melhor win rate com resultado positivo: 68% (#118 +0.33R, reprovada SOL < 60; #148 +0.14R, passa o dev). Na familia atual: 64% (#147/#151/#153).
+3. #154 (sair de tudo quando o BTC perde o regime) e a 1.a que cumpre pior ano (0.0%) E pior mes (-4.9%) com +12.3%/ano e queda -15%; win rate 60%.
+4. #151 (BTC so acima da media 50) tem a maior pontuacao (90, nova base pelo best.py): +14.3%/ano e 1.2 trades/semana, mas 2022 -13.5%
+   e pre 2018 -9%: sem a media 200 do BTC os anos de baixa voltam. Pontuacao alta NAO e aprovacao.
+5. #152 (sair ao 7.o dia a perder) abre +30% de trades mas o win rate cai para 51%. #153 (media 50 a subir) nao resolve 2024.
+6. Pre: as variantes com a media 200 do BTC continuam com 0-1 trades em 2017-18; a #151 mostra que, quando ha trades no pre, o resultado e ~0R.
+7. Painel: K58-K61 (dev) e K62-K63 (pre) gravadas; as corridas em paralelo voltaram a sobrepor K59/K63 (corrigido com --label no dev).
+8. Proximo passo: base K58 (#151) com a saida da #154 (sair quando o BTC perde a media 50) e com o filtro BTC > media 200 so para entrar em
+   2022 -> juntar o %/ano da #151 ao pior ano da #154. Ninguem passou o pre: holdout fechado.
 
 # Resumo indices (ARQUIVO, custos CFD incluidos)
 

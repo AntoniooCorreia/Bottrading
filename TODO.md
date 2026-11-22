@@ -252,7 +252,11 @@ Registadas em IDEAS.md antes de correr.
 
 ## Ideias do agente (2026-11-22, cripto sessao :30 01h30; base K54 = #147)
 Registadas em IDEAS.md antes de correr.
-- [ ] #151: k-sma50-d-btc50-bracket-s2 (BTC so acima da media 50; mais trades e pre com trades)
-- [ ] #152: k-sma50-d-bull50-bracket-s2-lose7 (sai ao 7.o dia se estiver a perder)
-- [ ] #153: k-sma50up-d-bull50-bracket-s2 (media 50 da moeda a subir)
-- [ ] #154: k-sma50-d-bull50-bracket-s2-rx (sai quando o regime do BTC desliga)
+- [x] #151: k-sma50-d-btc50-bracket-s2 -> PASSA dev (t +4.57; BTC +0.199R/137, ETH +0.194R/149, SOL +0.303R/97; win rate 64%; conf. 5/5);
+  carteira K58: +14.3%/ano, pior ano -13.5% (2022), pior mes -5.3%, pior queda -16.8%, 1.2 trades/semana. Pre 2017-18: 50 trades -0.003R, 2018 -9.0% -> REPROVADA no pre. Holdout NAO aberto
+- [x] #152: k-sma50-d-bull50-bracket-s2-lose7 -> PASSA dev (t +4.30; BTC +0.106R/150, ETH +0.158R/152, SOL +0.291R/112; win rate 51%; conf. 5/5);
+  carteira K59: +12.1%/ano, pior ano -0.7%, pior mes -5.3%, pior queda -17.0%, 1.3 trades/semana. Pre: 1 trade (BTC -1.04R) -> REPROVADA no pre. Holdout NAO aberto
+- [x] #153: k-sma50up-d-bull50-bracket-s2 -> PASSA dev (t +3.94; BTC +0.193R/102, ETH +0.178R/114, SOL +0.333R/73; win rate 64%; conf. 5/5);
+  carteira K61: +10.7%/ano, pior ano -1.2%, pior mes -4.2%, pior queda -17.7%, 0.9 trades/semana. Pre: 0 trades -> REPROVADA no pre (nao da para julgar). Holdout NAO aberto
+- [x] #154: k-sma50-d-bull50-bracket-s2-rx -> PASSA dev (t +4.53; BTC +0.173R/121, ETH +0.206R/128, SOL +0.276R/95; win rate 60%; conf. 5/5);
+  carteira K60: +12.3%/ano, pior ano 0.0%, pior mes -4.9%, pior queda -15.0%, 1.1 trades/semana. Pre: 1 trade (BTC -1.04R) -> REPROVADA no pre. Holdout NAO aberto
