@@ -260,3 +260,10 @@ Registadas em IDEAS.md antes de correr.
   carteira K61: +10.7%/ano, pior ano -1.2%, pior mes -4.2%, pior queda -17.7%, 0.9 trades/semana. Pre: 0 trades -> REPROVADA no pre (nao da para julgar). Holdout NAO aberto
 - [x] #154: k-sma50-d-bull50-bracket-s2-rx -> PASSA dev (t +4.53; BTC +0.173R/121, ETH +0.206R/128, SOL +0.276R/95; win rate 60%; conf. 5/5);
   carteira K60: +12.3%/ano, pior ano 0.0%, pior mes -4.9%, pior queda -15.0%, 1.1 trades/semana. Pre: 1 trade (BTC -1.04R) -> REPROVADA no pre. Holdout NAO aberto
+
+## Ideias do agente (2026-11-22, cripto sessao :00 02h, base K58 = #151)
+Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --period dev --push --num "#1xx" --nota ...` (e `--period pre` se passar).
+- [ ] #155: k-sma50-d-btc50-bracket-s2-rx (sai de tudo quando o BTC perde a media 50)
+- [ ] #156: k-sma50-d-btc50up-bracket-s2 (media 50 do BTC a subir)
+- [ ] #157: k-sma50-d-btc50-bracket-s15 (stop 1.5 ATR, mais trades)
+- [ ] #158: k-sma20-d-btc50-bracket-s2 (moeda acima da media 20, mais trades)
