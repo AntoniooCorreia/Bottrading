@@ -219,7 +219,11 @@ Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --p
 
 ## Ideias do agente (2026-11-22, cripto sessao :00 00h; base K20 = #118)
 Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --period dev --push --num "#13x" --nota "..."` (e `--period pre` se passar).
-- [ ] #139: k-sma100-d-bull-bracket-mh10 (tempo maximo 10 dias)
-- [ ] #140: k-sma100-d-own-bracket (sem filtro do BTC)
-- [ ] #141: k-sma100-d-bull-bracket-s2 (stop 2 ATR diario)
-- [ ] #142: carteira k-sma100-d-bull-bracket + k-dc20-d-bull-tp1 (#118 + #107)
+- [x] #139: k-sma100-d-bull-bracket-mh10 -> PASSA dev (t +4.12; BTC +0.135R/142, ETH +0.104R/135, SOL +0.235R/92; win rate 57%; confirmacao 5/5);
+  carteira K42: +9.1%/ano, pior ano -1.5%, pior mes -3.9%, pior queda -11.1%, 1.2 trades/semana. Pre 2017-18: 1 trade (ETH -1.03R) -> REPROVADA no pre. Holdout NAO aberto
+- [x] #140: k-sma100-d-own-bracket -> REPROVADA (SOL 56 trades < 60); t +4.31, BTC +0.369R/71, ETH +0.207R/81, SOL +0.277R/56; win rate 65%;
+  confirmacao 5/5; carteira K43: +9.7%/ano mas 2022 -13.5% (pior queda -17.7%), 0.7 trades/semana
+- [x] #141: k-sma100-d-bull-bracket-s2 -> PASSA dev (t +3.47; BTC +0.158R/118, ETH +0.148R/127, SOL +0.276R/86; win rate 62%; confirmacao 4/5);
+  carteira K44: +10.2%/ano, pior ano -2.1%, pior mes -5.3%, pior queda -18.1%, 1.1 trades/semana. Pre 2017-18: 1 trade (ETH -1.05R) -> REPROVADA no pre. Holdout NAO aberto
+- [x] #142: carteira #118 + #107 (K45) -> as duas REPROVADAS sozinhas (SOL < 60); a carteira junta so mais 14 trades em 6 anos (0.6/semana):
+  win rate 64%, +9.8%/ano, pior ano -2.0%, pior mes -4.1%, pior queda -8.0%. Sobrepoem-se quase sempre
