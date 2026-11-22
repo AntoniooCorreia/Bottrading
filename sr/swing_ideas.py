@@ -1018,3 +1018,10 @@ for _n, _v in {
 }.items():
     IDEAS[_n] = _v
     EXITS[_n] = {"signal_exit": False}
+
+
+# ---------------- TRADES MAIS CURTAS (2026-11-22) ----------------
+IDEAS["k-sma50-d-bull-bracket-s2-mh3"] = (sma_bull_entry(50), "1d", 2.0, 1.0, 3)
+IDEAS["k-sma600-4h-bull-bracket-mh12"] = (sma_bull_entry(600), "4h", 3.0, 1.0, 12)
+EXITS["k-sma50-d-bull-bracket-s2-mh3"] = dict(EXITS.get("k-sma50-d-bull-bracket-s2", {}))
+EXITS["k-sma600-4h-bull-bracket-mh12"] = dict(EXITS.get("k-sma600-4h-bull-bracket", {}))

@@ -38,6 +38,7 @@ def main():
     ap.add_argument("--nota", default="", help="nota curta que aparece no painel (ex.: '#100 persistencia 1 dia')")
     ap.add_argument("--out", default="", help="escreve a carteira num ficheiro JSON (sem Supabase)")
     ap.add_argument("--venue", default="spot", choices=["spot", "perp"], help="spot Kraken (so long) ou perpetuos Kraken")
+    ap.add_argument("--max-open", type=int, default=0, help="carteira: maximo de trades abertas ao mesmo tempo (0 = sem limite)")
     ap.add_argument("--num", default="", help="numero do catalogo (#133) para o separador Testes")
     a = ap.parse_args()
     global COST_PCT
@@ -116,6 +117,8 @@ def main():
     for i, r in allt.iterrows():
         open_ = [o for o in open_ if o[0].normalize() >= r.t0.normalize()]   # ainda aberta (liberta so no dia seguinte ao fecho)
         if any(o[1] == r.mk for o in open_):
+            continue
+        if a.max_open and len(open_) >= a.max_open:   # limite de trades abertas ao mesmo tempo (risco junto)
             continue
         open_.append((r.t, r.mk))
         keep.append(i)

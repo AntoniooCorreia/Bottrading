@@ -715,3 +715,13 @@ Ideias cripto testadas antes: 58 (#100-#158 mais variantes). Hoje: 4 (#159-#162)
 - **#162 r-capit-d**: depois de um dia que caiu mais de 3 ATR(14) (capitulacao), entra quando um dia fecha acima do maximo do dia
   da queda (nos 5 dias seguintes). Stop 3 ATR, alvo 1R, maximo 5 dias. Hipotese: ressalto depois de vendas forcadas.
 Fasquia: criterio oficial (>= 60 trades por moeda, positiva em cada, t >= 3.0, confirmacao >= 3/5); depois pre e holdout uma vez.
+
+## 2026-11-22 MAIS TRADES: MAIS MOEDAS E TRADES MAIS CURTAS (Claude, pedido do Antonio: ~170 trades/ano, "ou entao trades mais curtas") - registadas antes de correr
+Base: as 3 estrategias da demo experimental (#139 + #144 + #138), custos de perpetuos. Com 3 moedas: 62 trades/ano, +13.4%/ano.
+Com as 8 moedas (BTC, ETH, SOL + XRP, ADA, DOGE, LINK, AVAX) sem limite: 165 trades/ano, +22.6%/ano mas pior mes -13.4% e queda -41.5%.
+Trades mais curtas: aqui o stop e de 2-3 ATR DIARIO (~6-10% do preco), por isso os custos de perpetuos pesam ~0.02R por trade (ao contrario
+do scalping, onde pesavam 0.3-1.4R). Sair mais cedo liberta o lugar e deixa entrar outra trade.
+- **#163 k-sma50-d-bull-bracket-s2-mh3**: a #144 com tempo maximo de 3 dias (sai ao fecho do 3.o dia se nao bateu alvo/stop).
+- **#164 k-sma600-4h-bull-bracket-mh12**: a #138 com tempo maximo de 12 velas de 4h (2 dias).
+- **Carteiras (regra de risco, nao ideia nova)**: demo atual (#139+#144+#138) e versao curta (#139+#163+#164) em 8 moedas com no maximo
+  3 e 4 trades abertas ao mesmo tempo (--max-open). Objetivo: >= ~150 trades/ano, pior mes > -5%, queda < ~15%.
