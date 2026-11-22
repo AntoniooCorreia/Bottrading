@@ -78,14 +78,18 @@ def atr(b: pd.DataFrame, n: int = 14) -> np.ndarray:
 def run_positions(b: pd.DataFrame, pos: pd.Series, stop_atr: float, cfd_cost: float, fut_cost: float,
                   tp_r: float = 0.0, max_hold: int = 0, min_risk_cost: float = 4.0,
                   cost_pct: float = 0.0, financing: bool = True, return_open: bool = False,
-                  partial: float = 0.0, be: bool = False, signal_exit: bool = True):
-    """signal_exit=False: o sinal so serve para ENTRAR; a trade so sai no stop, no alvo ou no tempo maximo.
+                  partial: float = 0.0, be: bool = False, signal_exit: bool = True,
+                  lose_hold: int = 0, exit_fn=None):
+    """lose_hold > 0: ao fecho da vela lose_hold (ou depois), sai se o fecho estiver pior que a entrada (as que ganham ficam).
+    exit_fn: funcao b -> mascara booleana (so passado); sai ao fecho da vela i quando mascara[i] e True. Ambos desligados = igual.
+    signal_exit=False: o sinal so serve para ENTRAR; a trade so sai no stop, no alvo ou no tempo maximo.
     partial > 0 (com tp_r > 0): fecha essa fracao no alvo e o resto continua (stop do resto em breakeven se be=True).
     be=True sem partial e com tp_r > 0: nao fecha nada no alvo, so passa o stop para breakeven quando toca o alvo.
     Breakeven = entrada x (1 + cost_pct) (o resto ja nao perde depois de custos). Sem partial/be: igual ao de sempre."""
     o, h, l, c = (b[k].to_numpy() for k in ("open", "high", "low", "close"))
     want = pos.reindex(b.index).fillna(0).to_numpy()
     a = atr(b)
+    xm = exit_fn(b).reindex(b.index).fillna(False).to_numpy(dtype=bool) if exit_fn is not None else None
     idx = b.index
     nyday = np.asarray(idx.tz_convert("America/New_York").normalize().asi8) if idx.tz is not None else np.asarray(idx.normalize().asi8)
     n = len(b)
@@ -133,7 +137,9 @@ def run_positions(b: pd.DataFrame, pos: pd.Series, stop_atr: float, cfd_cost: fl
         w = int(np.sign(want[i]))
         if cur is not None:
             held = i - cur["i"]
-            if (signal_exit and w != cur["d"]) or (max_hold and held >= max_hold):
+            if ((signal_exit and w != cur["d"]) or (max_hold and held >= max_hold)
+                    or (lose_hold and held >= lose_hold and (c[i] - cur["entry"]) * cur["d"] < 0)
+                    or (xm is not None and xm[i])):
                 close_trade(i, c[i])   # sai no fecho da vela i (~ abertura da seguinte)
         if cur is None and w != 0 and np.isfinite(a[i]) and a[i] > 0:
             entry = o[i + 1]

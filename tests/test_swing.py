@@ -189,3 +189,19 @@ def test_signal_exit_false_ignores_signal():
     assert tr["exit"][0] == idx[20] and abs(tr["gross_R"][0]) < 1e-9
     tr = run_positions(b, pos, 3.0, 0.0, 0.0, 1.0, 0, 0.0, signal_exit=False)
     assert len(tr) == 1 and tr["exit"][0] == idx[30] and abs(tr["gross_R"][0] - 1.0) < 1e-9
+
+
+def test_lose_hold_and_exit_fn():
+    """#152/#154: lose_hold so fecha trades a perder; exit_fn fecha no fecho da vela marcada. Desligados = igual ao de sempre."""
+    b = synth_d(800, seed=3)
+    pos = pd.Series(1, index=b.index)
+    base = run_positions(b, pos, 2.0, 0.0, 0.0, 1.0, 0, 0.0, signal_exit=False)
+    same = run_positions(b, pos, 2.0, 0.0, 0.0, 1.0, 0, 0.0, signal_exit=False, lose_hold=0, exit_fn=None)
+    pd.testing.assert_frame_equal(base, same)
+    lh = run_positions(b, pos, 2.0, 0.0, 0.0, 1.0, 0, 0.0, signal_exit=False, lose_hold=7)
+    early = lh[(lh["gross_R"] > -0.999) & (lh["gross_R"] < 0.999)]
+    assert len(early) > 0 and (early["gross_R"] < 0).all()      # saidas fora do alvo/stop sao so a perder
+    xm = pd.Series(False, index=b.index); xm.iloc[::50] = True
+    xf = run_positions(b, pos, 2.0, 0.0, 0.0, 1.0, 0, 0.0, signal_exit=False, exit_fn=lambda _b: xm)
+    assert len(xf) > len(base)
+    assert set(xf["exit"]) & set(b.index[::50])

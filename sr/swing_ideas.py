@@ -383,6 +383,31 @@ def sma_bull2_extra_entry(n: int, extra: str, n_btc_fast: int = 50):
     return f
 
 
+def sma_btc50_entry(n: int, n_btc: int = 50):
+    """#151: moeda acima da media de n velas e BTC acima SO da media de n_btc dias (dia anterior fechado), vela a vela."""
+    def f(b: pd.DataFrame) -> pd.Series:
+        c = b["close"]
+        sma = c.rolling(n).mean()
+        return ((c > sma) & sma.notna() & _regime(b, n_btc, n_btc)).astype(int)
+    return f
+
+
+def sma_up_bull2_entry(n: int, k: int = 5, n_btc_fast: int = 50):
+    """#153: condicoes da #147 (sma_bull2_entry) + media de n velas da moeda acima da de k velas antes (a subir)."""
+    def f(b: pd.DataFrame) -> pd.Series:
+        sma = b["close"].rolling(n).mean()
+        base = sma_bull2_entry(n, n_btc_fast)(b).astype(bool)
+        return (base & (sma > sma.shift(k)).fillna(False)).astype(int)
+    return f
+
+
+def btc_regime_off(n_btc_fast: int = 50):
+    """#154: mascara de saida: True quando o regime do BTC (dia anterior acima das medias de 200 e n_btc_fast) esta desligado."""
+    def f(b: pd.DataFrame) -> pd.Series:
+        return ~(_regime(b, 200) & _regime(b, n_btc_fast, n_btc_fast)).astype(bool)
+    return f
+
+
 def pullback_bull(n_trend: int, n_dip: int, n_hi: int):
     """Recuo na tendencia: BTC em alta, moeda acima da media de n_trend e fecho abaixo dos n_dip fechos anteriores.
     Sai ao fechar acima do maximo das n_hi velas anteriores (tendencia retomada)."""
@@ -662,6 +687,11 @@ IDEAS = {
     "k-sma100-d-bull50-bracket-s2-tp075": (sma_bull2_entry(100), "1d", 2.0, 0.75, 0),
     "k-sma100-d-bull50-mom7-bracket-s2": (sma_bull2_extra_entry(100, "mom7"), "1d", 2.0, 1.0, 0),
     "k-sma100-d-bull50-red-bracket-s2": (sma_bull2_extra_entry(100, "red"), "1d", 2.0, 1.0, 0),
+    # cripto 2026-11-22 sessao :30 (01h30), base #147 (registadas antes de correr)
+    "k-sma50-d-btc50-bracket-s2": (sma_btc50_entry(50), "1d", 2.0, 1.0, 0),
+    "k-sma50-d-bull50-bracket-s2-lose7": (sma_bull2_entry(50), "1d", 2.0, 1.0, 0),
+    "k-sma50up-d-bull50-bracket-s2": (sma_up_bull2_entry(50), "1d", 2.0, 1.0, 0),
+    "k-sma50-d-bull50-bracket-s2-rx": (sma_bull2_entry(50), "1d", 2.0, 1.0, 0),
 }
 
 # saidas extra por ideia (argumentos de run_positions): partial = fracao fechada no alvo tp_r (resto com stop em breakeven);
@@ -684,6 +714,10 @@ EXITS = {
     "k-sma100-d-bull50-bracket-s2-tp075": {"signal_exit": False},
     "k-sma100-d-bull50-mom7-bracket-s2": {"signal_exit": False},
     "k-sma100-d-bull50-red-bracket-s2": {"signal_exit": False},
+    "k-sma50-d-btc50-bracket-s2": {"signal_exit": False},
+    "k-sma50-d-bull50-bracket-s2-lose7": {"signal_exit": False, "lose_hold": 7},
+    "k-sma50up-d-bull50-bracket-s2": {"signal_exit": False},
+    "k-sma50-d-bull50-bracket-s2-rx": {"signal_exit": False, "exit_fn": btc_regime_off(50)},
 }
 
 
