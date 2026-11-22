@@ -617,3 +617,27 @@ entra na abertura seguinte quando esta sem posicao; sai SO no alvo 1R ou no stop
   trades (corta trades, nao abre).
 Fasquia (criterio oficial cripto, fixo): >= 60 trades em CADA uma de BTC/ETH/SOL, meanR > 0 em cada, t junto >= 3.0, CONFIRMACAO
 positiva em >= 3/5 moedas extra; depois --period pre >= 0. Comparar sempre com a base K44: win rate, % total, melhor ano, pior ano, trades/semana.
+
+## 2026-11-22 cripto - sessao :00 (01h) (4 ideias; ideias cripto testadas antes: 60; hoje: 12 de 20) - registadas antes de correr
+Base (best.py): K49 = #146 k-sma100-d-bull50-bracket-s2 (pontuacao 86: win rate 63%, total +65%, melhor ano +26.9%, pior ano 0.0%,
+pior mes -5.3%, 1.0 trades/semana). PASSA o dev (t +3.88, conf. 5/5); REPROVA no pre (1 trade).
+O que falha: (a) 119 trades de 8-30 dias valem +0.02R (win rate 53%) contra +0.24 a +0.38R nas de <= 7 dias; (b) 2024 0.0R
+(81 trades, win rate 52%); (c) pior mes -5.3%; (d) 1.0 trades/semana (objetivo 2-3), mediana de 8 dias sem trade; 2022 sem trades;
+(e) pre: 1 trade (regime do BTC so existe a partir de mar-2018).
+Uma mudanca de cada vez contra a #146 (moeda fecha acima da media de 100 dias; BTC fechou o dia anterior acima das medias de 200 e
+50 dias; entra na abertura seguinte quando esta sem posicao; sai SO no alvo 1R ou no stop 2 ATR(14) diario; reentra se continuar):
+- **#147 k-sma50-d-bull50-bracket-s2** (MAIS TRADES; ataca (d)): moeda acima da media de 50 dias (em vez de 100). Hipotese: na #141
+  a media 50 (#144) deu mais dias com condicao ligada e melhor pior ano; o filtro duplo do BTC (#146) corta os recuos maus que a
+  media 50 deixa entrar -> as duas melhorias somam-se: mais trades sem perder o pior ano. Risco: entradas em recuos que viram queda.
+- **#148 k-sma100-d-bull50-bracket-s2-tp075** (MAIS TRADES; ataca (a)): alvo 0.75R (em vez de 1R), stop igual. Hipotese: com
+  deriva positiva, um alvo mais perto e tocado mais vezes e mais depressa -> win rate mais alto, menos trades de 8-30 dias presas
+  e mais trades por semana. Risco: o custo em R e o mesmo e o ganho por vitoria cai 25% -> R por trade pode cair.
+- **#149 k-sma100-d-bull50-mom7-bracket-s2** (ataca (b) e (a)): alem das condicoes da #146, a moeda tem de fechar acima do fecho de
+  7 dias antes. Hipotese: momento de 1-4 semanas e documentado em cripto (Liu e Tsyvinski 2021: o retorno da semana preve o da
+  seguinte); em anos de lado (2024) metade das entradas acontece em semanas a descer, que sao as trades lentas. Risco: corta trades.
+- **#150 k-sma100-d-bull50-red-bracket-s2** (ataca win rate e (a)): alem das condicoes da #146, so entra depois de um dia que fechou
+  abaixo do fecho anterior (dia vermelho). Hipotese: comprar um recuo de 1 dia dentro da tendencia da um preco de entrada melhor
+  (reversao de curto prazo) -> alvo tocado mais depressa e win rate mais alto. E o contrario da #149: testamos as duas para saber de
+  que lado esta o efeito diario dentro da tendencia. Risco: corta trades (menos de 60 na SOL).
+Fasquia (criterio oficial cripto, fixo): >= 60 trades em CADA uma de BTC/ETH/SOL, meanR > 0 em cada, t junto >= 3.0, CONFIRMACAO
+positiva em >= 3/5 moedas extra; depois --period pre >= 0. Comparar sempre com a base K49: win rate, % total, melhor ano, pior ano, trades/semana.
