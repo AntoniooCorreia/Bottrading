@@ -697,3 +697,21 @@ entra na abertura seguinte quando esta sem posicao; sai SO no alvo 1R ou no stop
 Fasquia (criterio oficial cripto, fixo): >= 60 trades em CADA uma de BTC/ETH/SOL, meanR > 0 em cada, t junto >= 3.0, CONFIRMACAO
 positiva em >= 3/5 moedas extra; depois --period pre >= 0. Comparar sempre com a base K58: win rate, % total, melhor ano, pior ano, trades/semana.
 Com esta sessao o limite da noite (20 ideias) fica atingido.
+
+## 2026-11-22 ENTRAR NOS LONGS MAIS CEDO (Claude, pedido do Antonio: "faz testes para dar longs mais rapido") - registadas antes de correr
+Contexto: BTC a ~60 900 $, 19% abaixo da media de 200 dias; as estrategias da demo (filtros de media) so voltam depois de +25-40%.
+Os filtros de media mais rapidos ja foram testados esta noite (#146-#158: BTC > media 50, moeda > media 20/50): passam dev mas
+reprovam no pre ou no holdout (#155, #157). Por isso aqui a ideia e OUTRA: comprar a RECUPERACAO depois de uma queda grande, sem
+esperar pela media. Custos de perpetuos (--venue perp, a venue da demo experimental), so long, alvo 1R, parametros fixos.
+Ideias cripto testadas antes: 58 (#100-#158 mais variantes). Hoje: 4 (#159-#162).
+- **#159 r-hi10-dd-d**: fecho diario acima do maximo das 10 velas anteriores E a moeda >= 30% abaixo do seu maximo de 100 dias.
+  Stop 3 ATR(14) diario, alvo 1R, maximo 10 dias. Sem filtro do BTC. Hipotese: depois de um crash, a primeira rutura de 10 dias
+  marca a volta do comprador (capitulacao acabou); entra semanas antes de a media de 200 virar.
+- **#160 r-btc-reclaim20-d**: BTC abaixo da media de 200 dias (mercado em baixa) mas o BTC fechou acima da sua media de 20 dias, e a
+  moeda fechou acima da sua media de 20 dias. Stop 2 ATR, alvo 1R, maximo 10 dias. Hipotese: em baixa, as recuperacoes do BTC acima
+  da media de 20 arrastam as outras durante alguns dias.
+- **#161 r-hi10-dd-4h**: a #159 em velas de 4h: fecho acima do maximo das 60 velas anteriores (10 dias) e moeda >= 30% abaixo do maximo
+  das ultimas 600 velas (100 dias). Stop 3 ATR(14) de 4h, alvo 1R, maximo 60 velas. Hipotese: o mesmo, detetado ate 20h mais cedo.
+- **#162 r-capit-d**: depois de um dia que caiu mais de 3 ATR(14) (capitulacao), entra quando um dia fecha acima do maximo do dia
+  da queda (nos 5 dias seguintes). Stop 3 ATR, alvo 1R, maximo 5 dias. Hipotese: ressalto depois de vendas forcadas.
+Fasquia: criterio oficial (>= 60 trades por moeda, positiva em cada, t >= 3.0, confirmacao >= 3/5); depois pre e holdout uma vez.

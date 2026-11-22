@@ -969,3 +969,52 @@ IDEAS["h-dc24-1h-short"] = (h_dc24_short(), "1h", 3.0, 2.0, 24)
 IDEAS["h-rsi2-1h-short"] = (h_rsi2_short(), "1h", 3.0, 0.0, 24)
 EXITS["h-dc24-1h-short"] = {"signal_exit": False}
 NO_MIN_RISK |= {"h-dc24-1h-short", "h-rsi2-1h-short"}
+
+
+# ---------------- ENTRAR NOS LONGS MAIS CEDO (2026-11-22, pedido do Antonio) ----------------
+def _atr_s(b, n=14):
+    h, l, c = b["high"], b["low"], b["close"]
+    tr = pd.concat([h - l, (h - c.shift()).abs(), (l - c.shift()).abs()], axis=1).max(axis=1)
+    return tr.rolling(n).mean()
+
+
+def r_hi_dd(n_hi: int, n_max: int, dd: float = 0.30):
+    def f(b):
+        c = b["close"]
+        brk = c > b["high"].rolling(n_hi).max().shift(1)
+        deep = c <= (1 - dd) * b["high"].rolling(n_max).max()
+        return (brk & deep).astype(float)
+    return f
+
+
+def r_btc_reclaim20():
+    def f(b):
+        c = b["close"]
+        bull200 = btc_bull_regime(b.index, n=200)
+        bull20 = btc_bull_regime(b.index, n=20)
+        if bull200 is None or bull20 is None:
+            bull200 = (c > c.rolling(200).mean()).shift(1).fillna(False)
+            bull20 = (c > c.rolling(20).mean()).shift(1).fillna(False)
+        return ((~bull200.astype(bool)) & bull20.astype(bool) & (c > c.rolling(20).mean())).astype(float)
+    return f
+
+
+def r_capit():
+    def f(b):
+        c, h = b["close"], b["high"]
+        a = _atr_s(b).shift(1)
+        crash = (c.shift(1) - c) > 3 * a          # dia que caiu mais de 3 ATR
+        hi_crash = h.where(crash).ffill(limit=5)
+        recent = crash.rolling(5).max().shift(1).fillna(0).astype(bool)
+        return (recent & (c > hi_crash.shift(1))).astype(float)
+    return f
+
+
+for _n, _v in {
+    "r-hi10-dd-d": (r_hi_dd(10, 100), "1d", 3.0, 1.0, 10),
+    "r-btc-reclaim20-d": (r_btc_reclaim20(), "1d", 2.0, 1.0, 10),
+    "r-hi10-dd-4h": (r_hi_dd(60, 600), "4h", 3.0, 1.0, 60),
+    "r-capit-d": (r_capit(), "1d", 3.0, 1.0, 5),
+}.items():
+    IDEAS[_n] = _v
+    EXITS[_n] = {"signal_exit": False}

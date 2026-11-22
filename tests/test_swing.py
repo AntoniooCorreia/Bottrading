@@ -8,14 +8,16 @@ from sr.swing_ideas import EXITS, IDEAS
 
 # Ideias de calendario com datas fixas (ex.: FOMC desde 2012) precisam de velas sinteticas nesses anos e mais longas
 CAL = {"fomc-holiday-1h": ("2019-01-02", 12000), "flush-1h": ("2000-01-03", 40000), "ibs-cash-1h": ("2000-01-03", 30000),
-       "rsi2-cash-1h": ("2000-01-03", 60000), "h-squeeze-1h": ("2000-01-03", 30000)}
+       "rsi2-cash-1h": ("2000-01-03", 60000), "h-squeeze-1h": ("2000-01-03", 30000), "r-hi10-dd-d": ("1950-01-03", 20000), "r-hi10-dd-4h": ("1950-01-03", 40000), "r-capit-d": ("1950-01-03", 20000), "r-btc-reclaim20-d": ("1950-01-03", 20000)}
 
 
 def synth_d(n=3000, seed=0, tf="1d", start="2000-01-03"):
     rng = np.random.default_rng(seed)
-    if tf in ("5m", "15m"):   # scalping cripto: 24/7
-        idx = pd.date_range(start, periods=n, freq=tf.replace("m", "min"), tz="UTC")
-        c = 10000 * np.exp(np.cumsum(rng.standard_normal(n) * 0.002))
+    if tf in ("5m", "15m") or start == "1950-01-03":   # cripto 24/7 (scalping; e ideias de crash/recuperacao com vol de cripto)
+        freq = {"1d": "D", "4h": "4h"}.get(tf, tf.replace("m", "min"))
+        vol = {"1d": 0.04, "4h": 0.016}.get(tf, 0.002)
+        idx = pd.date_range(start, periods=n, freq=freq, tz="UTC")
+        c = 10000 * np.exp(np.cumsum(rng.standard_normal(n) * vol))
         o = np.r_[c[0], c[:-1]] * (1 + rng.standard_normal(n) * 0.0003)
         h = np.maximum(o, c) * (1 + np.abs(rng.standard_normal(n)) * 0.0007)
         l = np.minimum(o, c) * (1 - np.abs(rng.standard_normal(n)) * 0.0007)
