@@ -249,3 +249,10 @@ Registadas em IDEAS.md antes de correr.
   carteira K56: +10.6%/ano, pior ano 0.0%, pior mes -4.2%, pior queda -15.8%, 0.9 trades/semana. Pre 2017-18: 0 trades -> REPROVADA no pre (nao da para julgar). Holdout NAO aberto
 - [x] #150: k-sma100-d-bull50-red-bracket-s2 -> REPROVADA (SOL 56 < 60; t +3.27; win rate 63%; conf. 3/5);
   carteira K57: +8.1%/ano, pior ano 0.0%, pior mes -4.3%, pior queda -13.2%, 0.75 trades/semana
+
+## Ideias do agente (2026-11-22, cripto sessao :30 01h30; base K54 = #147)
+Registadas em IDEAS.md antes de correr.
+- [ ] #151: k-sma50-d-btc50-bracket-s2 (BTC so acima da media 50; mais trades e pre com trades)
+- [ ] #152: k-sma50-d-bull50-bracket-s2-lose7 (sai ao 7.o dia se estiver a perder)
+- [ ] #153: k-sma50up-d-bull50-bracket-s2 (media 50 da moeda a subir)
+- [ ] #154: k-sma50-d-bull50-bracket-s2-rx (sai quando o regime do BTC desliga)

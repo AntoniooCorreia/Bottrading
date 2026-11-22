@@ -641,3 +641,32 @@ Uma mudanca de cada vez contra a #146 (moeda fecha acima da media de 100 dias; B
   que lado esta o efeito diario dentro da tendencia. Risco: corta trades (menos de 60 na SOL).
 Fasquia (criterio oficial cripto, fixo): >= 60 trades em CADA uma de BTC/ETH/SOL, meanR > 0 em cada, t junto >= 3.0, CONFIRMACAO
 positiva em >= 3/5 moedas extra; depois --period pre >= 0. Comparar sempre com a base K49: win rate, % total, melhor ano, pior ano, trades/semana.
+
+## 2026-11-22 cripto - sessao :30 (01h30) (4 ideias; ideias cripto testadas antes: 64; hoje: 16 de 20) - registadas antes de correr
+Base (best.py): K54 = #147 k-sma50-d-bull50-bracket-s2 (pontuacao 86: win rate 64%, total +68%, melhor ano +27.0%, pior ano -0.8%,
+pior mes -5.3%, 1.0 trades/semana). PASSA o dev (t +4.10, conf. 5/5); REPROVA no pre (1 trade, -1R).
+O que falha: (a) 112 trades de 8-30 dias valem +0.03R (win rate 54%) contra +0.31 a +0.40R nas de <= 7 dias; (b) 2024 -0.8%
+(81 trades, win rate 52%, -0.01R); (c) pior mes -5.3% (as 3 moedas perdem juntas quando o BTC vira); (d) 1.0 trades/semana, mediana
+de 7 dias sem trade, 2022 sem trades; (e) pre: o filtro BTC > media 200 dias so existe a partir de ~mar-2018 (dados desde ago-2017)
+-> 1 trade; nenhuma variante com a media 200 do BTC consegue ter um pre com significado.
+Uma mudanca de cada vez contra a #147 (moeda fecha acima da media de 50 dias; BTC fechou o dia anterior acima das medias de 200 e
+50 dias; entra na abertura seguinte quando esta sem posicao; sai SO no alvo 1R ou no stop 2 ATR(14) diario; reentra se continuar):
+- **#151 k-sma50-d-btc50-bracket-s2** (MAIS TRADES; ataca (d) e (e)): o BTC so tem de estar acima da media de 50 dias (tira a de 200).
+  Hipotese: na #146/#147 a media 50 do BTC e o filtro que corta os recuos maus; a de 200 so acrescenta atraso (liga tarde em 2019 e
+  2023) -> mais dias ligados, mais trades, e o pre passa a ter trades a serio (a media 50 existe desde out-2017). Risco: os alivios
+  de 2022 (BTC acima da media 50 em mercado de baixa) -> 2022 negativo.
+- **#152 k-sma50-d-bull50-bracket-s2-lose7** (MAIS TRADES; ataca (a)): igual, mas ao fecho do 7.o dia, se a trade estiver abaixo do
+  preco de entrada, sai (as que estao a ganhar continuam ate ao alvo ou stop). Hipotese: as trades de 8-30 dias que acabam mal sao as
+  que nao arrancaram na 1.a semana; cortar SO essas (e nao todas, como o tempo maximo de 10 dias da #139/#143, que baixou o win rate
+  para 57%) poupa perdas de -1R e liberta a moeda para um bracket novo. Risco: algumas recuperam depois do dia 7.
+  Mudanca ao motor: run_positions ganha lose_hold (n velas; 0 = desligado, igual ao de sempre).
+- **#153 k-sma50up-d-bull50-bracket-s2** (ataca (b)): alem das condicoes da #147, a media de 50 dias da moeda tem de estar a subir
+  (acima da de 5 dias antes). Hipotese: em 2024 (de lado) a media 50 andou plana e o preco cruzou-a muitas vezes -> entradas sem
+  tendencia; exigir a media a subir deixa so as subidas com tendencia. Risco: corta trades (na #119, media 100 a subir, a SOL ficou
+  com 58 < 60).
+- **#154 k-sma50-d-bull50-bracket-s2-rx** (ataca (c)): igual, mas sai de TODAS as posicoes ao fecho do dia em que o regime do BTC
+  desliga (BTC fechou o dia anterior abaixo da media de 50 ou de 200 dias). Hipotese: o pior mes e quando o BTC vira e as 3 moedas
+  vao ao stop juntas; sair quando o regime desliga corta essas perdas antes de -1R. Risco: baixa o win rate (saidas pequenas a perder)
+  e alguns recuos do BTC sao so ruido. Mudanca ao motor: run_positions ganha exit_fn (mascara de saida, so passado; None = igual).
+Fasquia (criterio oficial cripto, fixo): >= 60 trades em CADA uma de BTC/ETH/SOL, meanR > 0 em cada, t junto >= 3.0, CONFIRMACAO
+positiva em >= 3/5 moedas extra; depois --period pre >= 0. Comparar sempre com a base K54: win rate, % total, melhor ano, pior ano, trades/semana.
