@@ -227,3 +227,10 @@ Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --p
   carteira K44: +10.2%/ano, pior ano -2.1%, pior mes -5.3%, pior queda -18.1%, 1.1 trades/semana. Pre 2017-18: 1 trade (ETH -1.05R) -> REPROVADA no pre. Holdout NAO aberto
 - [x] #142: carteira #118 + #107 (K45) -> as duas REPROVADAS sozinhas (SOL < 60); a carteira junta so mais 14 trades em 6 anos (0.6/semana):
   win rate 64%, +9.8%/ano, pior ano -2.0%, pior mes -4.1%, pior queda -8.0%. Sobrepoem-se quase sempre
+
+## Ideias do agente (2026-11-22, cripto sessao :30 00h30; base K44 = #141)
+Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --period dev --push --num "#14x" --nota "..."` (e `--period pre` se passar).
+- [ ] #143: k-sma100-d-bull-bracket-s2-mh10 (#141 + tempo maximo 10 dias)
+- [ ] #144: k-sma50-d-bull-bracket-s2 (#141 com a moeda acima da media de 50 dias)
+- [ ] #145: k-ema100-d-bull-bracket-s2 (#141 com EMA 100 na moeda e EMA 200 no BTC)
+- [ ] #146: k-sma100-d-bull50-bracket-s2 (#141 + BTC tambem acima da media de 50 dias)
