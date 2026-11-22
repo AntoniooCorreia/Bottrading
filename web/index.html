@@ -590,9 +590,13 @@ function vPlano(){
 /* ---------- conta demo (paper trading crypto) ---------- */
 const CN={btc:"Bitcoin (BTC)",eth:"Ethereum (ETH)",sol:"Solana (SOL)"};
 function vDemo(){
-  const D=S.demo; if(!D||!D.acc) return `<div class="card"><div class="empty">A carregar a conta demo…</div></div>`;
+  const D0=S.demo; if(!D0||!D0.accs) return `<div class="card"><div class="empty">A carregar a conta demo…</div></div>`;
+  const AC=S.demoAcc||1, X=AC===2;
+  const D={...D0,acc:D0.accs.find(x=>x.id===AC),pos:D0.pos.filter(p=>(p.account||1)===AC),eq:(D0.eq||[]).filter(e=>(e.account||1)===AC)};
+  const tabs=`<div style="margin-bottom:12px">${seg([["1","K1 (referência)"],["2","🧪 Experimental (o agente escolhe)"]],String(AC),"(v=>{S.demoAcc=+v;render()})")}</div>`;
+  if(!D.acc) return tabs+`<div class="card"><div class="empty">Conta ainda não criada.</div></div>`;
   const a=D.acc||{balance:100000,start_balance:100000}, open=D.pos.filter(p=>p.status==="open"), closed=D.pos.filter(p=>p.status==="closed");
-  const px=D.px||{}; const unreal=open.reduce((s,p)=>s+(px[p.coin]?(+p.qty)*(px[p.coin]-(+p.entry_price)):0),0);
+  const px=D.px||{}; const unreal=open.reduce((s,p)=>s+(px[p.coin]?(+(p.side||1))*(+p.qty)*(px[p.coin]-(+p.entry_price)):0),0);
   const eq=(+a.balance)+unreal, ret=(eq/(+a.start_balance)-1)*100;
   const wins=closed.filter(p=>+p.pnl_eur>0).length;
   const last=a.last_run?new Date(a.last_run).toLocaleString("pt-PT",{dateStyle:"short",timeStyle:"short"}):"ainda não correu";
@@ -603,23 +607,27 @@ function vDemo(){
     chart=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto"><line x1="${L}" x2="${W-R}" y1="${y(+a.start_balance)}" y2="${y(+a.start_balance)}" stroke="var(--text-3)" stroke-dasharray="3 3"/>
       <text x="${L-6}" y="${y(y1)+4}" text-anchor="end" font-size="11" fill="var(--text-3)">${Math.round(y1)}</text><text x="${L-6}" y="${y(y0)+4}" text-anchor="end" font-size="11" fill="var(--text-3)">${Math.round(y0)}</text>
       <polyline fill="none" stroke="var(--accent)" stroke-width="2" points="${E.map((e,i)=>x(i).toFixed(1)+","+y(+e.equity).toFixed(1)).join(" ")}"/></svg>`;}
-  const row=p=>{const cur=p.status==="open"?px[p.coin]:+p.exit_price; const pnl=p.status==="open"?(cur?(+p.qty)*(cur-(+p.entry_price))-(+p.fee_eur):null):+p.pnl_eur;
-    return `<tr><td>${CN[p.coin]||p.coin}</td><td><code>${esc(p.strategy)}</code></td><td>${new Date(p.entry_time).toLocaleString("pt-PT",{dateStyle:"short",timeStyle:"short"})}</td>
+  const row=p=>{const cur=p.status==="open"?px[p.coin]:+p.exit_price; const sd=+(p.side||1); const pnl=p.status==="open"?(cur?sd*(+p.qty)*(cur-(+p.entry_price))-(+p.fee_eur):null):+p.pnl_eur;
+    return `<tr><td>${CN[p.coin]||p.coin}${X?`<div class="small"><span class="badge ${sd===1?"ok":"bad"}">${sd===1?"LONG":"SHORT"}</span></div>`:""}</td><td><code>${esc(p.strategy)}</code>${p.tp?`<div class="small muted">alvo ${nf(+p.tp,2)} $</div>`:""}</td><td>${new Date(p.entry_time).toLocaleString("pt-PT",{dateStyle:"short",timeStyle:"short"})}</td>
       <td class="num">${nf(+p.entry_price,2)} $</td><td class="num">${nf(+p.stop,2)} $</td><td class="num">${cur?nf(cur,2)+" $":"—"}</td>
       <td class="num ${cls(pnl)}"><b>${pnl==null?"—":(pnl>=0?"+":"−")+nf(Math.abs(pnl),2)+" $"}</b>${p.r!=null?`<div class="small muted">${rr(+p.r)}</div>`:""}</td>
       <td>${p.status==="open"?"aberta":esc(p.exit_reason||"")}</td></tr>`;};
-  return `<div class="kpis">${kpi("Saldo (com trades abertas)",nf(eq,2)+" $",`começou com ${nf(+a.start_balance,0)} $`, cls(eq-(+a.start_balance)))}
+  const cfg=(S.stc&&S.stc.demo_exp&&S.stc.demo_exp.value)||null;
+  const how=X?`<div class="card"><h2>Como funciona a demo experimental</h2><div class="small" style="color:var(--text-2)">
+      <p style="margin-top:0">Conta separada de <b>100 000 $</b> que simula <b>perpétuos da Kraken</b> (long e short, comissão 0,05% + 0,02% de slippage por lado e funding de 0,01% a cada 8h). <b>Quem escolhe as estratégias é o agente</b>: todas as noites corre <code>demo_pick.py</code> e fica com as que ganham nas 3 moedas no backtest de 2019–2024 com estes custos, por ordem de t, até ~3 trades por semana. <b>Não são estratégias aprovadas</b>: isto é um teste ao vivo com dinheiro a fingir. A K1 continua igual na outra conta.</p>
+      ${cfg?`<p><b>Agora a correr</b> (escolhidas a ${esc(cfg.escolhida||"")}):</p><ul style="margin:0 0 8px;padding-left:18px">${cfg.estrategias.map(e=>`<li><b>${esc(e.num||"")} ${esc(e.ideia)}</b> · velas de ${esc(e.tf)} · ${e.side===1?"long":"short"} · stop ${e.stop_atr} ATR${e.tp_r?` · alvo ${e.tp_r}R`:""}${e.max_hold?` · máx. ${e.max_hold} velas`:""} — backtest: ${nf(e.trades_semana,1)} trades/semana, win rate ${nf(e.win,0)}%, ${rr(e.r_trade,3)} por trade</li>`).join("")}</ul><p style="margin-bottom:0" class="muted">${esc(cfg.porque||"")}</p>`:`<p style="margin-bottom:0">O agente ainda não escolheu estratégias.</p>`}</div></div>`:"";
+  return tabs+`<div class="kpis">${kpi("Saldo (com trades abertas)",nf(eq,2)+" $",`começou com ${nf(+a.start_balance,0)} $`, cls(eq-(+a.start_balance)))}
     ${kpi("Rentabilidade",pc(ret,2),"desde o início da demo",cls(ret))}
     ${kpi("Trades fechadas",closed.length,closed.length?`${wins} ganhas (${Math.round(wins/closed.length*100)}%)`:"ainda nenhuma")}
-    ${kpi("Abertas agora",open.length,`máximo 1 por moeda · última verificação ${last}`)}</div>
+    ${kpi("Abertas agora",open.length,`${X?"1 por moeda e estratégia":"máximo 1 por moeda"} · última verificação ${last}`)}</div>${how}
     <div class="card"><h2>Preços ao vivo</h2><p class="hint">Kraken, em dólares. Atualiza de 5 em 5 segundos${D.pxAt?" · "+D.pxAt.toLocaleTimeString("pt-PT"):""}. Variação desde a abertura do dia.</p>
       <div class="kpis sm" style="margin:0">${["btc","eth","sol"].map(c=>{const o=open.find(p=>p.coin===c); return `<div class="kpi"><div class="k">${CN[c]}</div><div class="v">${px[c]?nf(px[c],2)+" $":"—"}</div><div class="s"><span class="${cls((D.chg||{})[c])}">${pc((D.chg||{})[c],2)}</span>${o?` · em posição, stop ${nf(+o.stop,2)} $`:" · sem posição"}</div></div>`;}).join("")}</div></div>
-    ${sigCard(D,open)}
-    <div class="card"><h2>Como funciona</h2><div class="small" style="color:var(--text-2)">
+    ${X?"":sigCard(D,open)}
+    ${X?"":`<div class="card"><h2>Como funciona</h2><div class="small" style="color:var(--text-2)">
       <p style="margin-top:0">De hora a hora (quando fecha cada vela) o bot lê os <b>preços reais da Kraken</b> (BTC, ETH, SOL em dólares) e aplica as estratégias de tendência <b>K1</b>: compra quando o preço rompe máximos ou fica acima da média, e vende quando a tendência acaba ou o stop é tocado (o stop é vigiado a cada minuto). <b>Nenhuma ordem real é enviada</b>: as trades são simuladas aqui, com a comissão da Kraken (0,26% por lado).</p>
-      <p style="margin-bottom:0">Risco de 1% do saldo por trade, stop a 3 ATR, no máximo 1 posição por moeda e 1/3 do saldo por moeda (sem alavancagem). Cada compra e venda chega também ao Telegram.</p></div></div>
+      <p style="margin-bottom:0">Risco de 1% do saldo por trade, stop a 3 ATR, no máximo 1 posição por moeda e 1/3 do saldo por moeda (sem alavancagem). Cada compra e venda chega também ao Telegram.</p></div></div>`}
     ${chart?`<div class="card"><h2>Evolução do saldo</h2>${chart}</div>`:""}
-    <div class="card"><h2>Posições abertas</h2>${open.length?`<div class="scroll"><table class="t"><thead><tr><th>Moeda</th><th>Estratégia</th><th>Entrada</th><th class="num">Preço entrada</th><th class="num">Stop</th><th class="num">Preço atual</th><th class="num">Resultado</th><th>Estado</th></tr></thead><tbody>${open.map(row).join("")}</tbody></table></div>`:`<div class="empty">Sem posições abertas. O bot está à espera de uma tendência de subida em BTC, ETH ou SOL.</div>`}</div>
+    <div class="card"><h2>Posições abertas</h2>${open.length?`<div class="scroll"><table class="t"><thead><tr><th>Moeda</th><th>Estratégia</th><th>Entrada</th><th class="num">Preço entrada</th><th class="num">Stop</th><th class="num">Preço atual</th><th class="num">Resultado</th><th>Estado</th></tr></thead><tbody>${open.map(row).join("")}</tbody></table></div>`:`<div class="empty">Sem posições abertas. ${X?"À espera dos sinais das estratégias escolhidas pelo agente.":"O bot está à espera de uma tendência de subida em BTC, ETH ou SOL."}</div>`}</div>
     <div class="card"><h2>Trades fechadas</h2>${closed.length?`<div class="scroll"><table class="t"><thead><tr><th>Moeda</th><th>Estratégia</th><th>Entrada</th><th class="num">Preço entrada</th><th class="num">Stop</th><th class="num">Saída</th><th class="num">Resultado</th><th>Motivo</th></tr></thead><tbody>${closed.slice().reverse().map(row).join("")}</tbody></table></div>`:`<div class="empty">Ainda nenhuma trade fechada.</div>`}</div>`;
 }
 /* o que falta para LONG (as 4 estrategias da K1) e para SHORT (espelho, so informativo: spot na Kraken nao permite short) */
@@ -656,8 +664,8 @@ async function loadSig(){
 }
 async function loadDemo(){
   try{
-    const [acc,pos,eqs]=await Promise.all([q("paper_account?select=*"),q("paper_positions?select=*&order=id.asc"),q("paper_equity?select=at,equity&order=at.asc&limit=5000")]);
-    S.demo={...(S.demo||{}),acc:acc[0],pos,eq:eqs}; if(S.route==="demo") render();
+    const [acc,pos,eqs]=await Promise.all([q("paper_account?select=*&order=id.asc"),q("paper_positions?select=*&order=id.asc"),q("paper_equity?select=at,equity,account&order=at.asc&limit=10000")]);
+    S.demo={...(S.demo||{}),accs:acc,acc:acc[0],pos,eq:eqs}; if(S.route==="demo") render();
   }catch(e){console.error(e);}
 }
 /* precos ao vivo da Kraken de 5 em 5 segundos (so no browser; o bot vigia os stops de minuto a minuto) */

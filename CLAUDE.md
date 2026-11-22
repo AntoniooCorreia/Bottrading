@@ -29,6 +29,16 @@ de spot (0.57% ida e volta) esta OTIMISTA. Nao mexer sem o Antonio, mas diz-lo q
 TESTES (pedido do Antonio, 2026-11-21): QUALQUER teste tem de aparecer no separador Testes. crypto_lab.py faz isso sozinho para
 --period dev|pre|holdout (results/runs/<variante>__<periodo>.json + tabela runs com --push). Usa sempre --num "#1xx".
 
+DEMO EXPERIMENTAL (pedido do Antonio, 2026-11-22: "quero que sejam os bots automaticamente a pensar nisso"): conta 2 da Edge Function
+paper-bot, 100 000 USD, perpetuos simulados (long/short). As estrategias sao escolhidas SO pelo agente:
+- No FIM de cada noite (ou depois de testar algo que caiba na demo): `python demo_pick.py --push`. Regras fixas no ficheiro
+  (ganha nas 3 moedas com custos de perpetuos 2019-2024, >= 1 trade/semana, por ordem de t, sem repetir a mesma entrada, ate ~3/semana;
+  so troca se a nova 1.a tiver t >= +0.3 acima da atual). Se a lista mudar: `--log mudanca "Demo experimental: agora corre X"` com o porque.
+- So entra na demo o que estiver em sr/demo_spec.py SPECS (familias breakout, rsi2, lowclose, above_sma + filtros EMA e regime BTC).
+  Ideia nova que caiba nestas familias: acrescenta a SPECS e corre pytest (tests/test_demo_spec.py compara a spec com a ideia E o
+  engine.ts com o Python). Familia nova = mexer em engine.ts + demo_spec.py + testes; NAO faças deploy da Edge Function (o Antonio/Claude do chat faz).
+- A conta 1 (K1) nao muda sem o OK do Antonio. A demo experimental nao e aprovacao; ao fim de 2-3 meses compara-se com o backtest.
+
 ## MISSAO NOTURNA ATUAL (pedido do Antonio, 2026-11-19): PEGAR NO MELHOR TESTE, PERCEBER O QUE FALHA, MELHORAR E ABRIR MAIS TRADES
 1. No inicio de CADA sessao: `python best.py`. O 1.o da lista (pontuacao = win rate + % total acumulado + melhor ano, a mesma
    do painel Backtesting > Carteiras) e a BASE. `python best.py --label Kn` mostra o diagnostico de qualquer carteira.
