@@ -49,6 +49,7 @@
 | #148 | 2026-11-22 | k-sma100-d-bull50-bracket-s2-tp075 (#146 com alvo 0.75R); K55 | +3.48 | 68% | +0.14 | +9.3%, -0.9% (pior mes -6.4%, queda -16%) | PASSA dev (conf. 4/5); pre 1 trade -1R: REPROVADA no pre |
 | #149 | 2026-11-22 | k-sma100-d-bull50-mom7-bracket-s2 (#146 + moeda acima do fecho de 7 dias antes); K56 | +3.96 | 64% | +0.23 | +10.6%, 0.0% (pior mes -4.2%, queda -16%) | PASSA dev (conf. 5/5); pre 0 trades: REPROVADA no pre |
 | #150 | 2026-11-22 | k-sma100-d-bull50-red-bracket-s2 (#146 so depois de um dia vermelho); K57 | +3.27 | 63% | +0.21 | +8.1%, 0.0% (pior mes -4.3%) | REPROVADA (SOL 56 < 60) |
+| #159-#162 | 2026-11-22 | LONGS MAIS CEDO, perpetuos: rutura de 10 dias depois de -30% (diario e 4h), BTC acima da media 20 em mercado de baixa, ressalto depois de capitulacao; K74-K76 | +1.2 a +1.6 | 54-57% | +0.11 a +0.13 | +0.8% a +2.8%/ano | REPROVADAS: poucas trades (10-57 por moeda) e t < 3; BTC negativo nas ruturas pos-crash; #162 sem nenhum sinal (quedas > 3 ATR quase nao existem) |
 
 Scalping (2026-11-21): ANTES de custos ha uma vantagem pequena (RSI(2) 15m long: win rate 69%, +0.05R; Bollinger 5m BTC +0.08R),
 mas o stop de um scalp e 0.4-1.7% do preco e os custos da Kraken (0.57% ida e volta) valem 0.3-1.4R por trade. Nem com custos de maker
