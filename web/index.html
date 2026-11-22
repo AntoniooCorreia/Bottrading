@@ -593,7 +593,7 @@ function vDemo(){
   const D0=S.demo; if(!D0||!D0.accs) return `<div class="card"><div class="empty">A carregar a conta demo…</div></div>`;
   const AC=S.demoAcc||1, X=AC===2;
   const D={...D0,acc:D0.accs.find(x=>x.id===AC),pos:D0.pos.filter(p=>(p.account||1)===AC),eq:(D0.eq||[]).filter(e=>(e.account||1)===AC)};
-  const tabs=`<div style="margin-bottom:12px">${seg([["1","K1 (referência)"],["2","🧪 Experimental (o agente escolhe)"]],String(AC),"(v=>{S.demoAcc=+v;render()})")}</div>`;
+  const tabs=`<div style="margin-bottom:12px">${seg([["1","K1 (referência)"],["2","🧪 Experimental (o agente escolhe)"]],String(AC),"(v=>{S.demoAcc=+v;render();if(+v===2&&!(S.demo&&S.demo.expSig))loadExpSig()})")}</div>`;
   if(!D.acc) return tabs+`<div class="card"><div class="empty">Conta ainda não criada.</div></div>`;
   const a=D.acc||{balance:100000,start_balance:100000}, open=D.pos.filter(p=>p.status==="open"), closed=D.pos.filter(p=>p.status==="closed");
   const px=D.px||{}; const unreal=open.reduce((s,p)=>s+(px[p.coin]?(+(p.side||1))*(+p.qty)*(px[p.coin]-(+p.entry_price)):0),0);
@@ -622,7 +622,7 @@ function vDemo(){
     ${kpi("Abertas agora",open.length,`${X?"1 por moeda e estratégia":"máximo 1 por moeda"} · última verificação ${last}`)}</div>${how}
     <div class="card"><h2>Preços ao vivo</h2><p class="hint">Kraken, em dólares. Atualiza de 5 em 5 segundos${D.pxAt?" · "+D.pxAt.toLocaleTimeString("pt-PT"):""}. Variação desde a abertura do dia.</p>
       <div class="kpis sm" style="margin:0">${["btc","eth","sol"].map(c=>{const o=open.find(p=>p.coin===c); return `<div class="kpi"><div class="k">${CN[c]}</div><div class="v">${px[c]?nf(px[c],2)+" $":"—"}</div><div class="s"><span class="${cls((D.chg||{})[c])}">${pc((D.chg||{})[c],2)}</span>${o?` · em posição, stop ${nf(+o.stop,2)} $`:" · sem posição"}</div></div>`;}).join("")}</div></div>
-    ${X?"":sigCard(D,open)}
+    ${X?expSigCard(D,open):sigCard(D,open)}
     ${X?"":`<div class="card"><h2>Como funciona</h2><div class="small" style="color:var(--text-2)">
       <p style="margin-top:0">De hora a hora (quando fecha cada vela) o bot lê os <b>preços reais da Kraken</b> (BTC, ETH, SOL em dólares) e aplica as estratégias de tendência <b>K1</b>: compra quando o preço rompe máximos ou fica acima da média, e vende quando a tendência acaba ou o stop é tocado (o stop é vigiado a cada minuto). <b>Nenhuma ordem real é enviada</b>: as trades são simuladas aqui, com a comissão da Kraken (0,26% por lado).</p>
       <p style="margin-bottom:0">Risco de 1% do saldo por trade, stop a 3 ATR, no máximo 1 posição por moeda e 1/3 do saldo por moeda (sem alavancagem). Cada compra e venda chega também ao Telegram.</p></div></div>`}
@@ -651,6 +651,50 @@ function sigCard(D,open){
     <h2 style="font-size:14px;margin-top:16px">Short (só informação)</h2>
     <p class="hint">Espelho das mesmas regras para vender a descoberto. Na Kraken spot não é possível shortar; o bot <b>não</b> abre estas trades, mas assim vês quando o mercado está do lado vendedor.</p>
     <div class="scroll"><table class="t">${head(false)}<tbody>${rows(false)}</tbody></table></div></div>`;
+}
+/* demo experimental: o que falta para cada estrategia escolhida pelo agente abrir trade (mesmas regras do engine.ts) */
+async function loadExpSig(){
+  const cfg=(S.stc&&S.stc.demo_exp&&S.stc.demo_exp.value)||null; if(!cfg||!cfg.estrategias) return;
+  const pairs={btc:"XBTUSD",eth:"ETHUSD",sol:"SOLUSD"}, TFM={"1h":60,"4h":240,"1d":1440}, cache={};
+  const get=async(p,i)=>{const k=p+i; if(!cache[k]){const j=await fetch(`https://api.kraken.com/0/public/OHLC?pair=${p}&interval=${i}`,{cache:"no-store"}).then(r=>r.json());
+    const key=Object.keys(j.result).find(x=>x!=="last"); cache[k]=j.result[key].slice(0,-1).map(r=>({t:r[0]*1000,h:+r[2],l:+r[3],c:+r[4]}));} return cache[k];};
+  try{
+    const btcD=await get("XBTUSD",1440), bc=btcD.map(x=>x.c), bavg=bc.slice(-200).reduce((a,x)=>a+x,0)/200;
+    const regime={close:bc[bc.length-1],lvl:bavg,bull:bc[bc.length-1]>bavg};
+    const rows=[];
+    for(const e of cfg.estrategias){
+      const tfm=TFM[e.tf];
+      for(const [coin,pair] of Object.entries(pairs)){
+        const b=await get(pair,tfm), c=b.map(x=>x.c), last=b[b.length-1], conds=[];
+        const E=e.entry, side=e.side||1;
+        if(E.kind==="above_sma"){const m=c.slice(-E.n).reduce((a,x)=>a+x,0)/E.n; conds.push({txt:`${coin.toUpperCase()} fechar acima da média de ${E.n} velas de ${e.tf}`,lvl:m,cur:last.c,ok:last.c>m,up:true});}
+        else if(E.kind==="breakout"){const prev=b.slice(-E.n-1,-1); const m=side===1?Math.max(...prev.map(x=>x.h)):Math.min(...prev.map(x=>x.l));
+          conds.push({txt:`${coin.toUpperCase()} fechar ${side===1?"acima do máximo":"abaixo do mínimo"} das últimas ${E.n} velas de ${e.tf}`,lvl:m,cur:last.c,ok:side===1?last.c>m:last.c<m,up:side===1});}
+        else if(E.kind==="lowclose"){const m=Math.min(...c.slice(-E.n)); conds.push({txt:`${coin.toUpperCase()} fechar no mínimo das últimas ${E.n} velas`,lvl:m,cur:last.c,ok:last.c<=m,up:false});}
+        else if(E.kind==="rsi2"){conds.push({txt:`RSI(2) ${side===1?"abaixo de "+E.lo:"acima de "+(100-E.lo)}`,lvl:null,cur:null,ok:null});}
+        if(e.trend_ema){const a=2/(e.trend_ema+1); let m=c[0]; c.forEach(x=>m=a*x+(1-a)*m); conds.push({txt:`${coin.toUpperCase()} ${side===1?"acima":"abaixo"} da EMA ${e.trend_ema} de ${e.tf}`,lvl:m,cur:last.c,ok:side===1?last.c>m:last.c<m,up:side===1});}
+        if(e.btc) conds.push({txt:`BTC fechar o dia ${e.btc==="bull"?"acima":"abaixo"} da média de 200 dias`,lvl:regime.lvl,cur:regime.close,ok:e.btc==="bull"?regime.bull:!regime.bull,up:e.btc==="bull"});
+        rows.push({e,coin,conds,next:last.t+2*tfm*60000});
+      }
+    }
+    S.demo={...(S.demo||{}),expSig:{rows,at:new Date()}}; if(S.route==="demo") render();
+  }catch(err){console.error(err);}
+}
+function expSigCard(D,open){
+  const G=D.expSig; if(!G) return `<div class="card"><h2>O que falta para abrir trade</h2><div class="empty">A calcular…</div></div>`;
+  const px=D.px||{}; const fmt=t=>new Date(t).toLocaleString("pt-PT",{weekday:"short",hour:"2-digit",minute:"2-digit"});
+  const byS={}; G.rows.forEach(r=>(byS[r.e.ideia]=byS[r.e.ideia]||[]).push(r));
+  return `<div class="card"><h2>O que falta para abrir trade</h2>
+    <p class="hint">Para cada estratégia escolhida pelo agente e cada moeda: as condições que têm de estar todas ✅ <b>no fecho da vela</b>. "falta +19%" = o preço tem de subir 19%. O bot decide logo a seguir ao fecho (velas diárias: 00:03 UTC). Atualizado ${G.at.toLocaleTimeString("pt-PT")}.</p>
+    ${Object.entries(byS).map(([id,rs])=>{const e=rs[0].e; return `<h2 style="font-size:14px;margin:14px 0 6px">${esc(e.num||"")} <code>${esc(id)}</code> <span class="small muted">· velas de ${esc(e.tf)} · ${e.side===1?"long":"short"}</span></h2>
+      <div class="scroll"><table class="t"><thead><tr><th>Moeda</th><th>Condições</th><th>Estado</th><th>Próxima decisão</th></tr></thead><tbody>
+      ${rs.map(r=>{const o=open.find(p=>p.coin===r.coin&&p.strategy===id); const all=r.conds.every(c=>c.ok);
+        return `<tr><td><b>${r.coin.toUpperCase()}</b>${px[r.coin]?`<div class="small muted">${nf(px[r.coin],2)} $</div>`:""}</td>
+        <td class="small">${r.conds.map(c=>{const cur=c.cur==null?null:(c.txt.startsWith("BTC")?c.cur:(px[r.coin]||c.cur)); const d=(c.lvl&&cur)?(c.lvl/cur-1)*100:null;
+          return `<div>${c.ok===true?"✅":c.ok===false?"❌":"⚪"} ${esc(c.txt)}${c.lvl?` <span class="muted">(${nf(c.lvl,2)} $${c.ok===false&&d!=null?` · falta ${d>0?"+":""}${nf(d,1)}%`:""})</span>`:""}</div>`;}).join("")}</td>
+        <td>${o?`<span class="badge ok">em posição</span>`:all?`<span class="badge ok">entra no próximo fecho</span>`:`<span class="badge neu">à espera</span>`}</td>
+        <td class="small">${fmt(r.next)}</td></tr>`;}).join("")}</tbody></table></div>`;}).join("")}
+  </div>`;
 }
 async function loadSig(){
   const pairs={btc:"XBTUSD",eth:"ETHUSD",sol:"SOLUSD"}, sig={};
@@ -780,7 +824,7 @@ function load(){
   }).catch(e=>{document.getElementById("stTxt").textContent="Erro a carregar dados: "+e;});
 }
 (function(){const t=store("bt_theme"); if(t){document.documentElement.setAttribute("data-theme",t); document.getElementById("theme").value=t;}})();
-render(); load(); loadDemo(); livePx(); setInterval(()=>{load();loadDemo();},60000); setInterval(livePx,5000); loadSig(); setInterval(loadSig,300000);
+render(); load(); loadDemo(); livePx(); setInterval(()=>{load();loadDemo();},60000); setInterval(livePx,5000); loadSig(); setInterval(loadSig,300000); setTimeout(loadExpSig,4000); setInterval(loadExpSig,300000);
 window.loadDemo=loadDemo;
 window.load=load;
 </script>
