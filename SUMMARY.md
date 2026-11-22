@@ -33,6 +33,10 @@
 | #141 | 2026-11-22 | k-sma100-d-bull-bracket-s2 (#118 com stop 2 ATR); K44 | +3.47 | 62% | +0.19 | +10.2%, -2.1% (pior mes -5.3%, queda -18%) | PASSA dev; pre 1 trade -1R: REPROVADA no pre |
 | #142 | 2026-11-22 | carteira #118 + #107 (rutura 20 dias); K45 | - | 64% | - | +9.8%, -2.0% | as duas falham SOL < 60; quase nao acrescenta trades |
 | #138 | 2026-11-21 | k-sma600-4h-bull-bracket (#118 em 4h, stop 3 ATR de 4h, so alvo 1R ou stop); K41 | +2.47 | 59% | +0.09 | +5.5%, -2.1% (pior mes -9.3%) | REPROVADA (t < 3); 2x mais trades que a #118 mas o custo come metade do ganho |
+| #143 | 2026-11-22 | k-sma100-d-bull-bracket-s2-mh10 (#141 + tempo maximo 10 dias); K46 | +3.20 | 57% | +0.12 | +9.8%, -2.9% (pior mes -6.4%, queda -21%) | PASSA dev (conf. 4/5); pre 1 trade -1R: REPROVADA no pre |
+| #144 | 2026-11-22 | k-sma50-d-bull-bracket-s2 (#141 com a moeda acima da media 50); K47 | +3.69 | 63% | +0.20 | +10.6%, -0.7% (pior mes -5.3%, queda -19%) | PASSA dev (conf. 5/5); pre 1 trade -1R: REPROVADA no pre |
+| #145 | 2026-11-22 | k-ema100-d-bull-bracket-s2 (#141 com EMA 100 / EMA 200 BTC); K48 | +3.37 | 61% | +0.17 | +10.4%, -4.3% (2022) | PASSA dev (conf. 4/5); pre 47 trades -0.06R, 2018 -7.5%: REPROVADA no pre |
+| #146 | 2026-11-22 | k-sma100-d-bull50-bracket-s2 (#141 + BTC tambem acima da media 50); K49 | +3.88 | 63% | +0.21 | +10.9%, 0.0% (pior mes -5.3%, queda -17%) | PASSA dev (conf. 5/5); pre 1 trade -1R: REPROVADA no pre. Nova base (pontuacao 86) |
 
 Scalping (2026-11-21): ANTES de custos ha uma vantagem pequena (RSI(2) 15m long: win rate 69%, +0.05R; Bollinger 5m BTC +0.08R),
 mas o stop de um scalp e 0.4-1.7% do preco e os custos da Kraken (0.57% ida e volta) valem 0.3-1.4R por trade. Nem com custos de maker
@@ -44,18 +48,17 @@ Perpetuos (#133-#137): mesmo com custos 4x mais baixos nada passa. Os shorts int
 
 #138 (2026-11-21, 19h): a #118 em 4h abre 2x mais trades (1.2/semana, SOL 173) com win rate 59%, mas so +0.09R/trade: t 2.47, REPROVADA.
 
-Leitura honesta cripto (2026-11-22, sessao das :00 00h):
-1. Ideias cripto testadas no total: 56 (#100-#142, K1, scalping, intraday, perpetuos). Mais testes = mais desconfianca.
-2. Melhor win rate com resultado positivo: 68% (#118, +0.33R/trade, +10.3%/ano, pior ano -2.0%), mas SOL 54 trades: reprovada.
-3. #139 (tempo max 10 dias) e #141 (stop 2 ATR) PASSAM o criterio do dev (>= 60 trades nas 3 moedas): 2x mais trades (1.1-1.2/semana),
-   win rate 57-62%, +9-10%/ano, pior ano ~-2%. Mas o R por trade cai para metade (+0.33 -> +0.15/+0.19) e a pior queda sobe (-8% -> -11%/-18%).
-4. As duas REPROVAM no pre 2017-18: so 1 trade (-1R), como a #113/#117. Esta familia (BTC > media 200 dias) quase nao tem trades no pre:
-   o pre e de facto um teste que estas ideias nao conseguem passar, por falta de amostra, nao por prova de que nao funcionam.
-5. #141 nas trades de 8-30 dias: 0R; 2024 ja e -1.8%. O ganho vem das trades curtas. #140 (sem filtro do BTC) confirma que o filtro protege 2022 (-13.5% sem ele).
-6. #142: juntar a rutura de 20 dias (#107) a #118 quase nao acrescenta trades: as duas entram no mesmo regime.
-7. Holdouts ja abertos: K1, #100, #116. Conta demo continua na K1. Custos de spot (0.57%) continuam otimistas face a tabela Kraken jul-2026.
-8. PROBLEMA NO PAINEL: o Supabase recusa portfolio_K* (set_state so aceita portfolio_C*); K36-K45 so em results/carteiras/. Precisa do OK do Antonio.
-9. Proximo passo: base nova (best.py) = K44 (#141). Atacar as trades de 8-30 dias da #141 (ex.: tempo max + stop 2 ATR) e o pre sem amostra.
+Leitura honesta cripto (2026-11-22, sessao das :30 00h30):
+1. Ideias cripto testadas no total: 60 (#100-#146, K1, scalping, intraday, perpetuos). Mais testes = mais desconfianca.
+2. Melhor win rate com resultado positivo: 68% (#118, +0.33R/trade, +10.3%/ano), mas SOL 54 trades: reprovada. Melhor que passa o dev: 63% (#144/#146).
+3. #143-#146 (variantes da #141) PASSAM TODAS o dev, mas nenhuma abre 2-3 trades/semana: 1.0-1.5/semana. O limite e o BTC abaixo da media de 200 dias (2022 quase sem trades).
+4. #146 (BTC tambem acima da media de 50) e a melhor: +10.9%/ano, pior ano 0.0%, 2024 +0.2% (antes -2.9%), win rate 63%. Nova base (K49).
+5. #143 (tempo max 10 dias) abre +35% de trades mas cada uma vale metade: os 0R das trades lentas viram custos, nao ganhos.
+6. TODAS reprovam no pre: com a media de 200 dias do BTC so ha 1 trade em 2017-18 (dados desde ago-2017 -> regime so existe a partir de mar-2018, ja em baixa).
+   A #145 (EMA, sem esse problema) tem 47 trades no pre e perde (-0.06R, 2018 -7.5%): sinal honesto de que a familia pode nao sobreviver a um mercado de baixa sem o filtro lento.
+7. Decisao para o Antonio: o pre, tal como esta, nao consegue julgar esta familia (1 trade). Nada foi mudado; periodos e criterio continuam fixos.
+8. Painel: as carteiras K46-K53 ficaram gravadas no Supabase (o erro de portfolio_K* ja nao aparece). Demo experimental: entrou a #144 (#139 + #144 + #138).
+9. Proximo passo: base K49 (#146). Mais trades sem baixar o R: 2.a estrategia que funcione com o BTC abaixo da media de 200 (ha 0 trades em 2022) ou timeframe 12h com o mesmo filtro.
 
 # Resumo indices (ARQUIVO, custos CFD incluidos)
 

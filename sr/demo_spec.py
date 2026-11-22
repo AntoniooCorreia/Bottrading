@@ -38,6 +38,12 @@ SPECS: dict[str, dict] = {
     "k-sma100-d-bull-bracket-s2": {"num": "#141", "tf": "1d", "side": 1, "entry": {"kind": "above_sma", "n": 100},
                                    "trend_ema": 0, "btc": "bull", "stop_atr": 2.0, "tp_r": 1.0, "max_hold": 0,
                                    "signal_exit": False},
+    "k-sma100-d-bull-bracket-s2-mh10": {"num": "#143", "tf": "1d", "side": 1, "entry": {"kind": "above_sma", "n": 100},
+                                        "trend_ema": 0, "btc": "bull", "stop_atr": 2.0, "tp_r": 1.0, "max_hold": 10,
+                                        "signal_exit": False},
+    "k-sma50-d-bull-bracket-s2": {"num": "#144", "tf": "1d", "side": 1, "entry": {"kind": "above_sma", "n": 50},
+                                  "trend_ema": 0, "btc": "bull", "stop_atr": 2.0, "tp_r": 1.0, "max_hold": 0,
+                                  "signal_exit": False},
 }
 
 

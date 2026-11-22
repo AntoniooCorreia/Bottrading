@@ -327,6 +327,46 @@ def sma_own_entry(n: int):
     return f
 
 
+def btc_ema_regime(index: pd.DatetimeIndex, n: int = 200) -> pd.Series | None:
+    """Como btc_bull_regime mas com a EMA de n dias do BTC (so dias ja fechados: vale a partir do dia seguinte)."""
+    if len(index) == 0:
+        return pd.Series(False, index=index, dtype=bool)
+    try:
+        from .swing import load_tf
+        btc_daily = load_tf("btc", "1d", None)
+    except Exception:
+        return None
+    if index.tz is None or len(btc_daily) < n + 1 or index[-1] < btc_daily.index[0] + pd.Timedelta(days=n):
+        return None
+    c = btc_daily["close"]
+    bull = (c > c.ewm(span=n, adjust=False).mean()).astype(float)
+    bull.index = bull.index + pd.Timedelta(days=1)
+    out = bull.reindex(bull.index.union(index)).ffill().reindex(index)
+    return out.fillna(0).astype(bool)
+
+
+def ema_bull_entry(n: int, n_btc: int = 200):
+    """#145: moeda acima da EMA de n velas e BTC acima da EMA de n_btc dias (dia anterior fechado), vela a vela.
+    Sem dados do BTC para as datas: EMA de n_btc da propria serie (so passado)."""
+    def f(b: pd.DataFrame) -> pd.Series:
+        c = b["close"]
+        e = c.ewm(span=n, adjust=False).mean()
+        r = btc_ema_regime(b.index, n_btc)
+        if r is None:
+            r = (c > c.ewm(span=n_btc, adjust=False).mean()).shift(1).fillna(False).astype(bool)
+        return ((c > e) & r).astype(int)
+    return f
+
+
+def sma_bull2_entry(n: int, n_btc_fast: int = 50):
+    """#146: como sma_bull_entry, mas o BTC tem de estar acima da media de 200 dias E da media de n_btc_fast dias."""
+    def f(b: pd.DataFrame) -> pd.Series:
+        c = b["close"]
+        sma = c.rolling(n).mean()
+        return ((c > sma) & sma.notna() & _regime(b, 200) & _regime(b, n_btc_fast, n_btc_fast)).astype(int)
+    return f
+
+
 def pullback_bull(n_trend: int, n_dip: int, n_hi: int):
     """Recuo na tendencia: BTC em alta, moeda acima da media de n_trend e fecho abaixo dos n_dip fechos anteriores.
     Sai ao fechar acima do maximo das n_hi velas anteriores (tendencia retomada)."""
@@ -596,6 +636,11 @@ IDEAS = {
     "k-sma100-d-bull-bracket-mh10": (sma_bull_entry(100), "1d", 3.0, 1.0, 10),
     "k-sma100-d-own-bracket": (sma_own_entry(100), "1d", 3.0, 1.0, 0),
     "k-sma100-d-bull-bracket-s2": (sma_bull_entry(100), "1d", 2.0, 1.0, 0),
+    # cripto 2026-11-22 sessao :30 00h30 (registadas em IDEAS.md antes de correr): variantes da #141
+    "k-sma100-d-bull-bracket-s2-mh10": (sma_bull_entry(100), "1d", 2.0, 1.0, 10),
+    "k-sma50-d-bull-bracket-s2": (sma_bull_entry(50), "1d", 2.0, 1.0, 0),
+    "k-ema100-d-bull-bracket-s2": (ema_bull_entry(100), "1d", 2.0, 1.0, 0),
+    "k-sma100-d-bull50-bracket-s2": (sma_bull2_entry(100), "1d", 2.0, 1.0, 0),
 }
 
 # saidas extra por ideia (argumentos de run_positions): partial = fracao fechada no alvo tp_r (resto com stop em breakeven);
@@ -610,6 +655,10 @@ EXITS = {
     "k-sma100-d-bull-bracket-mh10": {"signal_exit": False},
     "k-sma100-d-own-bracket": {"signal_exit": False},
     "k-sma100-d-bull-bracket-s2": {"signal_exit": False},
+    "k-sma100-d-bull-bracket-s2-mh10": {"signal_exit": False},
+    "k-sma50-d-bull-bracket-s2": {"signal_exit": False},
+    "k-ema100-d-bull-bracket-s2": {"signal_exit": False},
+    "k-sma100-d-bull50-bracket-s2": {"signal_exit": False},
 }
 
 
