@@ -367,6 +367,22 @@ def sma_bull2_entry(n: int, n_btc_fast: int = 50):
     return f
 
 
+def sma_bull2_extra_entry(n: int, extra: str, n_btc_fast: int = 50):
+    """#149/#150: condicoes da #146 + um filtro diario extra (so passado, fecho da vela).
+    extra='mom7': fecho acima do fecho de 7 velas antes; extra='red': fecho abaixo do fecho anterior."""
+    def f(b: pd.DataFrame) -> pd.Series:
+        c = b["close"]
+        base = sma_bull2_entry(n, n_btc_fast)(b).astype(bool)
+        if extra == "mom7":
+            x = c > c.shift(7)
+        elif extra == "red":
+            x = c < c.shift(1)
+        else:
+            raise ValueError(extra)
+        return (base & x.fillna(False)).astype(int)
+    return f
+
+
 def pullback_bull(n_trend: int, n_dip: int, n_hi: int):
     """Recuo na tendencia: BTC em alta, moeda acima da media de n_trend e fecho abaixo dos n_dip fechos anteriores.
     Sai ao fechar acima do maximo das n_hi velas anteriores (tendencia retomada)."""
@@ -641,6 +657,11 @@ IDEAS = {
     "k-sma50-d-bull-bracket-s2": (sma_bull_entry(50), "1d", 2.0, 1.0, 0),
     "k-ema100-d-bull-bracket-s2": (ema_bull_entry(100), "1d", 2.0, 1.0, 0),
     "k-sma100-d-bull50-bracket-s2": (sma_bull2_entry(100), "1d", 2.0, 1.0, 0),
+    # cripto 2026-11-22 sessao :00 (01h), base #146 (registadas antes de correr)
+    "k-sma50-d-bull50-bracket-s2": (sma_bull2_entry(50), "1d", 2.0, 1.0, 0),
+    "k-sma100-d-bull50-bracket-s2-tp075": (sma_bull2_entry(100), "1d", 2.0, 0.75, 0),
+    "k-sma100-d-bull50-mom7-bracket-s2": (sma_bull2_extra_entry(100, "mom7"), "1d", 2.0, 1.0, 0),
+    "k-sma100-d-bull50-red-bracket-s2": (sma_bull2_extra_entry(100, "red"), "1d", 2.0, 1.0, 0),
 }
 
 # saidas extra por ideia (argumentos de run_positions): partial = fracao fechada no alvo tp_r (resto com stop em breakeven);
@@ -659,6 +680,10 @@ EXITS = {
     "k-sma50-d-bull-bracket-s2": {"signal_exit": False},
     "k-ema100-d-bull-bracket-s2": {"signal_exit": False},
     "k-sma100-d-bull50-bracket-s2": {"signal_exit": False},
+    "k-sma50-d-bull50-bracket-s2": {"signal_exit": False},
+    "k-sma100-d-bull50-bracket-s2-tp075": {"signal_exit": False},
+    "k-sma100-d-bull50-mom7-bracket-s2": {"signal_exit": False},
+    "k-sma100-d-bull50-red-bracket-s2": {"signal_exit": False},
 }
 
 
