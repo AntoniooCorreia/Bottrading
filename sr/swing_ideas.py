@@ -318,6 +318,15 @@ def sma_bull_entry(n: int):
     return f
 
 
+def sma_own_entry(n: int):
+    """Como sma_bull_entry mas sem o filtro do BTC: so a moeda acima da sua media de n velas (vela a vela)."""
+    def f(b: pd.DataFrame) -> pd.Series:
+        c = b["close"]
+        sma = c.rolling(n).mean()
+        return ((c > sma) & sma.notna()).astype(int)
+    return f
+
+
 def pullback_bull(n_trend: int, n_dip: int, n_hi: int):
     """Recuo na tendencia: BTC em alta, moeda acima da media de n_trend e fecho abaixo dos n_dip fechos anteriores.
     Sai ao fechar acima do maximo das n_hi velas anteriores (tendencia retomada)."""
@@ -583,6 +592,10 @@ IDEAS = {
     "k-sma100-d-slope-tp1": (sma_slope_bull(100, 20), "1d", 3.0, 1.0, 0),
     # cripto 2026-11-21 sessao :00 19h (registada em IDEAS.md antes de correr): #118 em 4h, stop 3 ATR de 4h
     "k-sma600-4h-bull-bracket": (sma_bull_entry(600), "4h", 3.0, 1.0, 0),
+    # cripto 2026-11-22 sessao :00 00h (registadas em IDEAS.md antes de correr): variantes da #118
+    "k-sma100-d-bull-bracket-mh10": (sma_bull_entry(100), "1d", 3.0, 1.0, 10),
+    "k-sma100-d-own-bracket": (sma_own_entry(100), "1d", 3.0, 1.0, 0),
+    "k-sma100-d-bull-bracket-s2": (sma_bull_entry(100), "1d", 2.0, 1.0, 0),
 }
 
 # saidas extra por ideia (argumentos de run_positions): partial = fracao fechada no alvo tp_r (resto com stop em breakeven);
@@ -594,6 +607,9 @@ EXITS = {
     "k-dc20-d-own-be": {"be": True},
     "k-sma100-d-bull-bracket": {"signal_exit": False},
     "k-sma600-4h-bull-bracket": {"signal_exit": False},
+    "k-sma100-d-bull-bracket-mh10": {"signal_exit": False},
+    "k-sma100-d-own-bracket": {"signal_exit": False},
+    "k-sma100-d-bull-bracket-s2": {"signal_exit": False},
 }
 
 

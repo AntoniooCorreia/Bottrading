@@ -563,3 +563,28 @@ Limite da noite: so cabe 1 ideia (19 de 20 ja usadas hoje), por isso escolho a q
   (mesma entrada em 4h mas com saida pelo sinal e stop 6 ATR) deu so 40% de win rate e +0.14R.
 Fasquia (criterio oficial cripto, fixo): >= 60 trades em CADA uma de BTC/ETH/SOL, meanR > 0 em cada, t junto >= 3.0, CONFIRMACAO
 positiva em >= 3/5 moedas extra; depois --period pre >= 0. Comparar com a base K20: win rate, % total, melhor ano, pior ano, trades/semana.
+
+## 2026-11-22 cripto - sessao :00 (00h) (4 ideias; ideias cripto testadas antes: 52; hoje: 4 de 20) - registadas antes de correr
+Base (best.py): K20 = #118 k-sma100-d-bull-bracket (pontuacao 83: win rate 68%, total +62%, melhor ano +17.7%, pior ano -2.0%,
+pior mes -4.1%, 0.6 trades/semana). O que falha: SOL 54 trades (< 60); 0.6 trades/semana; mediana de 13 dias sem trade entre entradas;
+32 trades com mais de 30 dias valem so +0.11R (win rate 56%) contra +0.48R nas de 4-7 dias; 2022 com 2 trades e -2%.
+A #138 (mesma regra em 4h) mostrou que encurtar muito o stop duplica as trades mas o custo come metade do ganho.
+Uma mudanca de cada vez contra a #118 (entrada: moeda fecha acima da media de 100 dias e BTC acima da media de 200 dias; entra na
+abertura seguinte quando esta sem posicao; sai SO no alvo 1R ou no stop 3 ATR(14) diario; volta a entrar se a condicao continuar):
+- **#139 k-sma100-d-bull-bracket-mh10** (ataca as trades lentas e abre mais trades): igual, mas com tempo maximo de 10 dias (sai ao fecho
+  do 10.o dia). Hipotese: as trades > 30 dias sao as que entraram quando a volatilidade caiu depois da entrada; o alvo fica longe e a
+  deriva ja nao paga. Fechar ao fim de 10 dias liberta a moeda e o bracket recomeca com um ATR atual -> mais trades e menos trades
+  mortas. Risco: as saidas por tempo nao sao +-1R e podem baixar o win rate.
+- **#140 k-sma100-d-own-bracket** (MAIS TRADES, menos filtros): igual, mas SEM o filtro do BTC: so a moeda acima da sua media de 100
+  dias. Hipotese: cada moeda tem a sua tendencia; o filtro do BTC tira as subidas proprias da SOL/ETH (ex.: 2019 T2 nas alts, recuperacoes
+  antes do BTC) -> mais trades, sobretudo na SOL. Risco: subidas de alivio de 2022 -> pior ano mais negativo.
+- **#141 k-sma100-d-bull-bracket-s2** (MAIS TRADES): igual, mas stop 2 ATR(14) diario (alvo 1R = 2 ATR). Hipotese: meio caminho entre a
+  #118 (3 ATR diario, custo ~0.05R) e a #138 (~1.2 ATR diario, custo ~0.12R): ~1.5x mais trades com custo ~0.08R; o win rate vem da
+  deriva, nao do tamanho do stop. Risco: o mesmo da #138 (ruido diario e custos), em menor grau.
+- **#142 carteira #118 + #107** (MAIS TRADES, 2.a estrategia): a #118 e a k-dc20-d-bull-tp1 (#107: rutura do maximo de 20 dias com BTC
+  acima da media de 200 dias, alvo 1R, stop 3 ATR) juntas na mesma carteira, 1 posicao por moeda. Hipotese: a rutura de 20 dias dispara
+  em momentos diferentes (depois de consolidacoes) e preenche os dias sem trade da #118 -> mais trades/semana com win rate parecido
+  (#107: 60%). Nao e uma ideia nova (as duas ja foram testadas): e um teste de carteira. Risco: as duas estao no mesmo regime e
+  sobrepoem-se, por isso o ganho em trades pode ser pequeno.
+Fasquia (criterio oficial cripto, fixo): >= 60 trades em CADA uma de BTC/ETH/SOL, meanR > 0 em cada, t junto >= 3.0, CONFIRMACAO
+positiva em >= 3/5 moedas extra; depois --period pre >= 0. Comparar sempre com a base K20: win rate, % total, melhor ano, pior ano, trades/semana.
