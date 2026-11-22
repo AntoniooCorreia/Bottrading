@@ -38,3 +38,13 @@
   ADA -0.14, DOGE -0.11, LINK +0.06, AVAX +0.04). Carteira: 2025 +4.3%, 2026 -1.8%, pior mes -4.6%, pior queda -6.9%.
   Veredicto automatico REPROVADA (< 60 trades por moeda). Leitura: positiva mas quase zero; o win rate cai de 53% para 46%.
   A aposta simetrica precisa de deriva forte, que 2025-26 nao teve. Holdout gasto; nada se afina depois disto.
+- 2026-11-22 cripto #155 `k-sma50-d-btc50-bracket-s2-rx` (moeda > media 50, BTC > media 50, alvo 1R / stop 2 ATR, sai de tudo quando
+  o BTC perde a media 50; PASSA no dev: t 5.05, win rate 60%, confirmacao 5/5; pre 2017-18 +0.048R/trade em 54 trades, >= 0:
+  BTC -0.07R/33, ETH +0.23R/21, 2017 +8.9%, 2018 -6.3%) -> holdout 2025-01-01 ate ao fim dos dados, UMA vez, custos Kraken:
+  BTC +0.025R/38, ETH +0.019R/36, SOL -0.061R/40; junto 114 trades -0.007R, t -0.09, win rate 47%. Confirmacao 1/5.
+  Carteira: 2025 +4.7%, 2026 -5.5%, pior mes -5.8%, pior queda -20.0%. Veredicto automatico REPROVADA.
+  Leitura: a vantagem do dev (+0.22R, win rate 60%) desaparece fora do dev (pre ~+0.05R, holdout ~0R). Holdout gasto; nada se afina.
+- 2026-11-22 cripto #157 `k-sma50-d-btc50-bracket-s15` (a #151 com stop 1.5 ATR; PASSA no dev: t 3.77, win rate 61%, conf. 4/5;
+  pre +0.034R/trade em 77 trades, >= 0) -> holdout UMA vez: BTC -0.043R/49, ETH -0.071R/47, SOL -0.106R/45; junto 141 trades
+  -0.072R, t -0.86, win rate 52%; confirmacao 0/5. Carteira: 2025 +0.9%, 2026 -11.1%, pior queda -25.8%. REPROVADA.
+  Leitura: o stop mais curto so acrescenta custo; fora do dev perde. Holdout gasto; nada se afina.

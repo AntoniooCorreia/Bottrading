@@ -263,7 +263,11 @@ Registadas em IDEAS.md antes de correr.
 
 ## Ideias do agente (2026-11-22, cripto sessao :00 02h, base K58 = #151)
 Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --period dev --push --num "#1xx" --nota ...` (e `--period pre` se passar).
-- [ ] #155: k-sma50-d-btc50-bracket-s2-rx (sai de tudo quando o BTC perde a media 50)
-- [ ] #156: k-sma50-d-btc50up-bracket-s2 (media 50 do BTC a subir)
-- [ ] #157: k-sma50-d-btc50-bracket-s15 (stop 1.5 ATR, mais trades)
-- [ ] #158: k-sma20-d-btc50-bracket-s2 (moeda acima da media 20, mais trades)
+- [x] #155: k-sma50-d-btc50-bracket-s2-rx -> PASSA dev (t +5.05; BTC +0.193R/154, ETH +0.201R/157, SOL +0.269R/112; win rate 60%; conf. 5/5;
+  K64 +15.2%/ano, pior ano -9.4%, pior mes -5.0%). Pre +0.048R/54 trades (>= 0). HOLDOUT (uma vez): -0.007R/114, t -0.09, conf. 1/5: REPROVADA
+- [x] #156: k-sma50-d-btc50up-bracket-s2 -> PASSA dev (t +4.60; BTC +0.210R/119, ETH +0.192R/127, SOL +0.350R/88; win rate 65%; conf. 5/5;
+  K65 +13.4%/ano, pior ano -5.3%, pior mes -4.3%). Pre -0.114R/41 trades: REPROVADA no pre
+- [x] #157: k-sma50-d-btc50-bracket-s15 -> PASSA dev (t +3.77; BTC +0.116R/218, ETH +0.148R/211, SOL +0.209R/154; win rate 61%; conf. 4/5;
+  K66 +14.8%/ano, pior ano -11.6%, pior mes -6.5%, 1.9 trades/semana). Pre +0.034R/77 (>= 0). HOLDOUT (uma vez): -0.072R/141, t -0.86, conf. 0/5: REPROVADA
+- [x] #158: k-sma20-d-btc50-bracket-s2 -> PASSA dev (t +4.65; BTC +0.209R/137, ETH +0.219R/139, SOL +0.270R/101; win rate 64%; conf. 5/5;
+  K67 +14.4%/ano, pior ano -13.6%). Pre -0.100R/53 trades, 2018 -12.2%: REPROVADA no pre

@@ -408,6 +408,46 @@ def btc_regime_off(n_btc_fast: int = 50):
     return f
 
 
+def btc_sma_up_regime(index: pd.DatetimeIndex, n: int = 50, k: int = 10) -> pd.Series | None:
+    """#156: True quando, no dia anterior fechado, o BTC fechou acima da media de n dias E essa media estava acima da de k dias antes."""
+    if len(index) == 0:
+        return pd.Series(False, index=index, dtype=bool)
+    try:
+        from .swing import load_tf
+        btc_daily = load_tf("btc", "1d", None)
+    except Exception:
+        return None
+    if index.tz is None or len(btc_daily) < n + k + 1 or index[-1] < btc_daily.index[0] + pd.Timedelta(days=n + k):
+        return None
+    c = btc_daily["close"]
+    sma = c.rolling(n).mean()
+    ok = ((c > sma) & (sma > sma.shift(k))).astype(float).where(sma.shift(k).notna())
+    ok.index = ok.index + pd.Timedelta(days=1)
+    out = ok.reindex(ok.index.union(index)).ffill().reindex(index)
+    return out.fillna(0).astype(bool)
+
+
+def sma_btc50up_entry(n: int, n_btc: int = 50, k: int = 10):
+    """#156: moeda acima da media de n velas; BTC acima da media de n_btc dias com essa media a subir (vs k dias antes).
+    Sem dados do BTC: o mesmo na propria serie (so passado)."""
+    def f(b: pd.DataFrame) -> pd.Series:
+        c = b["close"]
+        sma = c.rolling(n).mean()
+        r = btc_sma_up_regime(b.index, n_btc, k)
+        if r is None:
+            s2 = c.rolling(n_btc).mean()
+            r = ((c > s2) & (s2 > s2.shift(k))).shift(1).fillna(False).astype(bool)
+        return ((c > sma) & sma.notna() & r).astype(int)
+    return f
+
+
+def btc50_off(n_btc: int = 50):
+    """#155: mascara de saida: True quando o regime da #151 (BTC fechou o dia anterior acima da media de n_btc) esta desligado."""
+    def f(b: pd.DataFrame) -> pd.Series:
+        return ~_regime(b, n_btc, n_btc).astype(bool)
+    return f
+
+
 def pullback_bull(n_trend: int, n_dip: int, n_hi: int):
     """Recuo na tendencia: BTC em alta, moeda acima da media de n_trend e fecho abaixo dos n_dip fechos anteriores.
     Sai ao fechar acima do maximo das n_hi velas anteriores (tendencia retomada)."""
@@ -692,6 +732,11 @@ IDEAS = {
     "k-sma50-d-bull50-bracket-s2-lose7": (sma_bull2_entry(50), "1d", 2.0, 1.0, 0),
     "k-sma50up-d-bull50-bracket-s2": (sma_up_bull2_entry(50), "1d", 2.0, 1.0, 0),
     "k-sma50-d-bull50-bracket-s2-rx": (sma_bull2_entry(50), "1d", 2.0, 1.0, 0),
+    # cripto 2026-11-22 sessao :00 (02h), base #151 (registadas antes de correr)
+    "k-sma50-d-btc50-bracket-s2-rx": (sma_btc50_entry(50), "1d", 2.0, 1.0, 0),
+    "k-sma50-d-btc50up-bracket-s2": (sma_btc50up_entry(50), "1d", 2.0, 1.0, 0),
+    "k-sma50-d-btc50-bracket-s15": (sma_btc50_entry(50), "1d", 1.5, 1.0, 0),
+    "k-sma20-d-btc50-bracket-s2": (sma_btc50_entry(20), "1d", 2.0, 1.0, 0),
 }
 
 # saidas extra por ideia (argumentos de run_positions): partial = fracao fechada no alvo tp_r (resto com stop em breakeven);
@@ -718,6 +763,10 @@ EXITS = {
     "k-sma50-d-bull50-bracket-s2-lose7": {"signal_exit": False, "lose_hold": 7},
     "k-sma50up-d-bull50-bracket-s2": {"signal_exit": False},
     "k-sma50-d-bull50-bracket-s2-rx": {"signal_exit": False, "exit_fn": btc_regime_off(50)},
+    "k-sma50-d-btc50-bracket-s2-rx": {"signal_exit": False, "exit_fn": btc50_off(50)},
+    "k-sma50-d-btc50up-bracket-s2": {"signal_exit": False},
+    "k-sma50-d-btc50-bracket-s15": {"signal_exit": False},
+    "k-sma20-d-btc50-bracket-s2": {"signal_exit": False},
 }
 
 
