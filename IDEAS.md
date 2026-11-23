@@ -829,3 +829,23 @@ Fasquia: criterio oficial (>= 60 trades por moeda, positiva em cada, t >= 3.0, c
 Resultado (dev 2019-2024, perp): as 4 REPROVADAS (K95-K98). #181 t -0.28 (win 52%, 105 trades/ano, pior ano -1.6%), #182 t -0.75,
 #183 t -1.85 (win 49%), #184 t -0.02 (win 47%, conf. 3/5). Leitura: o +0.01R da #180 era ruido; tirar o BTC, alongar a EMA, ir para long
 em forca relativa ou trocar o ressalto pela rutura da tudo ~0R ou pior. 20 ideias de baixa esta noite (#165-#184), nenhuma com vantagem.
+
+## 2026-11-23 cripto - sessao :00 (19h) (4 ideias; ideias cripto testadas antes: ~98 (#100-#184); esta noite (desde 19h de 23-11): 4 de 20 com esta sessao) - registadas antes de correr
+PRIORIDADE DA NOITE (BTC abaixo da media de 200 dias -> demo experimental parada). `python best.py`: base K67 (#158), pontuacao 92, win rate 64%,
++86% total, pior ano -13.6% (2022: 32 trades, win 31%, -0.42R); por duracao as perdas estao nas trades de 4-30 dias (+0.13R vs +0.46R em <= 1 dia).
+Diagnostico das 20 ideias de baixa de ontem (#165-#184): o modo de falha repetido e ENTRAR NO SITIO ERRADO DO MOVIMENTO. Shorts de tendencia
+(abaixo da media, quebra do minimo) entram ja esticados e levam o ressalto; vender o ressalto logo no RSI(2) > 90 (#177-#179) e atropelado quando o
+ressalto continua (V de 2020/2023). Caminho ainda nao testado: esperar a CONFIRMACAO de que o ressalto falhou, ou vender na RESISTENCIA da media
+descendente (classico de analise tecnica: a media em queda funciona como resistencia; "bear flag"/"lower high"). Fundamento: o short entra num preco
+melhor que a tendencia pura (perto do topo do ressalto) mas so depois de o comprador desistir (fecho abaixo do minimo anterior / rejeicao na media),
+o que deve cortar os ressaltos em V que continuam. Todas: short, BTC em baixa (fechou o dia anterior abaixo da media de 200 dias), so alvo/stop/tempo,
+--venue perp, parametros fixos. Familia nova (nao cabe nas SPECS atuais): se passar, mexer em engine.ts + demo_spec.py + testes (sem deploy).
+- **#185 s-failrally-d-bear-s2-tp1-mh3**: houve RSI(2) diario > 90 num dos 3 dias anteriores (ressalto) e hoje o fecho fica abaixo do minimo de ontem
+  -> short na abertura seguinte. Stop 2 ATR(14) diario, alvo 1R, maximo 3 dias. Hipotese: o ressalto falhou; o regresso a baixa comeca.
+- **#186 s-failrally-4h-bear-s2-tp1-mh6** (MAIS TRADES): a #185 em 4h: RSI(2) de 4h > 90 numa das 6 velas anteriores e fecho de 4h abaixo do minimo da
+  vela anterior. Stop 2 ATR(14) de 4h, alvo 1R, maximo 6 velas (1 dia). Hipotese: o mesmo, 6x mais frequente.
+- **#187 s-ema20rej-d-bear-s2-tp1-mh3**: rejeicao na media descendente: maximo do dia >= EMA(20) diaria, fecho < EMA(20), EMA(20) < EMA(50) e BTC em baixa.
+  Stop 2 ATR, alvo 1R, maximo 3 dias. Hipotese: o ressalto bate na resistencia dinamica e volta para baixo.
+- **#188 s-ema20rej-4h-bear-s2-tp1-mh6** (MAIS TRADES): a #187 em velas de 4h (EMA 20 e EMA 50 de 4h). Stop 2 ATR(14) de 4h, alvo 1R, maximo 6 velas.
+Fasquia: criterio oficial (>= 60 trades por moeda, positiva em cada, t >= 3.0, confirmacao >= 3/5); depois pre e holdout uma vez.
+Risco conhecido: o dev tem pouca baixa (sobretudo 2022) -> as diarias podem ter < 60 trades por moeda.
