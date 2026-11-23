@@ -275,8 +275,13 @@ function setPf(v){S.pf=v;store("bt_pf",v);S.cal.y=null;S.per.y=null;S.tr.page=0;
 function setAcc(v){S.acc=Math.max(100,+v||100000);store("bt_acc",S.acc);render();}
 
 /* ---------- dados da carteira ---------- */
-function portfolios(){const d=S.data; if(!d) return []; return [d.portfolio?{id:"ref",...d.portfolio,ref:true}:null,...d.extra.map(p=>({id:p.label,...p})),...(S.arq||[]).map(p=>({id:"arq_"+p.label,...p,arquivo:true}))].filter(Boolean);}
+S.full={};   /* carteiras completas (com trades), so as que forem abertas */
+const pfKey=P=>P.ref?"portfolio":P.arquivo?"arq_portfolio_"+P.label:"portfolio_"+P.label;
+function withFull(P){const f=S.full[pfKey(P)]; return f&&f.value?{...P,...f.value}:P;}
+function portfolios(){const d=S.data; if(!d) return []; return [d.portfolio?{id:"ref",...d.portfolio,ref:true}:null,...d.extra.map(p=>({id:p.label,...p})),...(S.arq||[]).map(p=>({id:"arq_"+p.label,...p,arquivo:true}))].filter(Boolean).map(withFull);}
 function curPf(){const L=portfolios(); return L.find(p=>p.id===S.pf)||L[0]||null;}
+function ensureFull(P){if(!P||P.trades) return; const k=pfKey(P); if(S.full[k]) return; S.full[k]={loading:true};
+  q("state?select=value&key=eq."+encodeURIComponent(k)).then(r=>{S.full[k]={value:r[0]?r[0].value:{trades:[]}}; render();}).catch(()=>{delete S.full[k];});}
 function pfName(P){const n=P.markets&&P.markets.length?P.markets.length:new Set((P.por_indice||[]).map(r=>r.indice)).size;
   return (P.aviso?"⚠ ":"")+(P.label?P.label+" · ":"")+(P.ref?"Referência · demo":P.arquivo?"Arquivo índices":"Carteira")+" ("+n+(P.mercado==="crypto"?" moedas":" índices")+")";}
 /* agrega trades por dia de saida: {date:{r,n,w,list}} */
@@ -527,6 +532,7 @@ function vTestes(){
   if(X){ const r=(S.tests.per&&X[S.tests.per])||X.dev||X.pre||X.holdout; const mkk=MK.includes(S.tests.mk)?S.tests.mk:MK[0];
     const pers=["dev","pre","holdout"].filter(p=>X[p]);
     const mm=r.markets[mkk]||{};
+    if(!r.equity){S.runFull=S.runFull||{}; if(!S.runFull[r.id]){S.runFull[r.id]=1; q("runs?select=equity,periods&id=eq."+encodeURIComponent(r.id)).then(x=>{if(x[0]){r.equity=x[0].equity;r.periods=x[0].periods;} render();});}}
     const days=(r.periods&&r.periods[mkk]&&r.periods[mkk].day)||[];
     const dm=Object.fromEntries(days.map(d=>[d[0],{r:d[1],n:d[2],w:d[3]}]));
     const CC={[MK[0]]:"var(--c1)",[MK[1]]:"var(--c2)",[MK[2]]:"var(--c3)"}; const ser=MK.filter(k=>r.equity&&r.equity[k]&&r.equity[k].length).map(k=>({name:nm(k),color:CC[k],pts:r.equity[k]}));
@@ -723,7 +729,7 @@ async function livePx(){
 }
 /* ---------- carteiras de backtesting: avaliar contra os objetivos do Antonio ---------- */
 function evalPf(P){
-  const T=P.trades||[], s=stats(T), wr=s.n?s.wr:(P.win??null), tps=P.trades_ano/52;
+  const T=P.trades||[], s=stats(T), wr=s.n?s.wr:(P.win_calc??P.win??null), tps=P.trades_ano/52;
   const C=[];
   const add=(nome,ok,val,hard)=>C.push({nome,ok,val,hard});
   const of=P.oficial_passa, ofTxt=(P.oficial||[]).filter(o=>!o.passa).map(o=>o.ideia+": "+o.motivos.join(", ")).join(" · ");
@@ -744,8 +750,8 @@ function evalPf(P){
   return {C,st,why,score,wr};
 }
 /* pontuacao pedida pelo Antonio: win rate + % total acumulado + melhor ano (percentil entre testes do mesmo periodo) */
-function pfMetrics(P){const T=P.trades||[]; const tot=T.reduce((a,t)=>a+t[4],0); const ys=Object.values(P.por_ano||{}).map(Number);
-  return {win:T.length?T.filter(t=>t[4]>0).length/T.length*100:(P.win||0),tot,best:ys.length?Math.max(...ys):0};}
+function pfMetrics(P){const T=P.trades||[]; const tot=T.length?T.reduce((a,t)=>a+t[4],0):(+P.tot_calc||0); const ys=Object.values(P.por_ano||{}).map(Number);
+  return {win:T.length?T.filter(t=>t[4]>0).length/T.length*100:(P.win_calc??P.win??0),tot,best:ys.length?Math.max(...ys):0};}
 function scoreAll(L){const pool=L.filter(x=>x.p.mercado==="crypto"&&x.p.period==="dev");
   const ks=["win","tot","best"]; pool.forEach(x=>x.m=pfMetrics(x.p));
   pool.forEach(x=>{x.sc=Math.round(100*ks.reduce((a,k)=>a+pool.filter(y=>y.m[k]<x.m[k]).length/Math.max(1,pool.length-1),0)/3);});
@@ -782,6 +788,7 @@ function render(){
   document.getElementById("pfCtl").style.display=["testes","diario","plano","demo","carteiras"].includes(S.route)?"none":"";
   if(!S.data){document.getElementById("view").innerHTML=`<div class="card"><div class="empty">A carregar dados…</div></div>`; return;}
   const L=portfolios(); document.getElementById("pfSel").innerHTML=L.map(p=>`<option value="${p.id}" ${p.id===(curPf()||{}).id?"selected":""}>${esc(pfName(p))}</option>`).join("");
+  if(!["testes","diario","plano","demo","carteiras"].includes(S.route)){const P=curPf(); if(P&&!P.trades){ensureFull(P); document.getElementById("view").innerHTML=`<div class="card"><div class="empty">A carregar a carteira ${esc(P.label||"")}…</div></div>`; return;}}
   document.getElementById("acc").value=S.acc;
   hideTip();
   try{ document.getElementById("view").innerHTML=VIEWS[S.route](); }
@@ -808,16 +815,18 @@ function stateRows(){
     const ch=meta.filter(r=>!S.stc[r.key]||S.stc[r.key].updated_at!==r.updated_at).map(r=>r.key);
     const keep=new Set(meta.map(r=>r.key)); Object.keys(S.stc).forEach(k=>{if(!keep.has(k)) delete S.stc[k];});
     const chunks=[]; for(let i=0;i<ch.length;i+=15) chunks.push(ch.slice(i,i+15));
-    return Promise.all(chunks.map(c=>q("state?select=key,value,updated_at&key=in.("+c.map(k=>'"'+k+'"').join(",")+")")))
+    return Promise.all(chunks.map(c=>q("state_light?select=key,value,updated_at&key=in.("+c.map(k=>'"'+k+'"').join(",")+")")))
       .then(parts=>{parts.flat().forEach(r=>{S.stc[r.key]=r;}); return Object.values(S.stc);});
   });
 }
 function load(){
-  Promise.all([q("runs?select=*&order=created_at.desc"),stateRows(),q("agent_log?select=*&order=at.desc&limit=300"),
-    S.arq?Promise.resolve(null):q("state?select=key,value&key=like.arq_portfolio_*").catch(()=>[])])
+  Promise.all([q("runs?select=id,variant,period,params,verdict,pooled,markets,yearly,fut,created_at&order=created_at.desc"),stateRows(),q("agent_log?select=*&order=at.desc&limit=300"),
+    S.arq?Promise.resolve(null):q("state_light?select=key,value&key=like.arq_portfolio_*").catch(()=>[])])
   .then(([runs,state,log,arq])=>{
     if(arq) S.arq=arq.map(r=>({label:r.key.slice(14),...r.value})).sort((a,b)=>a.label.localeCompare(b.label,undefined,{numeric:true}));
     const st=Object.fromEntries(state.map(r=>[r.key,r.value]));
+    const old=Object.fromEntries(((S.data&&S.data.runs)||[]).filter(r=>r.equity).map(r=>[r.id,r]));
+    runs.forEach(r=>{const o=old[r.id]; if(o&&o.created_at===r.created_at){r.equity=o.equity;r.periods=o.periods;}});
     S.data={runs,log,todo:st.todo||[],summary:st.summary||"",holdoutLog:st.holdout_log||"",ideas:st.ideas||"",portfolio:st.portfolio||null,
       extra:Object.keys(st).filter(k=>k.startsWith("portfolio_")).sort((a,b)=>a.localeCompare(b,undefined,{numeric:true})).map(k=>({label:k.slice(10),...st[k]}))};
     status(log); render();
