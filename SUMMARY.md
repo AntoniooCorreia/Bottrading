@@ -52,6 +52,7 @@
 | #159-#162 | 2026-11-22 | LONGS MAIS CEDO, perpetuos: rutura de 10 dias depois de -30% (diario e 4h), BTC acima da media 20 em mercado de baixa, ressalto depois de capitulacao; K74-K76 | +1.2 a +1.6 | 54-57% | +0.11 a +0.13 | +0.8% a +2.8%/ano | REPROVADAS: poucas trades (10-57 por moeda) e t < 3; BTC negativo nas ruturas pos-crash; #162 sem nenhum sinal (quedas > 3 ATR quase nao existem) |
 | #163 | 2026-11-22 | #144 com maximo 3 dias (perp); K77 | +4.26 | 55% | +0.098 | +13.0%/ano, pior ano 0.0%, 132 trades/ano so com 3 moedas | PASSA dev + conf. 4/5; pre so 1 trade (-1R): reprovada pela regra, mas o pre nao serve para filtros do BTC 200d. Entra na demo experimental |
 | #164 | 2026-11-22 | #138 com maximo 2 dias (perp); K78 | +2.39 | 53% | +0.040 | +3.6%/ano | REPROVADA (t < 3) |
+| #165-#168 | 2026-11-23 | MERCADO EM BAIXA, shorts perp com BTC < media 200: espelhos da #163 (media 50, max 3d), #139 (media 100, max 10d), #138 (media 600 de 4h) e quebra do minimo de 20 dias; K79-K82 | -2.08 a +0.47 | 44-49% | -0.09 a +0.04 | -3.3% a +0.5%/ano | REPROVADAS: so 2022 ganha (+11 a +15%); perdem nas baixas curtas de 2020/2021/2023/2024 (ressaltos em V); confirmacao 0/5 nos espelhos |
 | carteiras 8 moedas | 2026-11-22 | demo (#139+#144+#138) e curta (#139+#163+#164) em 8 moedas com --max-open | - | 52-58% | - | curta max 4: 179 trades/ano, +17%/ano, pior ano -1.0%, pior mes -10.4%, queda -22% | so diagnostico |
 
 Scalping (2026-11-21): ANTES de custos ha uma vantagem pequena (RSI(2) 15m long: win rate 69%, +0.05R; Bollinger 5m BTC +0.08R),
@@ -64,17 +65,16 @@ Perpetuos (#133-#137): mesmo com custos 4x mais baixos nada passa. Os shorts int
 
 #138 (2026-11-21, 19h): a #118 em 4h abre 2x mais trades (1.2/semana, SOL 173) com win rate 59%, mas so +0.09R/trade: t 2.47, REPROVADA.
 
-Leitura honesta cripto (2026-11-22, sessao das :00 02h):
-1. Ideias cripto testadas no total: 72 (#100-#158, K1, scalping, intraday, perpetuos). Mais testes = mais desconfianca num resultado isolado.
+Leitura honesta cripto (2026-11-23, sessao das :00 00h):
+1. Ideias cripto testadas no total: 82 (#100-#168, K1, scalping, intraday, perpetuos). Mais testes = mais desconfianca num resultado isolado.
 2. Melhor win rate com resultado positivo: 68% (#118 +0.33R, reprovada SOL < 60; #148 +0.14R). Na familia atual: 65% (#156, +0.24R no dev).
-3. #155 (#151 + sair quando o BTC perde a media 50) e #157 (stop 1.5 ATR) passaram dev e pre e foram ao holdout UMA vez: as duas ~0R
-   ou negativas (-0.01R e -0.07R por trade, confirmacao 1/5 e 0/5). #156 e #158 reprovaram no pre (2018 negativo).
-4. Leitura: a familia "moeda acima da media + BTC em alta + alvo 1R" tem t 4-5 em 2019-2024 mas ~0R em 2017-18 e em 2025-26.
-   O mais provavel e que o dev (2019-2024 com 3 anos de subida forte) explique quase toda a vantagem. Nao vale a pena mais variantes.
-5. Holdout ja gasto em cripto: K1, #100, #116, #155, #157. Nenhuma estrategia cripto esta aprovada.
-6. Limite da noite atingido (20 ideias em 2026-11-22). Demo experimental: lista mantida (#139, #144, #138).
-7. Proximo passo: parar de variar esta familia; ideias com outra fonte de vantagem (ex.: funding/basis dos perpetuos, sazonalidade
-   semanal medida em 2017-2018 primeiro) e decisao do Antonio sobre o custo real da Kraken (0.80% taker torna o spot ainda pior).
+3. A familia "moeda acima da media + BTC em alta + alvo 1R" tem t 4-5 em 2019-2024 mas ~0R em 2017-18 e no holdout (#155, #157): o dev explica quase tudo.
+4. Holdout ja gasto em cripto: K1, #100, #116, #155, #157. Nenhuma estrategia cripto esta aprovada.
+5. Mercado em baixa (prioridade de 23-11): os espelhos em short das que passaram em alta (#165-#167) PERDEM (-0.02 a -0.11R, conf. 0/5).
+   So 2022 (baixa longa) da lucro; nas baixas curtas (2020, 2021, 2023, 2024) o BTC volta acima da media e os shorts levam o ressalto.
+6. A quebra do minimo de 20 dias em baixa (#168) e rara (25-32 trades por moeda) e ~0R. Shorts em tendencia nao sao o caminho no dev.
+7. Proximo passo: ressaltos em LONG dentro da baixa (sobrevenda extrema, alvo 0.5-1R, max 1-3 dias), que e o que os shorts mostram que
+   acontece; e decisao do Antonio sobre o custo real da Kraken (0.80% taker torna o spot ainda pior).
 
 # Resumo indices (ARQUIVO, custos CFD incluidos)
 

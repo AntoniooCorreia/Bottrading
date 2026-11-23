@@ -1025,3 +1025,36 @@ IDEAS["k-sma50-d-bull-bracket-s2-mh3"] = (sma_bull_entry(50), "1d", 2.0, 1.0, 3)
 IDEAS["k-sma600-4h-bull-bracket-mh12"] = (sma_bull_entry(600), "4h", 3.0, 1.0, 12)
 EXITS["k-sma50-d-bull-bracket-s2-mh3"] = dict(EXITS.get("k-sma50-d-bull-bracket-s2", {}))
 EXITS["k-sma600-4h-bull-bracket-mh12"] = dict(EXITS.get("k-sma600-4h-bull-bracket", {}))
+
+
+# ---------------- MERCADO EM BAIXA: SHORTS (2026-11-23, prioridade da noite) ----------------
+def _btc_bear(b):
+    """BTC fechou o dia anterior abaixo da media de 200 dias (o contrario de _regime; sem dados conta como baixa, como a demo)."""
+    return ~_regime(b, 200).reindex(b.index).fillna(False).astype(bool)
+
+
+def sma_bear_entry(n: int):
+    """Espelho de sma_bull_entry: fecho abaixo da media de n velas e BTC em baixa -> -1 (short). So para entrar."""
+    def f(b):
+        c = b["close"]
+        sma = c.rolling(n).mean()
+        return -((c < sma) & sma.notna() & _btc_bear(b)).astype(float)
+    return f
+
+
+def dc_bear_entry(n: int):
+    """Fecho abaixo do minimo das n velas anteriores e BTC em baixa -> -1 (short). So para entrar."""
+    def f(b):
+        c = b["close"]
+        return -((c < b["low"].rolling(n).min().shift(1)) & _btc_bear(b)).astype(float)
+    return f
+
+
+for _n, _v in {
+    "s-sma50-d-bear-bracket-s2-mh3": (sma_bear_entry(50), "1d", 2.0, 1.0, 3),
+    "s-sma100-d-bear-bracket-mh10": (sma_bear_entry(100), "1d", 3.0, 1.0, 10),
+    "s-sma600-4h-bear-bracket": (sma_bear_entry(600), "4h", 3.0, 1.0, 0),
+    "s-dc20-d-bear-bracket-s2-mh5": (dc_bear_entry(20), "1d", 2.0, 1.0, 5),
+}.items():
+    IDEAS[_n] = _v
+    EXITS[_n] = {"signal_exit": False}
