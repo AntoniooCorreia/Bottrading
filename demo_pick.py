@@ -8,6 +8,9 @@ Regras (fixas, nao afinar):
   - entre as que passam, ordena por t junto e junta estrategias (no maximo 3) ate a soma chegar a 3 trades/semana.
     Cada estrategia tem as suas posicoes (1 por moeda) e 1% de risco por trade.
   - So troca a lista se a nova 1.a estrategia tiver t pelo menos 0.3 acima da atual 1.a (evita andar a saltar).
+  - REGIME ATUAL (2026-11-23): le o BTC na Kraken. Se nenhuma das escolhidas pode operar no regime de agora (ex.: todas precisam de
+    BTC acima da media de 200 dias e ele esta abaixo), junta a melhor que passa as regras E opera no regime atual. Se nao houver,
+    avisa (a demo fica parada) e regista-o no doc.
 A demo experimental NAO e aprovacao: e um teste ao vivo com dinheiro a fingir. A conta 1 (K1) nao muda.
   python demo_pick.py [--push]      (--push grava state.demo_exp no Supabase; a demo usa-a na hora seguinte)
 """
@@ -46,6 +49,19 @@ def evaluate(name: str) -> dict:
             "por_moeda": {k: [m[k]["meanR"], m[k]["n"]] for k in m}}
 
 
+def btc_regime_now() -> str | None:
+    """'bull' se o BTC fechou ontem acima da media de 200 dias (Kraken), 'bear' se abaixo, None se nao der para ler."""
+    try:
+        with urllib.request.urlopen("https://api.kraken.com/0/public/OHLC?pair=XBTUSD&interval=1440", timeout=20) as r:
+            j = json.load(r)
+        k = [x for x in j["result"] if x != "last"][0]
+        c = [float(x[4]) for x in j["result"][k][:-1]]
+        return "bull" if c[-1] > sum(c[-200:]) / 200 else "bear"
+    except Exception as e:
+        print(f"[kraken] nao li o regime do BTC ({e})")
+        return None
+
+
 def current() -> dict | None:
     try:
         req = urllib.request.Request(f"{supa.URL}/rest/v1/state?select=value&key=eq.demo_exp",
@@ -78,6 +94,17 @@ def main():
         if fam(r) in {fam(x) for x in pick}:   # mesma entrada (so muda stop/tempo) = mesmas trades em dobro: salta
             continue
         pick.append(r)
+    reg = btc_regime_now()
+    aviso = ""
+    active = lambda r: SPECS[r["ideia"]].get("btc") in (None, "", reg)
+    if reg and not any(active(r) for r in pick):
+        extra = next((r for r in ok if active(r) and r not in pick), None)
+        if extra:
+            pick.append(extra)
+        else:
+            aviso = (f"Nenhuma estrategia que passa as regras opera com o BTC em regime '{reg}': "
+                     "a demo experimental fica parada ate o regime mudar.")
+            print("\nAVISO:", aviso)
     cur = current()
     if cur and cur.get("estrategias"):
         cur_first = cur["estrategias"][0]["ideia"]
@@ -95,7 +122,7 @@ def main():
                      f"ate ~3 trades/semana, sem repetir a mesma regra de entrada. Juntas: ~{tpw:.1f} trades/semana. " + "; ".join(
                          f"{r['num']} {r['ideia']}: t {r['t']:+.2f}, {r['trades_semana']}/sem, win {r['win']:.0f}%, {r['r_trade']:+.3f}R"
                          for r in pick),
-           "aprovada": False, "candidatas": res}
+           "aprovada": False, "candidatas": res, "regime_btc": reg, "aviso": aviso}
     print(f"\nESCOLHIDAS: {doc['porque']}")
     if a.push:
         print("gravado no painel:", supa.set_state("demo_exp", doc))

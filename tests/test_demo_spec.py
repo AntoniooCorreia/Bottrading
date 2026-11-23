@@ -47,7 +47,11 @@ def test_spec_igual_a_ideia(name):
 def test_engine_ts_igual_ao_python(tmp_path):
     btc = load_tf("btc", "1d", None)
     cases = []
-    for name, spec in SPECS.items():
+    extra = {"_t_short_sma": {"num": "t", "tf": "1d", "side": -1, "entry": {"kind": "above_sma", "n": 50}, "trend_ema": 0,
+                              "btc": "bear", "stop_atr": 2.0, "tp_r": 1.0, "max_hold": 3, "signal_exit": False},
+             "_t_short_brk": {"num": "t", "tf": "4h", "side": -1, "entry": {"kind": "breakout", "n": 60}, "trend_ema": 200,
+                              "btc": "bear", "stop_atr": 3.0, "tp_r": 1.0, "max_hold": 12, "signal_exit": False}}
+    for name, spec in {**SPECS, **extra}.items():
         b = load_tf("eth", spec["tf"], None).iloc[-720:]
         bd = btc[btc.index < b.index[-1] + pd.Timedelta(days=1)].iloc[-720:]
         cases.append({"name": name, "spec": spec,

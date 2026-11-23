@@ -8,7 +8,7 @@ acrescentar aqui + correr pytest. Familias de entrada:
   breakout  fecho acima do maximo (long) / abaixo do minimo (short) das n velas anteriores
   rsi2      RSI(2) < lo (long) / > 100-lo (short); com signal_exit sai quando RSI > hi (long) / < 100-hi (short)
   lowclose  fecho e o mais baixo das ultimas n velas (long)
-  above_sma fecho acima da media de n velas (long)
+  above_sma fecho acima da media de n velas (long) / abaixo da media (short, side -1)
 Filtros: trend_ema (fecho acima/abaixo da EMA de n velas, conforme o lado), btc ("bull"/"bear": BTC fechou o dia anterior
 acima/abaixo da media de 200 dias).
 """
@@ -82,7 +82,7 @@ def entry_signal(b: pd.DataFrame, spec: dict, btc_daily: pd.DataFrame) -> pd.Ser
         sig = c <= c.rolling(e["n"]).min()
     elif e["kind"] == "above_sma":
         m = c.rolling(e["n"]).mean()
-        sig = (c > m) & m.notna()
+        sig = ((c > m) if side == 1 else (c < m)) & m.notna()
     else:
         raise ValueError(e["kind"])
     if spec.get("trend_ema"):

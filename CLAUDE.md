@@ -39,6 +39,24 @@ paper-bot, 100 000 USD, perpetuos simulados (long/short). As estrategias sao esc
   engine.ts com o Python). Familia nova = mexer em engine.ts + demo_spec.py + testes; NAO faças deploy da Edge Function (o Antonio/Claude do chat faz).
 - A conta 1 (K1) nao muda sem o OK do Antonio. A demo experimental nao e aprovacao; ao fim de 2-3 meses compara-se com o backtest.
 
+## PRIORIDADE DA NOITE (pedido do Antonio, 2026-11-23): ESTRATEGIAS PARA MERCADO EM BAIXA -> DEMO EXPERIMENTAL A OPERAR JA
+O BTC esta ~17-19% abaixo da media de 200 dias e TODAS as estrategias aprovadas para a demo precisam de BTC acima dela: a demo esta
+parada. O Antonio quer ver trades. Enquanto o BTC estiver abaixo da media de 200 dias, TODAS as ideias da noite sao para esse regime
+(antes da missao de baixo). Sempre com --venue perp (a demo simula perpetuos; shorts permitidos), --num, carteira no painel.
+Caminhos com fundamento (escolhe, justifica e regista no IDEAS.md ANTES de correr; parametros fixos):
+- espelhos em short das que passaram em alta: #163 ao contrario (moeda ABAIXO da media de 50 dias + BTC abaixo da media de 200 dias,
+  stop 2 ATR, alvo 1R, maximo 3 dias), #139 ao contrario (media 100, maximo 10 dias), #138 ao contrario (media 600 velas de 4h);
+- quebra do minimo de 10/20 dias em short com BTC em baixa e alvo curto; ressaltos de curto prazo em long dentro da baixa (sobrevenda
+  extrema) com alvo 0.5-1R e maximo 1-3 dias.
+Se passar o criterio oficial: acrescenta a sr/demo_spec.py SPECS (familias ja suportam short: breakout e above_sma com side -1 =
+fecho abaixo da media; btc "bear"), corre pytest e `python demo_pick.py --push` (o demo_pick ja junta sozinho uma estrategia que
+opere no regime atual). Nao faças deploy da Edge Function (nao e preciso para estas familias).
+
+CONTAGEM DO LIMITE DA NOITE (corrigido 2026-11-23; SUBSTITUI o "conta as entradas de hoje" do prompt): a noite vai das 19:00 as 07:00.
+Conta SO as seccoes do agente ("cripto - sessao ...") registadas desde as 19:00 da noite atual (se agora e antes das 07h, desde as 19:00
+de ontem). As seccoes "(Claude, ...)" feitas no chat com o Antonio NAO contam. Na noite de 22-11 o agente parou todas as sessoes por
+contar mal (contou as ideias da madrugada e as do chat): nao repetir.
+
 ## MISSAO NOTURNA ATUAL (pedido do Antonio, 2026-11-19): PEGAR NO MELHOR TESTE, PERCEBER O QUE FALHA, MELHORAR E ABRIR MAIS TRADES
 1. No inicio de CADA sessao: `python best.py`. O 1.o da lista (pontuacao = win rate + % total acumulado + melhor ano, a mesma
    do painel Backtesting > Carteiras) e a BASE. `python best.py --label Kn` mostra o diagnostico de qualquer carteira.

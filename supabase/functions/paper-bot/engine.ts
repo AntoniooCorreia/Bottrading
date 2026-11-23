@@ -62,7 +62,7 @@ export function entryAt(b: Bar[], i: number, s: Spec, btcDaily: Bar[], cache: { 
     const n = e.n!;
     if (i < n - 1) return false;
     const m = c.slice(i - n + 1, i + 1).reduce((a, x) => a + x, 0) / n;
-    sig = c[i] > m;
+    sig = s.side === 1 ? c[i] > m : c[i] < m;
   }
   if (!sig) return false;
   if (s.trend_ema) {
