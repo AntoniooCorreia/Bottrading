@@ -803,3 +803,7 @@ so alvo/stop/tempo, --venue perp, cabem na familia rsi2 da demo (side -1: RSI(2)
 - **#180 s-rsi2hi-4h-bear-ema200-s2-tp1-mh6**: #178 + a propria moeda com fecho de 4h abaixo da EMA(200) de 4h (trend_ema 200 da demo).
   Hipotese: so vende ressaltos quando a moeda tambem esta em baixa; corta os ressaltos que sao inicio de nova alta (2019/2020/2023).
 Fasquia: criterio oficial (>= 60 trades por moeda, positiva em cada, t >= 3.0, confirmacao >= 3/5); depois pre e holdout uma vez.
+Resultado (dev 2019-2024, perp): as 4 REPROVADAS (K91-K94). #177 t -3.08 (win 43%), #178 t -2.64 (win 49%), #179 t -3.85 (win 55%),
+#180 t +0.33 (win 54%, positiva nas 3 moedas mas +0.01R/trade; carteira +2.7%/ano, pior ano -0.6%). Leitura: vender ressaltos so com
+o BTC em baixa perde; exigir a propria moeda abaixo da EMA 200 de 4h melhora ~0.08R por trade (o regime da moeda pesa mais que o do
+BTC), mas nao chega para pagar custos com folga. 16 ideias de baixa esta noite, nenhuma com vantagem: em baixa, ficar de fora e honesto.

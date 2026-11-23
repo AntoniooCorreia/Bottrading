@@ -294,7 +294,7 @@ Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --p
 - [x] #176: l-low30-4h-bear200up-s3-tp05-mh12 -> REPROVADA (t -1.99; BTC -0.015R/67, ETH -0.175R/74, SOL -0.058R/53; win rate 55%; conf. 0/5; K90 -2.6%/ano, pior ano -8.3% (2022))
 
 ## Ideias do agente (2026-11-23, sessao 01h30): vender ressaltos em baixa (perp)
-- [ ] #177 s-rsi2hi-d-bear-s2-tp1-mh3
-- [ ] #178 s-rsi2hi-4h-bear-s2-tp1-mh6
-- [ ] #179 s-rsi2hi-4h-bear-s3-tp05-mh12
-- [ ] #180 s-rsi2hi-4h-bear-ema200-s2-tp1-mh6
+- [x] #177 s-rsi2hi-d-bear-s2-tp1-mh3 -> REPROVADA (t -3.08, win 43%, K91)
+- [x] #178 s-rsi2hi-4h-bear-s2-tp1-mh6 -> REPROVADA (t -2.64, win 49%, K92)
+- [x] #179 s-rsi2hi-4h-bear-s3-tp05-mh12 -> REPROVADA (t -3.85, win 55%, K93)
+- [x] #180 s-rsi2hi-4h-bear-ema200-s2-tp1-mh6 -> REPROVADA (t +0.33, win 54%, K94; positiva nas 3 moedas mas ~0R)

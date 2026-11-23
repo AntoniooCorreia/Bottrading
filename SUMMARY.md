@@ -54,6 +54,7 @@
 | #164 | 2026-11-22 | #138 com maximo 2 dias (perp); K78 | +2.39 | 53% | +0.040 | +3.6%/ano | REPROVADA (t < 3) |
 | #165-#168 | 2026-11-23 | MERCADO EM BAIXA, shorts perp com BTC < media 200: espelhos da #163 (media 50, max 3d), #139 (media 100, max 10d), #138 (media 600 de 4h) e quebra do minimo de 20 dias; K79-K82 | -2.08 a +0.47 | 44-49% | -0.09 a +0.04 | -3.3% a +0.5%/ano | REPROVADAS: so 2022 ganha (+11 a +15%); perdem nas baixas curtas de 2020/2021/2023/2024 (ressaltos em V); confirmacao 0/5 nos espelhos |
 | #169-#172 | 2026-11-23 | MERCADO EM BAIXA, ressaltos em LONG perp com BTC < media 200: RSI(2)<10 diario (alvo 0.5R, max 2d), minimo de 10 dias (1R, 3d), RSI(2)<10 em 4h (1R, 1d), minimo de 30 velas de 4h (0.5R, 2d); K83-K86 | -3.43 a -0.47 | 49-59% | -0.10 a -0.02 | -10.4% a -0.6%/ano | REPROVADAS: 2022 e o pior ano em todas (-8% a -42%); so o BTC diario fica ~+0.05R; em 4h claramente negativo (t -3.4) |
+| #177-#180 | 2026-11-23 | MERCADO EM BAIXA, vender ressaltos (short RSI(2) > 90) perp com BTC < media 200: diario (2 ATR/1R/3d), 4h (2 ATR/1R/1d), 4h (3 ATR/0.5R/2d), 4h + moeda abaixo da EMA 200 de 4h; K91-K94 | -3.85 a +0.33 | 43-55% | -0.17 a +0.01 | -6.7% a +2.7%/ano | REPROVADAS; #180 (moeda tambem em baixa) e positiva nas 3 moedas (+0.01R, pior ano -0.6%) mas t 0.33 e conf. 1/5 |
 | carteiras 8 moedas | 2026-11-22 | demo (#139+#144+#138) e curta (#139+#163+#164) em 8 moedas com --max-open | - | 52-58% | - | curta max 4: 179 trades/ano, +17%/ano, pior ano -1.0%, pior mes -10.4%, queda -22% | so diagnostico |
 
 Scalping (2026-11-21): ANTES de custos ha uma vantagem pequena (RSI(2) 15m long: win rate 69%, +0.05R; Bollinger 5m BTC +0.08R),
@@ -66,8 +67,8 @@ Perpetuos (#133-#137): mesmo com custos 4x mais baixos nada passa. Os shorts int
 
 #138 (2026-11-21, 19h): a #118 em 4h abre 2x mais trades (1.2/semana, SOL 173) com win rate 59%, mas so +0.09R/trade: t 2.47, REPROVADA.
 
-Leitura honesta cripto (2026-11-23, sessao das :00 01h):
-1. Ideias cripto testadas no total: 90 (#100-#176, K1, scalping, intraday, perpetuos). Mais testes = mais desconfianca num resultado isolado.
+Leitura honesta cripto (2026-11-23, sessao das :30 01h30):
+1. Ideias cripto testadas no total: 94 (#100-#180, K1, scalping, intraday, perpetuos). Mais testes = mais desconfianca num resultado isolado.
 2. Melhor win rate com resultado positivo: 68% (#118 +0.33R, reprovada SOL < 60; #148 +0.14R). Na familia atual: 65% (#156, +0.24R no dev).
 3. A familia "moeda acima da media + BTC em alta + alvo 1R" tem t 4-5 em 2019-2024 mas ~0R em 2017-18 e no holdout (#155, #157): o dev explica quase tudo.
 4. Holdout ja gasto em cripto: K1, #100, #116, #155, #157. Nenhuma estrategia cripto esta aprovada.
@@ -79,8 +80,10 @@ Leitura honesta cripto (2026-11-23, sessao das :00 01h):
    (baixa longa como 2022 vs. quedas curtas em V como 2020/2023). Nenhuma estrategia para o regime atual passa; a demo continua parada.
 8. A separacao pela inclinacao da media 200 do BTC (#173-#176) NAO ajuda: shorts com a media a descer -0.02/-0.09R (2020 -6/-8%),
    longs com a media a subir -0.09R (2022/2023 ainda -8% a -15%). No dev 2019-2024 nao ha vantagem em nenhum lado com BTC em baixa.
-9. Proximo passo: parar de procurar regras de baixa no dev (16 ideias ja, todas negativas) e decidir com o Antonio: demo parada em baixa
-   e aceitavel, ou testar so por pre 2017-2018 (inclui a baixa de 2018); e o custo real da Kraken (0.80% taker).
+9. Vender ressaltos em baixa (#177-#180, RSI(2) > 90) tambem perde (-0.03 a -0.20R). So quando a PROPRIA moeda tambem esta abaixo
+   da EMA 200 de 4h (#180) fica positiva nas 3 moedas (+0.01R, win 54%, pior ano -0.6%): o regime da moeda pesa mais que o do BTC, mas ~0R.
+10. Proximo passo: 16 ideias de baixa esta noite (#165-#180), todas sem vantagem. Parar e decidir com o Antonio: demo parada em baixa e aceitavel,
+   ou testar so por pre 2017-2018 (inclui a baixa de 2018); e o custo real da Kraken (0.80% taker).
 
 # Resumo indices (ARQUIVO, custos CFD incluidos)
 

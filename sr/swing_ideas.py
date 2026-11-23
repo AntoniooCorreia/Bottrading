@@ -1132,3 +1132,26 @@ for _n, _v in {
 }.items():
     IDEAS[_n] = _v
     EXITS[_n] = {"signal_exit": False}
+
+
+# ---------------- MERCADO EM BAIXA: VENDER RESSALTOS (2026-11-23, sessao 01h30) ----------------
+def rsi2hi_bear_entry(hi: float, trend_ema: int = 0):
+    """RSI(2) > hi e BTC em baixa -> -1 (short). Com trend_ema: tambem fecho abaixo da EMA(trend_ema) da propria moeda.
+    Igual a familia rsi2 da demo com side -1 (r > 100 - lo) e btc "bear"."""
+    def f(b):
+        c = b["close"]
+        sig = (_rsi(c, 2) > hi) & _btc_bear(b)
+        if trend_ema:
+            sig = sig & (c < _ema(c, trend_ema))
+        return -sig.astype(float)
+    return f
+
+
+for _n, _v in {
+    "s-rsi2hi-d-bear-s2-tp1-mh3": (rsi2hi_bear_entry(90), "1d", 2.0, 1.0, 3),
+    "s-rsi2hi-4h-bear-s2-tp1-mh6": (rsi2hi_bear_entry(90), "4h", 2.0, 1.0, 6),
+    "s-rsi2hi-4h-bear-s3-tp05-mh12": (rsi2hi_bear_entry(90), "4h", 3.0, 0.5, 12),
+    "s-rsi2hi-4h-bear-ema200-s2-tp1-mh6": (rsi2hi_bear_entry(90, 200), "4h", 2.0, 1.0, 6),
+}.items():
+    IDEAS[_n] = _v
+    EXITS[_n] = {"signal_exit": False}
