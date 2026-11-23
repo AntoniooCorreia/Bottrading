@@ -725,3 +725,21 @@ do scalping, onde pesavam 0.3-1.4R). Sair mais cedo liberta o lugar e deixa entr
 - **#164 k-sma600-4h-bull-bracket-mh12**: a #138 com tempo maximo de 12 velas de 4h (2 dias).
 - **Carteiras (regra de risco, nao ideia nova)**: demo atual (#139+#144+#138) e versao curta (#139+#163+#164) em 8 moedas com no maximo
   3 e 4 trades abertas ao mesmo tempo (--max-open). Objetivo: >= ~150 trades/ano, pior mes > -5%, queda < ~15%.
+
+## 2026-11-23 cripto - sessao :00 (00h) (4 ideias; ideias cripto testadas antes: ~74 (#100-#164); esta noite (desde 19h de 22-11): 4 de 20 com esta sessao) - registadas antes de correr
+PRIORIDADE DA NOITE: BTC ~17-19% abaixo da media de 200 dias -> demo experimental parada. `python best.py`: base K67 (#158), pontuacao 90,
+win rate 64%, +86% total, mas 2022 (ano de baixa) -13.6% (32 trades, win rate 31%, -0.42R): as estrategias de alta nao sabem estar em baixa.
+Por isso as 4 ideias sao para o regime de BAIXA (BTC fechou o dia anterior abaixo da media de 200 dias), em SHORT, custos de perpetuos
+(--venue perp), so alvo/stop/tempo (sem saida pelo sinal), reentrada repetida enquanto a condicao se mantem (como as de alta).
+Hipotese comum: a tendencia de baixa em cripto e tao persistente como a de alta (momentum de serie temporal funciona nos dois lados);
+alvo curto de 1R fecha depressa a maioria das trades antes dos ressaltos violentos tipicos de mercado em baixa. Mais trades: so operam
+quando as de alta estao paradas, por isso juntam trades a carteira sem sobrepor.
+- **#165 s-sma50-d-bear-bracket-s2-mh3** (espelho da #163): short quando o fecho diario da moeda esta ABAIXO da media de 50 dias e o BTC
+  abaixo da media de 200. Stop 2 ATR(14) diario, alvo 1R, maximo 3 dias.
+- **#166 s-sma100-d-bear-bracket-mh10** (espelho da #139): fecho abaixo da media de 100 dias + BTC em baixa. Stop 3 ATR, alvo 1R, maximo 10 dias.
+- **#167 s-sma600-4h-bear-bracket** (espelho da #138): fecho de 4h abaixo da media de 600 velas de 4h + BTC em baixa. Stop 3 ATR(14) de 4h,
+  alvo 1R, sem tempo maximo.
+- **#168 s-dc20-d-bear-bracket-s2-mh5** (quebra do minimo): fecho diario abaixo do minimo das 20 velas anteriores + BTC em baixa. Stop 2 ATR,
+  alvo 1R, maximo 5 dias. Hipotese: rutura de minimos em baixa = vendedores no controlo; alvo curto apanha a continuacao imediata.
+Fasquia: criterio oficial (>= 60 trades por moeda, positiva em cada, t >= 3.0, confirmacao >= 3/5); depois pre e holdout uma vez.
+Nota: o dev 2019-2024 tem pouca baixa (sobretudo 2022 e partes de 2019/2020/2023) -> risco real de < 60 trades por moeda.

@@ -271,3 +271,10 @@ Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --p
   K66 +14.8%/ano, pior ano -11.6%, pior mes -6.5%, 1.9 trades/semana). Pre +0.034R/77 (>= 0). HOLDOUT (uma vez): -0.072R/141, t -0.86, conf. 0/5: REPROVADA
 - [x] #158: k-sma20-d-btc50-bracket-s2 -> PASSA dev (t +4.65; BTC +0.209R/137, ETH +0.219R/139, SOL +0.270R/101; win rate 64%; conf. 5/5;
   K67 +14.4%/ano, pior ano -13.6%). Pre -0.100R/53 trades, 2018 -12.2%: REPROVADA no pre
+
+## Ideias do agente (2026-11-23, cripto sessao :00 00h; PRIORIDADE: mercado em baixa, short, perpetuos)
+Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --period dev --venue perp --push --num "#1xx" --nota ...`.
+- [ ] #165: s-sma50-d-bear-bracket-s2-mh3
+- [ ] #166: s-sma100-d-bear-bracket-mh10
+- [ ] #167: s-sma600-4h-bear-bracket
+- [ ] #168: s-dc20-d-bear-bracket-s2-mh5
