@@ -1221,3 +1221,27 @@ for _n, _v in {
 }.items():
     IDEAS[_n] = _v
     EXITS[_n] = {"signal_exit": False}
+
+
+# ---------------- RESSALTOS DE BAIXA EM LONG DEPOIS DE COMECAREM (2026-11-23, sessao 19h30) ----------------
+def dc_bull_in_bear_entry(n: int, ema_n: int = 0):
+    """Fecho acima do maximo das n velas anteriores e BTC em baixa -> 1 (long). Com ema_n: tambem fecho acima da EMA(ema_n).
+    So para entrar (familia breakout da demo, side +1, btc "bear")."""
+    def f(b):
+        c = b["close"]
+        sig = (c > b["high"].rolling(n).max().shift(1)) & _btc_bear(b)
+        if ema_n:
+            sig = sig & (c > _ema(c, ema_n))
+        return sig.astype(float)
+    return f
+
+
+for _n, _v in {
+    "l-dc20-4h-bear-s2-tp1-mh6": (dc_bull_in_bear_entry(20), "4h", 2.0, 1.0, 6),
+    "l-dc20-d-bear-s2-tp1-mh5": (dc_bull_in_bear_entry(20), "1d", 2.0, 1.0, 5),
+    "l-dc20-4h-bear-s2-tp2-mh12": (dc_bull_in_bear_entry(20), "4h", 2.0, 2.0, 12),
+    "l-dc24-1h-bear-s3-tp2-mh24": (dc_bull_in_bear_entry(24, 200), "1h", 3.0, 2.0, 24),
+}.items():
+    IDEAS[_n] = _v
+    EXITS[_n] = {"signal_exit": False}
+NO_MIN_RISK.add("l-dc24-1h-bear-s3-tp2-mh24")     # igual a #133 (intraday)
