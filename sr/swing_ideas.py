@@ -1245,3 +1245,14 @@ for _n, _v in {
     IDEAS[_n] = _v
     EXITS[_n] = {"signal_exit": False}
 NO_MIN_RISK.add("l-dc24-1h-bear-s3-tp2-mh24")     # igual a #133 (intraday)
+
+
+# ---------------- VARIANTES DA #191 (2026-11-23, sessao 20h) ----------------
+for _n, _v in {
+    "l-dc20-4h-bear-s2-tp2-mh30": (dc_bull_in_bear_entry(20), "4h", 2.0, 2.0, 30),
+    "l-dc10-4h-bear-s2-tp2-mh12": (dc_bull_in_bear_entry(10), "4h", 2.0, 2.0, 12),
+    "l-dc20-4h-bear-s15-tp2-mh12": (dc_bull_in_bear_entry(20), "4h", 1.5, 2.0, 12),
+    "l-dc20-4h-bear-s3-tp2-mh12": (dc_bull_in_bear_entry(20), "4h", 3.0, 2.0, 12),
+}.items():
+    IDEAS[_n] = _v
+    EXITS[_n] = {"signal_exit": False}

@@ -894,3 +894,7 @@ manda ideias de baixa; a melhor de baixa e a #191 (K105): l-dc20-4h-bear-s2-tp2-
   2 ATR e apanhado pelo ruido (2022: win 45%); stop mais largo sobe o win rate e os custos pesam menos em R. Ataca 2022.
 Fasquia: criterio oficial (>= 60 trades por moeda, positiva em cada, t >= 3.0, confirmacao >= 3/5); depois pre e holdout uma vez.
 Nota de desconfianca: sao variantes da melhor de 28 ideias de baixa; se uma passar, o pre (2018 foi baixa) e o holdout e que decidem.
+Resultado (dev 2019-2024, perp): as 4 REPROVADAS (K107-K110). #193 t +2.84 (+8.2%/ano mas pior ano -14% em 2022), #194 t +1.47 (+60% de trades,
+pior ano -21%), #195 t +2.74 (+9.3%/ano, pior ano -3.2%, 1.0 trades/semana), #196 t +1.67 (win 50%, pior ano -10%). Leitura: nenhuma vizinha da #191
+passa o t 3.0 e todas pioram 2022; a #191 parece estar perto de um maximo local (desconfiar dos seus t 2.45). A rutura de 4h com BTC em baixa
+ganha nos ressaltos em V (2020/2023) e perde ou empata na baixa longa (2022): o mesmo problema de regime das 24 anteriores, do outro lado.

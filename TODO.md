@@ -318,7 +318,7 @@ Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --p
 - [x] #192 l-dc24-1h-bear-s3-tp2-mh24 -> REPROVADA (t +1.33; BTC +0.077R/258, ETH +0.082R/254, SOL -0.014R/169; win 46%; conf. 5/5; K106 +3.2%/ano, pior ano -11.4%)
 
 ## Ideias do agente (2026-11-23, sessao 20h): variantes da #191 (rutura 4h em long com BTC em baixa, alvo 2R, perp)
-- [ ] #193 l-dc20-4h-bear-s2-tp2-mh30 (tempo maximo 5 dias)
-- [ ] #194 l-dc10-4h-bear-s2-tp2-mh12 (rutura de 10 velas: mais trades)
-- [ ] #195 l-dc20-4h-bear-s15-tp2-mh12 (stop 1.5 ATR: mais trades)
-- [ ] #196 l-dc20-4h-bear-s3-tp2-mh12 (stop 3 ATR: win rate)
+- [x] #193 l-dc20-4h-bear-s2-tp2-mh30 -> REPROVADA (t +2.84; BTC +0.174R/122, ETH +0.318R/110, SOL +0.145R/70; win 46%; conf. 4/5; K107 +8.2%/ano, pior ano -14.0% (2022))
+- [x] #194 l-dc10-4h-bear-s2-tp2-mh12 -> REPROVADA (t +1.47; BTC +0.097R/195, ETH +0.057R/185, SOL +0.057R/116; win 48%; conf. 5/5; K108 +4.5%/ano, pior ano -21.4% (2022))
+- [x] #195 l-dc20-4h-bear-s15-tp2-mh12 -> REPROVADA (t +2.74; BTC +0.174R/145, ETH +0.178R/140, SOL +0.199R/82; win 49%; conf. 4/5; K109 +9.3%/ano, pior ano -3.2%, pior mes -6.8%)
+- [x] #196 l-dc20-4h-bear-s3-tp2-mh12 -> REPROVADA (t +1.67; BTC +0.120R/123, ETH +0.072R/117, SOL +0.037R/73; win 50%; conf. 5/5; K110 +3.5%/ano, pior ano -10.0%)
