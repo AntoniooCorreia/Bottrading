@@ -767,3 +767,20 @@ Resultado (dev 2019-2024, perp): as 4 REPROVADAS (t -3.43 a -0.47; win rate 49-5
 Leitura: com o BTC abaixo da media de 200 dias, os shorts (#165-#168) perdem nas quedas curtas em V e os longs (#169-#172) perdem
 na baixa longa de 2022: o filtro junta dois mercados diferentes. Proxima ideia com fundamento: separa-los com uma regra fixa
 (inclinacao da media de 200 dias do BTC), a registar antes de correr.
+
+## 2026-11-23 cripto - sessao :00 (01h) (4 ideias; ideias cripto testadas antes: ~82 (#100-#172); esta noite (desde 19h de 22-11): 12 de 20 com esta sessao) - registadas antes de correr
+PRIORIDADE DA NOITE (BTC abaixo da media de 200 dias). `python best.py`: base K67 (#158), win rate 64%, +86% total, pior ano -13.6% (2022).
+Diagnostico das 8 ideias de baixa da noite (#165-#172): os shorts perdem nas quedas curtas em V (2019, 2020, 2023: BTC abaixo da media
+de 200 dias mas a media ainda a subir) e os longs em ressalto perdem na baixa longa de 2022 (media de 200 a descer). O filtro "BTC abaixo
+da media de 200" junta dois mercados diferentes. Regra fixa para os separar (inclinacao): a media de 200 dias do BTC (dia anterior
+fechado) comparada com o valor de 20 dias antes. "Baixa a serio" = BTC abaixo da media E media a descer; "correcao" = BTC abaixo da
+media E media ainda a subir. Fundamento: a inclinacao da media longa mede a tendencia primaria (Dow/Weinstein: fase 4 vs recuo na fase 2);
+o momentum de serie temporal funciona na tendencia primaria, a reversao de curto prazo funciona nos recuos contra ela.
+Cada ideia = UMA mudanca (o filtro de inclinacao) sobre uma ideia ja testada esta noite; resto igual. --venue perp.
+- **#173 s-sma50-d-bear200dn-bracket-s2-mh3** (= #165 + media 200 do BTC a descer): short, fecho diario abaixo da media de 50. Stop 2 ATR, alvo 1R, max 3 dias.
+- **#174 s-sma600-4h-bear200dn-bracket** (= #167 + media a descer): short, fecho de 4h abaixo da media de 600 velas. Stop 3 ATR, alvo 1R. (4h: mais trades)
+- **#175 l-rsi2-4h-bear200up-s2-tp1-mh6** (= #171 + media 200 do BTC a SUBIR): long, RSI(2) de 4h < 10. Stop 2 ATR, alvo 1R, max 6 velas. (4h: mais trades)
+- **#176 l-low30-4h-bear200up-s3-tp05-mh12** (= #172 + media a subir): long, fecho de 4h minimo de 30 velas. Stop 3 ATR, alvo 0.5R, max 12 velas.
+Hipotese: as perdas de 2022 dos longs e as de 2019/2020/2023 dos shorts desaparecem; risco: menos trades (< 60 por moeda nas shorts diarias).
+Fasquia: criterio oficial (>= 60 trades por moeda, positiva em cada, t >= 3.0, confirmacao >= 3/5); depois pre e holdout uma vez.
+Nota: no ultimo dado (31-10-2026) a media de 200 do BTC ainda sobe -> hoje o regime seria "correcao" (longs #175/#176 operariam).
