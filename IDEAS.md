@@ -807,3 +807,22 @@ Resultado (dev 2019-2024, perp): as 4 REPROVADAS (K91-K94). #177 t -3.08 (win 43
 #180 t +0.33 (win 54%, positiva nas 3 moedas mas +0.01R/trade; carteira +2.7%/ano, pior ano -0.6%). Leitura: vender ressaltos so com
 o BTC em baixa perde; exigir a propria moeda abaixo da EMA 200 de 4h melhora ~0.08R por trade (o regime da moeda pesa mais que o do
 BTC), mas nao chega para pagar custos com folga. 16 ideias de baixa esta noite, nenhuma com vantagem: em baixa, ficar de fora e honesto.
+
+## 2026-11-23 cripto - sessao :00 (02h) (4 ideias; ideias cripto testadas antes: ~90 (#100-#180); esta noite (desde 19h de 22-11): 20 de 20 com esta sessao) - registadas antes de correr
+PRIORIDADE DA NOITE (BTC abaixo da media de 200 dias). `python best.py`: base K67 (#158), win rate 64%, +86% total, pior ano -13.6% (2022).
+Diagnostico das 16 ideias de baixa (#165-#180): so a #180 (vender ressaltos RSI(2) > 90 de 4h com BTC em baixa E a moeda abaixo da EMA 200
+de 4h) foi positiva nas 3 moedas (+0.01R/trade, t +0.33, win 54%, pior ano -0.6%). A unica mudanca que ajudou foi o regime da PROPRIA moeda
+(+0.08R/trade face a #178). Ultima sessao da noite: 4 variantes, cada uma com UMA mudanca, todas a testar a hipotese "o regime da moeda
+manda mais que o do BTC". Todas cabem nas familias da demo (rsi2/breakout + trend_ema + btc opcional). --venue perp.
+- **#181 s-rsi2hi-4h-ema200-s2-tp1-mh6** (= #180 SEM o filtro do BTC): short quando RSI(2) de 4h > 90 e a moeda fecha abaixo da EMA 200 de 4h,
+  qualquer que seja o BTC. Stop 2 ATR(14) 4h, alvo 1R, maximo 6 velas. Hipotese: se o regime da moeda e o que conta, o filtro do BTC so corta
+  trades; ABRE MAIS TRADES (tambem opera moedas fracas com o BTC em alta).
+- **#182 s-rsi2hi-4h-bear-ema600-s2-tp1-mh6** (= #180 com EMA 600 de 4h, ~100 dias, em vez de 200): so vende ressaltos com a moeda numa baixa
+  mais longa e estabelecida. Hipotese: corta os ressaltos que sao fim de correcao (2019/2020/2023); menos trades, mais R por trade.
+- **#183 l-rsi2-4h-bear-ema200-s2-tp1-mh6** (espelho em long, = #171 + moeda ACIMA da EMA 200 de 4h): long quando RSI(2) de 4h < 10, BTC em baixa
+  e a moeda ainda acima da sua EMA 200 de 4h. Stop 2 ATR, alvo 1R, maximo 6 velas. Hipotese: forca relativa — moedas que aguentam a tendencia
+  com o BTC em baixa recuperam os recuos curtos; corta as compras em moedas em queda livre (2022). ABRE trades em baixa (long).
+- **#184 s-dc20-4h-bear-ema200-s2-tp1-mh6** (rutura em vez de ressalto): short quando o fecho de 4h fica abaixo do minimo das 20 velas
+  anteriores, moeda abaixo da EMA 200 de 4h e BTC em baixa. Stop 2 ATR, alvo 1R, maximo 6 velas. Hipotese: com as duas baixas confirmadas,
+  a quebra de minimo de 3-4 dias continua no dia seguinte.
+Fasquia: criterio oficial (>= 60 trades por moeda, positiva em cada, t >= 3.0, confirmacao >= 3/5); depois pre e holdout uma vez.
