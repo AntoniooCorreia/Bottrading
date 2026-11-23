@@ -873,3 +873,24 @@ Todas: LONG, BTC em baixa (fechou o dia anterior abaixo da media de 200 dias), s
   de 1h e BTC em BAIXA. Stop 3 ATR(14) de 1h, alvo 2R, maximo 24 velas. Hipotese: a rutura intraday que funcionou em alta tambem funciona nos
   ressaltos de baixa. (mais trades)
 Fasquia: criterio oficial (>= 60 trades por moeda, positiva em cada, t >= 3.0, confirmacao >= 3/5); depois pre e holdout uma vez.
+Resultado (dev 2019-2024, perp): as 4 REPROVADAS (K103-K106). #191 (alvo 2R, max 2 dias) e a melhor ideia de baixa ate agora: t +2.45,
+positiva nas 3 moedas (BTC +0.09R, ETH +0.24R, SOL +0.19R), confirmacao 5/5, +8.1%/ano, pior ano -1.4%; falha so o t >= 3.0.
+
+## 2026-11-23 cripto - sessao :00 (20h) (4 ideias; ideias cripto testadas antes: ~106 (#100-#192); esta noite (desde 19h de 23-11): 12 de 20 com esta sessao) - registadas antes de correr
+PRIORIDADE DA NOITE (BTC abaixo da media de 200 dias -> demo experimental parada). `python best.py`: base geral K67 (#158), mas a prioridade
+manda ideias de baixa; a melhor de baixa e a #191 (K105): l-dc20-4h-bear-s2-tp2-mh12. Diagnostico K105 (`best.py --label K105`):
+- por ano: 2020 +21.5% e 2023 +17.6% (ressaltos em V), 2022 -1.4% (118 trades, win 45%, -0.01R: a baixa longa da ruturas que falham), 2021/2024 ~+2%;
+- por duracao: trades <= 1 dia win 40% +0.15R; trades de 2-3 dias (a maioria acaba no tempo maximo de 12 velas) win 58% +0.18R ->
+  quando o tempo acaba, a trade ainda costuma estar a ganhar: o ressalto continua depois dos 2 dias;
+- 0.9 trades/semana, mediana de 7 dias sem trade entre entradas; t +2.45 (falta ~0.55).
+4 variantes da #191, cada uma com UMA mudanca, parametros fixos, --venue perp, todas cabem na familia breakout da demo (side +1, btc "bear"):
+- **#193 l-dc20-4h-bear-s2-tp2-mh30**: tempo maximo 30 velas (5 dias) em vez de 12. Hipotese: as saidas por tempo estao a cortar trades que
+  ainda ganham (58% win); mais tempo deixa mais trades chegar aos 2R. Ataca o que o diagnostico mostra.
+- **#194 l-dc10-4h-bear-s2-tp2-mh12** (MAIS TRADES): rutura do maximo das 10 velas de 4h anteriores (~40h) em vez de 20. Hipotese: os ressaltos
+  de baixa comecam depressa; uma rutura mais curta entra mais cedo e da mais sinais (dias sem trade 7 -> menos).
+- **#195 l-dc20-4h-bear-s15-tp2-mh12** (MAIS TRADES): stop 1.5 ATR(14) de 4h em vez de 2 (alvo continua 2R = 3 ATR). Hipotese: trades mais curtas
+  libertam o lugar mais cedo para a reentrada seguinte (como a #157 em alta: mais trades); risco: custos pesam mais em R.
+- **#196 l-dc20-4h-bear-s3-tp2-mh12**: stop 3 ATR(14) de 4h em vez de 2 (alvo 2R = 6 ATR). Hipotese: em baixa a volatilidade e alta e o stop de
+  2 ATR e apanhado pelo ruido (2022: win 45%); stop mais largo sobe o win rate e os custos pesam menos em R. Ataca 2022.
+Fasquia: criterio oficial (>= 60 trades por moeda, positiva em cada, t >= 3.0, confirmacao >= 3/5); depois pre e holdout uma vez.
+Nota de desconfianca: sao variantes da melhor de 28 ideias de baixa; se uma passar, o pre (2018 foi baixa) e o holdout e que decidem.

@@ -316,3 +316,9 @@ Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --p
 - [x] #190 l-dc20-d-bear-s2-tp1-mh5 -> REPROVADA (t +1.78; BTC +0.069R/32, ETH +0.271R/29, SOL +0.141R/15 < 60; win 58%; conf. 5/5; K104 +2.0%/ano, pior ano -4.2%)
 - [x] #191 l-dc20-4h-bear-s2-tp2-mh12 -> REPROVADA (t +2.45 < 3; BTC +0.109R/136, ETH +0.179R/129, SOL +0.182R/75; win 50%; conf. 5/5; K105 +8.1%/ano, pior ano -1.4%, pior mes -6.9%) -> a melhor ideia de baixa ate agora
 - [x] #192 l-dc24-1h-bear-s3-tp2-mh24 -> REPROVADA (t +1.33; BTC +0.077R/258, ETH +0.082R/254, SOL -0.014R/169; win 46%; conf. 5/5; K106 +3.2%/ano, pior ano -11.4%)
+
+## Ideias do agente (2026-11-23, sessao 20h): variantes da #191 (rutura 4h em long com BTC em baixa, alvo 2R, perp)
+- [ ] #193 l-dc20-4h-bear-s2-tp2-mh30 (tempo maximo 5 dias)
+- [ ] #194 l-dc10-4h-bear-s2-tp2-mh12 (rutura de 10 velas: mais trades)
+- [ ] #195 l-dc20-4h-bear-s15-tp2-mh12 (stop 1.5 ATR: mais trades)
+- [ ] #196 l-dc20-4h-bear-s3-tp2-mh12 (stop 3 ATR: win rate)
