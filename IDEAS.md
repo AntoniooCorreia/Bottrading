@@ -787,3 +787,19 @@ Nota: no ultimo dado (31-10-2026) a media de 200 do BTC ainda sobe -> hoje o reg
 Resultado (dev 2019-2024, perp): as 4 REPROVADAS (t -2.20 a -0.64; win rate 47-55%; K87-K90). A inclinacao nao separa os mercados:
 os shorts com a media a descer ainda perdem em 2020 (-6% a -8%) e os longs com a media a subir perdem em 2022 e 2023 (ate -15%).
 Leitura: com o BTC abaixo da media de 200 dias nao ha vantagem mecanica no dev depois de custos de perpetuos, em nenhum dos lados.
+
+## 2026-11-23 cripto - sessao :30 (01h30) (4 ideias; ideias cripto testadas antes: ~86 (#100-#176); esta noite (desde 19h de 22-11): 16 de 20 com esta sessao) - registadas antes de correr
+PRIORIDADE DA NOITE (BTC abaixo da media de 200 dias). `python best.py`: base K67 (#158), win rate 64%, +86% total, pior ano -13.6% (2022).
+Diagnostico das 12 ideias de baixa da noite (#165-#176): os shorts de tendencia (fecho abaixo da media, quebra do minimo) entram DEPOIS da
+queda, ja esticados, e sao apanhados pelos ressaltos violentos; os longs em sobrevenda perdem quando a baixa continua (2022).
+Caminho ainda nao testado: VENDER OS RESSALTOS dentro da baixa (Connors: abaixo da media de 200, vender sobrecompra de curto prazo).
+Fundamento: em mercado em baixa os ressaltos de 1-3 dias sao fechos de shorts sem compradores novos; o short entra num preco MELHOR
+(depois da subida), com o stop acima do ressalto, e o alvo curto apanha o regresso a tendencia. E o espelho, do lado certo, do que
+funcionou em alta (comprar recuos na tendencia). Todas: short, BTC em baixa (fechou o dia anterior abaixo da media de 200 dias),
+so alvo/stop/tempo, --venue perp, cabem na familia rsi2 da demo (side -1: RSI(2) > 90). 2 das 4 em 4h (mais trades).
+- **#177 s-rsi2hi-d-bear-s2-tp1-mh3**: RSI(2) diario > 90 + BTC em baixa -> short na abertura seguinte. Stop 2 ATR(14) diario, alvo 1R, maximo 3 dias.
+- **#178 s-rsi2hi-4h-bear-s2-tp1-mh6**: RSI(2) de 4h > 90 + BTC em baixa. Stop 2 ATR(14) de 4h, alvo 1R, maximo 6 velas (1 dia). (mais trades)
+- **#179 s-rsi2hi-4h-bear-s3-tp05-mh12**: igual a #178 com stop 3 ATR, alvo 0.5R, maximo 12 velas (win rate alto: alvo perto, stop longe). (mais trades)
+- **#180 s-rsi2hi-4h-bear-ema200-s2-tp1-mh6**: #178 + a propria moeda com fecho de 4h abaixo da EMA(200) de 4h (trend_ema 200 da demo).
+  Hipotese: so vende ressaltos quando a moeda tambem esta em baixa; corta os ressaltos que sao inicio de nova alta (2019/2020/2023).
+Fasquia: criterio oficial (>= 60 trades por moeda, positiva em cada, t >= 3.0, confirmacao >= 3/5); depois pre e holdout uma vez.
