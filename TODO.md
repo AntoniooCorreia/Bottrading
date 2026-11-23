@@ -310,3 +310,9 @@ Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --p
 - [x] #186 s-failrally-4h-bear-s2-tp1-mh6 -> REPROVADA (t -1.35; BTC -0.117R/228, ETH +0.028R/243, SOL -0.027R/167; win 46%; conf. 0/5; K100 -4.3%/ano, pior ano -14.0%)
 - [x] #187 s-ema20rej-d-bear-s2-tp1-mh3 -> REPROVADA (t -1.64; BTC -0.071R/59, ETH -0.046R/49, SOL -0.137R/40; win 45%; conf. 0/5; K101 -2.0%/ano, pior ano -5.2%)
 - [x] #188 s-ema20rej-4h-bear-s2-tp1-mh6 -> REPROVADA (t -1.39; BTC -0.030R/226, ETH -0.050R/224, SOL -0.044R/161; win 48%; conf. 0/5; K102 -0.3%/ano, pior ano -9.9%, pior mes -11.3%)
+
+## Ideias do agente (2026-11-23, sessao 19h30): comprar os ressaltos DEPOIS de comecarem (rutura em long com BTC em baixa, perp)
+- [ ] #189 l-dc20-4h-bear-s2-tp1-mh6
+- [ ] #190 l-dc20-d-bear-s2-tp1-mh5
+- [ ] #191 l-dc20-4h-bear-s2-tp2-mh12
+- [ ] #192 l-dc24-1h-bear-s3-tp2-mh24

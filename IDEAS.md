@@ -852,3 +852,24 @@ Risco conhecido: o dev tem pouca baixa (sobretudo 2022) -> as diarias podem ter 
 Resultado (dev 2019-2024, perp): as 4 REPROVADAS (K99-K102). #185 t +0.61 (win 53%, so 18-26 trades por moeda, +0.5%/ano), #186 t -1.35 (BTC -0.12R),
 #187 t -1.64 (win 45%), #188 t -1.39 (win 48%, pior mes -11%). Leitura: esperar a confirmacao do ressalto falhado no diario melhora o R (+0.05R vs
 -0.10R da #177) mas quase nao ha sinais; em 4h e na rejeicao da media volta a ~-0.04R. 24 ideias de baixa (#165-#188), nenhuma com vantagem.
+
+## 2026-11-23 cripto - sessao :30 (19h30) (4 ideias; ideias cripto testadas antes: ~102 (#100-#188); esta noite (desde 19h de 23-11): 8 de 20 com esta sessao) - registadas antes de correr
+PRIORIDADE DA NOITE (BTC abaixo da media de 200 dias -> demo experimental parada). `python best.py`: base K67 (#158), pontuacao 93, win rate 64%,
++86% total, pior ano -13.6% (2022: win 31%, -0.42R); perdas concentradas nas trades de 4-30 dias (+0.13R vs +0.46R em <= 1 dia).
+Diagnostico das 24 ideias de baixa (#165-#188): TODAS as shorts perdem pela mesma razao: os ressaltos de mercado em baixa sao violentos
+(2019, 2020, 2023, partes de 2022: +20-40% em dias). E as compras em sobrevenda (#169-#172) perdem porque compram ANTES de o ressalto comecar
+(faca a cair). Caminho ainda nao testado: em vez de lutar contra os ressaltos, OPERA-LOS em long, mas so DEPOIS de comecarem (rutura de maximo
+recente com o BTC em baixa). Fundamento: momentum de curto prazo (rutura) + fecho de shorts em cascata (short squeeze) tipico de cripto em baixa;
+a #133 (rutura de 24h em long) foi a melhor ideia de perpetuos (positiva nas 3 moedas, 4/5 confirmacao, t 2.16) mas so operava em alta.
+Todas: LONG, BTC em baixa (fechou o dia anterior abaixo da media de 200 dias), so alvo/stop/tempo, --venue perp, parametros fixos.
+3 das 4 em 4h/1h (MAIS TRADES). Cabem na familia breakout da demo (side +1, btc "bear"), exceto a de 1h (filtro EMA 200 de 1h: ver se passar).
+- **#189 l-dc20-4h-bear-s2-tp1-mh6**: fecho de 4h acima do maximo das 20 velas de 4h anteriores (~3 dias) + BTC em baixa -> long na abertura
+  seguinte. Stop 2 ATR(14) de 4h, alvo 1R, maximo 6 velas (1 dia). Hipotese: o ressalto confirmado continua nas horas seguintes (squeeze).
+- **#190 l-dc20-d-bear-s2-tp1-mh5**: a #189 no diario: fecho acima do maximo dos 20 dias anteriores + BTC em baixa. Stop 2 ATR(14) diario,
+  alvo 1R, maximo 5 dias. Hipotese: rutura de 20 dias em baixa = ressalto grande a comecar. Risco: < 60 trades por moeda.
+- **#191 l-dc20-4h-bear-s2-tp2-mh12**: = #189 com alvo 2R e o dobro do tempo para la chegar (12 velas = 2 dias). Hipotese: os ressaltos de baixa
+  vao longe (+20-40%); alvo maior apanha mais da perna (menos win rate, mais R por trade).
+- **#192 l-dc24-1h-bear-s3-tp2-mh24**: a #133 com o regime trocado: fecho de 1h acima do maximo das 24 velas anteriores, fecho acima da EMA 200
+  de 1h e BTC em BAIXA. Stop 3 ATR(14) de 1h, alvo 2R, maximo 24 velas. Hipotese: a rutura intraday que funcionou em alta tambem funciona nos
+  ressaltos de baixa. (mais trades)
+Fasquia: criterio oficial (>= 60 trades por moeda, positiva em cada, t >= 3.0, confirmacao >= 3/5); depois pre e holdout uma vez.
