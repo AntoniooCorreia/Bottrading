@@ -1256,3 +1256,64 @@ for _n, _v in {
 }.items():
     IDEAS[_n] = _v
     EXITS[_n] = {"signal_exit": False}
+
+
+# ---------------- FILTROS DA #191 E 2.a ESTRATEGIA EM BAIXA (2026-11-23, sessao 20h30) ----------------
+def dc_bull_in_bear_vol_entry(n: int, vol_mult: float):
+    """#191 + volume da vela da rutura > vol_mult x media do volume das n velas anteriores -> 1 (long)."""
+    def f(b):
+        c = b["close"]
+        sig = (c > b["high"].rolling(n).max().shift(1)) & _btc_bear(b)
+        if "volume" in b:      # velas sinteticas dos testes nao tem volume: sem filtro
+            v = b["volume"]
+            sig = sig & (v > vol_mult * v.rolling(n).mean().shift(1))
+        return sig.astype(float)
+    return f
+
+
+def _btc_tf_breakout(b, n: int, look: int, tf: str = "4h"):
+    """True se o BTC fechou uma vela de tf acima do maximo das n velas anteriores nesta vela ou nas look-1 anteriores.
+    Sem dados do BTC para estas datas (velas sinteticas dos testes) usa a propria serie."""
+    bo_own = lambda x: (x["close"] > x["high"].rolling(n).max().shift(1))
+    try:
+        from .swing import load_tf
+        btc = load_tf("btc", tf, None)
+    except Exception:
+        btc = None
+    if btc is None or b.index.tz is None or len(b) == 0 or b.index[-1] < btc.index[0] or b.index[0] > btc.index[-1]:
+        x = bo_own(b)
+    else:
+        x = bo_own(btc).reindex(b.index).fillna(False).astype(bool)
+    return x.astype(float).rolling(look, min_periods=1).max().fillna(0).astype(bool)
+
+
+def dc_bull_in_bear_btcbo_entry(n: int, look: int):
+    """#191 + o BTC tambem em rutura de n velas de 4h nas ultimas look velas -> 1 (long)."""
+    def f(b):
+        c = b["close"]
+        sig = (c > b["high"].rolling(n).max().shift(1)) & _btc_tf_breakout(b, n, look) & _btc_bear(b)
+        return sig.astype(float)
+    return f
+
+
+def dc_retest_bear_entry(n: int, window: int):
+    """Depois de uma rutura de n velas (BTC em baixa) nas `window` velas anteriores: vela que toca o nivel rompido
+    (minimo <= nivel) e fecha acima dele, BTC em baixa -> 1 (long). O nivel e o maximo das n velas que foi quebrado."""
+    def f(b):
+        c = b["close"]
+        prev_hi = b["high"].rolling(n).max().shift(1)
+        bo = (c > prev_hi) & _btc_bear(b)
+        level = prev_hi.where(bo).shift(1).ffill(limit=window - 1)
+        sig = level.notna() & (b["low"] <= level) & (c > level) & ~bo & _btc_bear(b)
+        return sig.astype(float)
+    return f
+
+
+for _n, _v in {
+    "l-dc20-4h-bear-vol15-s2-tp2-mh12": (dc_bull_in_bear_vol_entry(20, 1.5), "4h", 2.0, 2.0, 12),
+    "l-dc20-4h-bear-btcbo-s2-tp2-mh12": (dc_bull_in_bear_btcbo_entry(20, 6), "4h", 2.0, 2.0, 12),
+    "s-dc20-4h-bear-s2-tp2-mh12": (dc_bear_entry(20), "4h", 2.0, 2.0, 12),
+    "l-dc20-4h-bear-retest-s2-tp2-mh12": (dc_retest_bear_entry(20, 12), "4h", 2.0, 2.0, 12),
+}.items():
+    IDEAS[_n] = _v
+    EXITS[_n] = {"signal_exit": False}

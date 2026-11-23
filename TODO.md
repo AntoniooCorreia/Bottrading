@@ -324,7 +324,7 @@ Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --p
 - [x] #196 l-dc20-4h-bear-s3-tp2-mh12 -> REPROVADA (t +1.67; BTC +0.120R/123, ETH +0.072R/117, SOL +0.037R/73; win 50%; conf. 5/5; K110 +3.5%/ano, pior ano -10.0%)
 
 ## Ideias do agente (2026-11-23, sessao 20h30): filtrar ruturas falsas da #191 (volume, BTC) e 2.a estrategia na carteira (perp)
-- [ ] #197 l-dc20-4h-bear-vol15-s2-tp2-mh12
-- [ ] #198 l-dc20-4h-bear-btcbo-s2-tp2-mh12
-- [ ] #199 s-dc20-4h-bear-s2-tp2-mh12
-- [ ] #200 l-dc20-4h-bear-retest-s2-tp2-mh12
+- [x] #197 l-dc20-4h-bear-vol15-s2-tp2-mh12 -> REPROVADA so por SOL 54 < 60 trades (t +3.34; BTC +0.206R/109, ETH +0.255R/96, SOL +0.297R/54; win 53%; conf. 5/5; K111 +8.2%/ano, pior ano +0.5%, pior mes -5.6%)
+- [x] #198 l-dc20-4h-bear-btcbo-s2-tp2-mh12 -> REPROVADA (t +2.16; BTC +0.109R/136, ETH +0.217R/96, SOL +0.126R/53; win 48%; conf. 4/5; K114 +6.9%/ano, pior ano -2.9%)
+- [x] #199 s-dc20-4h-bear-s2-tp2-mh12 -> REPROVADA (t -0.16; BTC -0.085R/114, ETH -0.064R/126, SOL +0.157R/93; win 44%; conf. 4/5; K112 -0.2%/ano, pior ano -18% (2021)); carteira #191+#199 K115 +6.0%/ano, pior ano -17.9%
+- [x] #200 l-dc20-4h-bear-retest-s2-tp2-mh12 -> REPROVADA (t +1.71; BTC +0.148R/82, ETH +0.222R/93, SOL -0.092R/58; win 50%; conf. 3/5; K113 +3.6%/ano, pior ano -10.3%); carteira #191+#200 K116 +7.2%/ano, pior ano -1.1%, 53 trades/ano

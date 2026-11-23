@@ -40,9 +40,10 @@ def load_crypto(key: str, period: str | None = None, base: str = "1h") -> pd.Dat
     f = os.path.join("data", "crypto", f"{CRYPTO[key]}_{base}.csv.gz")
     if not os.path.exists(f):
         raise FileNotFoundError(f"{f} em falta: corre `TF={base} python crypto_download.py {CRYPTO[key]}`")
-    df = pd.read_csv(f, usecols=["ts", "open", "high", "low", "close"])
+    df = pd.read_csv(f)
+    cols = ["open", "high", "low", "close"] + (["volume"] if "volume" in df.columns else [])   # volume: so para filtros (#197)
     idx = pd.DatetimeIndex(pd.to_datetime(df["ts"], unit="ms", utc=True))
-    out = df[["open", "high", "low", "close"]].astype(float).set_index(idx)
+    out = df[cols].astype(float).set_index(idx)
     if period:
         a, b = PERIODS[period]
         a = "2017-01-01" if period == "pre" else a       # crypto: 'pre' = 2017-2018 (antes nao ha dados)
@@ -53,10 +54,13 @@ def load_crypto(key: str, period: str | None = None, base: str = "1h") -> pd.Dat
 def load_tf(key: str, tf: str, period: str | None = None) -> pd.DataFrame:
     agg = {"open": "first", "high": "max", "low": "min", "close": "last"}
     if key in CRYPTO:
+        agg = dict(agg, volume="sum")
         if tf in ("5m", "15m", "30m"):      # scalping: velas de 5m da Binance (data/crypto/*_5m.csv.gz)
             m5 = load_crypto(key, period, "5m")
+            agg = {k: v for k, v in agg.items() if k in m5.columns}
             return m5 if tf == "5m" else m5.resample(tf.replace("m", "min"), label="left", closed="left").agg(agg).dropna()
         h1 = load_crypto(key, period)
+        agg = {k: v for k, v in agg.items() if k in h1.columns}
         return h1 if tf == "1h" else h1.resample({"4h": "4h", "1d": "1D"}[tf], label="left",
                                                   closed="left").agg(agg).dropna()
     m5 = load_m5(key, period)

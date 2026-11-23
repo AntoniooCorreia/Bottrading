@@ -922,3 +922,11 @@ estrategia na mesma carteira (corridas sozinhas para o veredicto e juntas com a 
   melhor que a #191 e da trades nos dias em que a #191 ja saiu.
 Fasquia: criterio oficial (>= 60 trades por moeda, positiva em cada, t >= 3.0, confirmacao >= 3/5); depois pre e holdout uma vez.
 Nota de desconfianca: 32 ideias de baixa ja testadas (#165-#196); sao variantes da melhor delas.
+Resultado (dev 2019-2024, perp): as 4 REPROVADAS (K111-K116). **#197 (volume > 1.5x) e a 1.a ideia de baixa com t >= 3.0: t +3.34, positiva nas 3
+moedas (BTC +0.21R, ETH +0.26R, SOL +0.30R), confirmacao 5/5, win 53%, +8.2%/ano, NENHUM ano negativo (2022 +1.5%, pior mes -5.6%)**, mas
+SOL so tem 54 trades (< 60) -> REPROVADA pelo criterio oficial (nao se afina o filtro para chegar aos 60). O volume fez exatamente o previsto:
+2022 passou de -1.4% (118 trades, -0.01R) para +1.5% e o R por trade subiu de +0.15 para +0.24. #198 (BTC tambem em rutura) t +2.16: o BTC
+nao filtra melhor que o volume. #199 (short espelho) t -0.16: shorts de rutura em baixa perdem outra vez (2021 -18%); a carteira #191+#199 (K115)
+fica pior (pior ano -17.9%). #200 (reteste) t +1.71, SOL negativa; a carteira #191+#200 (K116) abre +30% de trades (53/ano) com pior ano -1.1%
+mas +7.2%/ano (menos que a #191 sozinha por trade). Mudanca no motor: load_crypto passa a ler o volume (so usado pela #197; resultados antigos iguais,
+#191 re-corrida da t +2.45 igual).
