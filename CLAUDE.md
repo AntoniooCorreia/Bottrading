@@ -52,6 +52,8 @@ Se passar o criterio oficial: acrescenta a sr/demo_spec.py SPECS (familias ja su
 fecho abaixo da media; btc "bear"), corre pytest e `python demo_pick.py --push` (o demo_pick ja junta sozinho uma estrategia que
 opere no regime atual). Nao faças deploy da Edge Function (nao e preciso para estas familias).
 
+LIMITE REDUZIDO (pedido do Antonio, 2026-11-23, uso semanal a 50%): ate ao fim da semana o limite e 10 ideias por noite (nao 20) e
+3 por sessao; so correm as sessoes das :00 (as das :30 estao desligadas). Gasta pouco: nada de reler ficheiros grandes sem necessidade.
 CONTAGEM DO LIMITE DA NOITE (corrigido 2026-11-23; SUBSTITUI o "conta as entradas de hoje" do prompt): a noite vai das 19:00 as 07:00.
 Conta SO as seccoes do agente ("cripto - sessao ...") registadas desde as 19:00 da noite atual (se agora e antes das 07h, desde as 19:00
 de ontem). As seccoes "(Claude, ...)" feitas no chat com o Antonio NAO contam. Na noite de 22-11 o agente parou todas as sessoes por
