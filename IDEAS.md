@@ -826,3 +826,6 @@ manda mais que o do BTC". Todas cabem nas familias da demo (rsi2/breakout + tren
   anteriores, moeda abaixo da EMA 200 de 4h e BTC em baixa. Stop 2 ATR, alvo 1R, maximo 6 velas. Hipotese: com as duas baixas confirmadas,
   a quebra de minimo de 3-4 dias continua no dia seguinte.
 Fasquia: criterio oficial (>= 60 trades por moeda, positiva em cada, t >= 3.0, confirmacao >= 3/5); depois pre e holdout uma vez.
+Resultado (dev 2019-2024, perp): as 4 REPROVADAS (K95-K98). #181 t -0.28 (win 52%, 105 trades/ano, pior ano -1.6%), #182 t -0.75,
+#183 t -1.85 (win 49%), #184 t -0.02 (win 47%, conf. 3/5). Leitura: o +0.01R da #180 era ruido; tirar o BTC, alongar a EMA, ir para long
+em forca relativa ou trocar o ressalto pela rutura da tudo ~0R ou pior. 20 ideias de baixa esta noite (#165-#184), nenhuma com vantagem.

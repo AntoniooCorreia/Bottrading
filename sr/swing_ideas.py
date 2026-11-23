@@ -1155,3 +1155,38 @@ for _n, _v in {
 }.items():
     IDEAS[_n] = _v
     EXITS[_n] = {"signal_exit": False}
+
+
+# ---------------- REGIME DA PROPRIA MOEDA (EMA 200 de 4h) EM BAIXA (2026-11-23, sessao 02h) ----------------
+def rsi2hi_entry(hi: float, trend_ema: int):
+    """RSI(2) > hi e fecho abaixo da EMA(trend_ema) da moeda -> -1 (short), SEM filtro do BTC (demo: btc vazio)."""
+    def f(b):
+        c = b["close"]
+        return -((_rsi(c, 2) > hi) & (c < _ema(c, trend_ema))).astype(float)
+    return f
+
+
+def rsi2_bear_ema_entry(lo: float, trend_ema: int):
+    """RSI(2) < lo, BTC em baixa e fecho ACIMA da EMA(trend_ema) da moeda -> 1 (long). Familia rsi2 + trend_ema + btc bear."""
+    def f(b):
+        c = b["close"]
+        return ((_rsi(c, 2) < lo) & (c > _ema(c, trend_ema)) & _btc_bear(b)).astype(float)
+    return f
+
+
+def dc_bear_ema_entry(n: int, trend_ema: int):
+    """Fecho abaixo do minimo das n velas anteriores, abaixo da EMA(trend_ema) e BTC em baixa -> -1 (short)."""
+    def f(b):
+        c = b["close"]
+        return -((c < b["low"].rolling(n).min().shift(1)) & (c < _ema(c, trend_ema)) & _btc_bear(b)).astype(float)
+    return f
+
+
+for _n, _v in {
+    "s-rsi2hi-4h-ema200-s2-tp1-mh6": (rsi2hi_entry(90, 200), "4h", 2.0, 1.0, 6),
+    "s-rsi2hi-4h-bear-ema600-s2-tp1-mh6": (rsi2hi_bear_entry(90, 600), "4h", 2.0, 1.0, 6),
+    "l-rsi2-4h-bear-ema200-s2-tp1-mh6": (rsi2_bear_ema_entry(10, 200), "4h", 2.0, 1.0, 6),
+    "s-dc20-4h-bear-ema200-s2-tp1-mh6": (dc_bear_ema_entry(20, 200), "4h", 2.0, 1.0, 6),
+}.items():
+    IDEAS[_n] = _v
+    EXITS[_n] = {"signal_exit": False}

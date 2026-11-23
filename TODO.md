@@ -298,3 +298,9 @@ Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --p
 - [x] #178 s-rsi2hi-4h-bear-s2-tp1-mh6 -> REPROVADA (t -2.64, win 49%, K92)
 - [x] #179 s-rsi2hi-4h-bear-s3-tp05-mh12 -> REPROVADA (t -3.85, win 55%, K93)
 - [x] #180 s-rsi2hi-4h-bear-ema200-s2-tp1-mh6 -> REPROVADA (t +0.33, win 54%, K94; positiva nas 3 moedas mas ~0R)
+
+## Ideias do agente (2026-11-23, sessao 02h): regime da propria moeda (EMA 200 de 4h) em baixa (perp)
+- [x] #181 s-rsi2hi-4h-ema200-s2-tp1-mh6 -> REPROVADA (t -0.28; BTC -0.018R/261, ETH -0.030R/281, SOL +0.036R/199; win 52%; conf. 2/5; K95 +1.9%/ano, pior ano -1.6%, pior mes -7.2%)
+- [x] #182 s-rsi2hi-4h-bear-ema600-s2-tp1-mh6 -> REPROVADA (t -0.75; BTC -0.033R/251, ETH -0.001R/242, SOL -0.039R/161; win 52%; conf. 0/5; K96 +0.5%/ano, pior ano -4.8%)
+- [x] #183 l-rsi2-4h-bear-ema200-s2-tp1-mh6 -> REPROVADA (t -1.85; BTC -0.160R/63, ETH +0.002R/62, SOL -0.207R/35; win 49%; conf. 2/5; K97 -1.6%/ano, pior ano -8.0%)
+- [x] #184 s-dc20-4h-bear-ema200-s2-tp1-mh6 -> REPROVADA (t -0.02; BTC +0.021R/137, ETH -0.016R/147, SOL -0.007R/119; win 47%; conf. 3/5; K98 +0.5%/ano, pior ano -5.6%)
