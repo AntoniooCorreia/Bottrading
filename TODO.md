@@ -278,3 +278,10 @@ Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --p
 - [x] #166: s-sma100-d-bear-bracket-mh10 -> REPROVADA (t -2.08; BTC -0.090R/81, ETH -0.110R/73, SOL -0.077R/61; win rate 44%; conf. 0/5; K80 -3.3%/ano, pior ano -10.1%)
 - [x] #167: s-sma600-4h-bear-bracket -> REPROVADA (t -1.15; BTC -0.085R/133, ETH -0.080R/102, SOL -0.015R/93; win rate 49%; conf. 0/5; K81 -1.8%/ano, 2022 +14.5%, 2021 -10.6%)
 - [x] #168: s-dc20-d-bear-bracket-s2-mh5 -> REPROVADA (t +0.47; BTC -0.066R/29, ETH -0.035R/32, SOL +0.247R/25 < 60; win rate 44%; conf. 3/5; K82 +0.5%/ano)
+
+## Ideias do agente (2026-11-23, cripto sessao :30 00h30; PRIORIDADE: mercado em baixa, ressaltos em long, perpetuos)
+Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --period dev --venue perp --push --num "#1xx" --nota ...`.
+- [ ] #169: l-rsi2-d-bear-s2-tp05-mh2
+- [ ] #170: l-low10-d-bear-s2-tp1-mh3
+- [ ] #171: l-rsi2-4h-bear-s2-tp1-mh6
+- [ ] #172: l-low30-4h-bear-s3-tp05-mh12

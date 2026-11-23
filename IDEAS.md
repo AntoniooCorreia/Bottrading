@@ -743,3 +743,23 @@ quando as de alta estao paradas, por isso juntam trades a carteira sem sobrepor.
   alvo 1R, maximo 5 dias. Hipotese: rutura de minimos em baixa = vendedores no controlo; alvo curto apanha a continuacao imediata.
 Fasquia: criterio oficial (>= 60 trades por moeda, positiva em cada, t >= 3.0, confirmacao >= 3/5); depois pre e holdout uma vez.
 Nota: o dev 2019-2024 tem pouca baixa (sobretudo 2022 e partes de 2019/2020/2023) -> risco real de < 60 trades por moeda.
+
+## 2026-11-23 cripto - sessao :30 (00h30) (4 ideias; ideias cripto testadas antes: ~78 (#100-#168); esta noite (desde 19h de 22-11): 8 de 20 com esta sessao) - registadas antes de correr
+PRIORIDADE DA NOITE (BTC abaixo da media de 200 dias). `python best.py`: base K67 (#158), win rate 64%, +86% total, mas 2022 -13.6%
+(win rate 31%). A sessao das 00h testou os shorts (#165-#168): TODOS reprovados, so 2022 ganha; em 2019/2020/2023 os shorts com
+BTC em baixa apanham os fundos e os ressaltos violentos. Isso aponta para o outro caminho registado no CLAUDE.md: RESSALTOS em LONG
+dentro da baixa. Fundamento: em mercado em baixa a reversao de curto prazo e forte (fecho de shorts, vendedores esgotados depois de
+quedas seguidas); os testes antigos de compra em sobrevenda (rsi2-dip-d, down3-d: win rate 56-71%) davam ~0R so por causa dos custos
+de spot (0.57%); com custos de perpetuos (0.14% + funding) e alvo curto, a mesma vantagem pode sobreviver. Alvo 0.5-1R e tempo maximo
+curto para nao ficar preso quando a baixa continua. Todas: long, so com BTC em baixa (fechou o dia anterior abaixo da media de 200
+dias), sem saida pelo sinal (so alvo/stop/tempo), --venue perp, cabem nas familias rsi2/lowclose da demo experimental (btc "bear").
+2 das 4 em 4h para abrir MAIS trades (o dev tem pouca baixa: risco de < 60 trades por moeda nas diarias).
+- **#169 l-rsi2-d-bear-s2-tp05-mh2**: RSI(2) diario < 10 + BTC em baixa -> long na abertura seguinte. Stop 2 ATR(14) diario, alvo 0.5R,
+  maximo 2 dias. Hipotese: sobrevenda extrema diaria em baixa ressalta 1-2 dias; alvo de meio R apanha so o ressalto (win rate alto).
+- **#170 l-low10-d-bear-s2-tp1-mh3**: fecho diario e o mais baixo das ultimas 10 velas + BTC em baixa. Stop 2 ATR, alvo 1R, maximo 3 dias.
+  Hipotese: minimo de 10 dias em baixa = vendedores esticados; ressalto ate 1R antes de nova perna.
+- **#171 l-rsi2-4h-bear-s2-tp1-mh6**: RSI(2) de 4h < 10 + BTC em baixa. Stop 2 ATR(14) de 4h, alvo 1R, maximo 6 velas (1 dia).
+  Hipotese: a mesma sobrevenda, 6x mais frequente; trades de horas.
+- **#172 l-low30-4h-bear-s3-tp05-mh12**: fecho de 4h e o mais baixo das ultimas 30 velas (5 dias) + BTC em baixa. Stop 3 ATR(14) de 4h,
+  alvo 0.5R, maximo 12 velas (2 dias). Hipotese: minimo de 5 dias em 4h com stop largo e alvo curto -> win rate alto.
+Fasquia: criterio oficial (>= 60 trades por moeda, positiva em cada, t >= 3.0, confirmacao >= 3/5); depois pre e holdout uma vez.
