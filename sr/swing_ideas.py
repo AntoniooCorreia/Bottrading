@@ -1190,3 +1190,34 @@ for _n, _v in {
 }.items():
     IDEAS[_n] = _v
     EXITS[_n] = {"signal_exit": False}
+
+
+# ---------------- RESSALTO FALHADO / REJEICAO NA MEDIA DESCENDENTE EM BAIXA (2026-11-23, sessao 19h) ----------------
+def failrally_bear_entry(hi: float, look: int):
+    """RSI(2) > hi numa das `look` velas anteriores e fecho abaixo do minimo da vela anterior, BTC em baixa -> -1 (short)."""
+    def f(b):
+        c = b["close"]
+        recent = (_rsi(c, 2) > hi).astype(float).shift(1).rolling(look).max().fillna(0).astype(bool)
+        sig = recent & (c < b["low"].shift(1)) & _btc_bear(b)
+        return -sig.astype(float)
+    return f
+
+
+def ema_reject_bear_entry(fast: int, slow: int):
+    """Maximo >= EMA(fast), fecho < EMA(fast), EMA(fast) < EMA(slow) e BTC em baixa -> -1 (short)."""
+    def f(b):
+        c = b["close"]
+        ef, es = _ema(c, fast), _ema(c, slow)
+        sig = (b["high"] >= ef) & (c < ef) & (ef < es) & _btc_bear(b)
+        return -sig.astype(float)
+    return f
+
+
+for _n, _v in {
+    "s-failrally-d-bear-s2-tp1-mh3": (failrally_bear_entry(90, 3), "1d", 2.0, 1.0, 3),
+    "s-failrally-4h-bear-s2-tp1-mh6": (failrally_bear_entry(90, 6), "4h", 2.0, 1.0, 6),
+    "s-ema20rej-d-bear-s2-tp1-mh3": (ema_reject_bear_entry(20, 50), "1d", 2.0, 1.0, 3),
+    "s-ema20rej-4h-bear-s2-tp1-mh6": (ema_reject_bear_entry(20, 50), "4h", 2.0, 1.0, 6),
+}.items():
+    IDEAS[_n] = _v
+    EXITS[_n] = {"signal_exit": False}

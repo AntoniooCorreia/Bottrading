@@ -849,3 +849,6 @@ o que deve cortar os ressaltos em V que continuam. Todas: short, BTC em baixa (f
 - **#188 s-ema20rej-4h-bear-s2-tp1-mh6** (MAIS TRADES): a #187 em velas de 4h (EMA 20 e EMA 50 de 4h). Stop 2 ATR(14) de 4h, alvo 1R, maximo 6 velas.
 Fasquia: criterio oficial (>= 60 trades por moeda, positiva em cada, t >= 3.0, confirmacao >= 3/5); depois pre e holdout uma vez.
 Risco conhecido: o dev tem pouca baixa (sobretudo 2022) -> as diarias podem ter < 60 trades por moeda.
+Resultado (dev 2019-2024, perp): as 4 REPROVADAS (K99-K102). #185 t +0.61 (win 53%, so 18-26 trades por moeda, +0.5%/ano), #186 t -1.35 (BTC -0.12R),
+#187 t -1.64 (win 45%), #188 t -1.39 (win 48%, pior mes -11%). Leitura: esperar a confirmacao do ressalto falhado no diario melhora o R (+0.05R vs
+-0.10R da #177) mas quase nao ha sinais; em 4h e na rejeicao da media volta a ~-0.04R. 24 ideias de baixa (#165-#188), nenhuma com vantagem.

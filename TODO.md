@@ -306,7 +306,7 @@ Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --p
 - [x] #184 s-dc20-4h-bear-ema200-s2-tp1-mh6 -> REPROVADA (t -0.02; BTC +0.021R/137, ETH -0.016R/147, SOL -0.007R/119; win 47%; conf. 3/5; K98 +0.5%/ano, pior ano -5.6%)
 
 ## Ideias do agente (2026-11-23, sessao 19h): vender o ressalto FALHADO / rejeicao na media descendente em baixa (perp)
-- [ ] #185 s-failrally-d-bear-s2-tp1-mh3
-- [ ] #186 s-failrally-4h-bear-s2-tp1-mh6
-- [ ] #187 s-ema20rej-d-bear-s2-tp1-mh3
-- [ ] #188 s-ema20rej-4h-bear-s2-tp1-mh6
+- [x] #185 s-failrally-d-bear-s2-tp1-mh3 -> REPROVADA (t +0.61; BTC +0.090R/26, ETH -0.007R/18, SOL +0.039R/18; win 53%; conf. 2/5; K99 +0.5%/ano, pior ano -1.3%; poucas trades)
+- [x] #186 s-failrally-4h-bear-s2-tp1-mh6 -> REPROVADA (t -1.35; BTC -0.117R/228, ETH +0.028R/243, SOL -0.027R/167; win 46%; conf. 0/5; K100 -4.3%/ano, pior ano -14.0%)
+- [x] #187 s-ema20rej-d-bear-s2-tp1-mh3 -> REPROVADA (t -1.64; BTC -0.071R/59, ETH -0.046R/49, SOL -0.137R/40; win 45%; conf. 0/5; K101 -2.0%/ano, pior ano -5.2%)
+- [x] #188 s-ema20rej-4h-bear-s2-tp1-mh6 -> REPROVADA (t -1.39; BTC -0.030R/226, ETH -0.050R/224, SOL -0.044R/161; win 48%; conf. 0/5; K102 -0.3%/ano, pior ano -9.9%, pior mes -11.3%)

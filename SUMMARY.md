@@ -56,6 +56,7 @@
 | #169-#172 | 2026-11-23 | MERCADO EM BAIXA, ressaltos em LONG perp com BTC < media 200: RSI(2)<10 diario (alvo 0.5R, max 2d), minimo de 10 dias (1R, 3d), RSI(2)<10 em 4h (1R, 1d), minimo de 30 velas de 4h (0.5R, 2d); K83-K86 | -3.43 a -0.47 | 49-59% | -0.10 a -0.02 | -10.4% a -0.6%/ano | REPROVADAS: 2022 e o pior ano em todas (-8% a -42%); so o BTC diario fica ~+0.05R; em 4h claramente negativo (t -3.4) |
 | #177-#180 | 2026-11-23 | MERCADO EM BAIXA, vender ressaltos (short RSI(2) > 90) perp com BTC < media 200: diario (2 ATR/1R/3d), 4h (2 ATR/1R/1d), 4h (3 ATR/0.5R/2d), 4h + moeda abaixo da EMA 200 de 4h; K91-K94 | -3.85 a +0.33 | 43-55% | -0.17 a +0.01 | -6.7% a +2.7%/ano | REPROVADAS; #180 (moeda tambem em baixa) e positiva nas 3 moedas (+0.01R, pior ano -0.6%) mas t 0.33 e conf. 1/5 |
 | #181-#184 | 2026-11-23 | MERCADO EM BAIXA, regime da propria moeda (EMA 200 de 4h), perp: #180 sem filtro do BTC, #180 com EMA 600, long RSI(2)<10 4h com a moeda acima da EMA 200 (forca relativa), short quebra do minimo de 20 velas 4h; K95-K98 | -1.85 a -0.02 | 47-52% | -0.11 a -0.01 | -1.6% a +1.9%/ano | REPROVADAS: o +0.01R da #180 era ruido; #184 conf. 3/5 mas ~0R |
+| #185-#188 | 2026-11-23 | MERCADO EM BAIXA, shorts perp so depois de o ressalto falhar (RSI(2) > 90 recente + fecho abaixo do minimo anterior, diario e 4h) ou na rejeicao da EMA 20 descendente (diario e 4h); K99-K102 | -1.64 a +0.61 | 45-53% | -0.08 a +0.05 | -4.3% a +0.5%/ano | REPROVADAS: #185 positiva mas so 18-26 trades por moeda; em 4h e na rejeicao da media ~-0.04R |
 | carteiras 8 moedas | 2026-11-22 | demo (#139+#144+#138) e curta (#139+#163+#164) em 8 moedas com --max-open | - | 52-58% | - | curta max 4: 179 trades/ano, +17%/ano, pior ano -1.0%, pior mes -10.4%, queda -22% | so diagnostico |
 
 Scalping (2026-11-21): ANTES de custos ha uma vantagem pequena (RSI(2) 15m long: win rate 69%, +0.05R; Bollinger 5m BTC +0.08R),
@@ -68,18 +69,15 @@ Perpetuos (#133-#137): mesmo com custos 4x mais baixos nada passa. Os shorts int
 
 #138 (2026-11-21, 19h): a #118 em 4h abre 2x mais trades (1.2/semana, SOL 173) com win rate 59%, mas so +0.09R/trade: t 2.47, REPROVADA.
 
-Leitura honesta cripto (2026-11-23, sessao das :00 02h, ultima da noite):
-1. Ideias cripto testadas no total: 98 (#100-#184, K1, scalping, intraday, perpetuos). Mais testes = mais desconfianca num resultado isolado.
+Leitura honesta cripto (2026-11-23, sessao das :00 19h, 1.a da noite de 23-11):
+1. Ideias cripto testadas no total: 102 (#100-#188, K1, scalping, intraday, perpetuos). Mais testes = mais desconfianca num resultado isolado.
 2. Melhor win rate com resultado positivo: 68% (#118 +0.33R, reprovada SOL < 60; #148 +0.14R). Na familia atual: 65% (#156, +0.24R no dev).
 3. A familia "moeda acima da media + BTC em alta + alvo 1R" tem t 4-5 em 2019-2024 mas ~0R em 2017-18 e no holdout (#155, #157): o dev explica quase tudo.
 4. Holdout ja gasto em cripto: K1, #100, #116, #155, #157. Nenhuma estrategia cripto esta aprovada.
-5. Mercado em baixa (20 ideias esta noite, #165-#184, todas perp): NENHUMA com vantagem. Shorts de tendencia so ganham em 2022 e perdem nas
-   quedas curtas em V (2020/2023); ressaltos em long perdem em 2022; vender ressaltos perde; a inclinacao da media 200 do BTC nao separa.
-6. O regime da propria moeda (EMA 200 de 4h) foi a unica coisa que melhorou um pouco (#180, +0.01R), mas as 4 variantes (#181-#184) voltam a ~0R:
-   era ruido. Win rate 47-55% em baixa, nunca com R positivo com folga.
-7. Com BTC abaixo da media de 200 dias, ficar de fora e o resultado honesto do dev; a demo experimental continua parada (demo_pick sem mudanca).
-8. Proximo passo: decidir com o Antonio se a demo parada em baixa e aceitavel, ou se se usa o pre 2017-2018 (inclui a baixa de 2018) para desenhar
-   ideias de baixa; e rever o custo real da Kraken (spot 0.80% taker, COST_PCT otimista).
+5. Mercado em baixa: 24 ideias (#165-#188, todas perp), NENHUMA com vantagem. Shorts de tendencia so ganham em 2022; ressaltos em long perdem em 2022;
+   vender ressaltos (logo, ou so depois de falharem, ou na EMA 20 descendente) fica entre -0.10R e +0.05R; a inclinacao da media 200 e o regime da moeda nao ajudam.
+6. A unica com R positivo nas 3 moedas foi a #185 (ressalto falhado diario, +0.05R) mas com 18-26 trades por moeda: ruido estatistico, nao vantagem.
+7. Com BTC abaixo da media de 200 dias, ficar de fora e o resultado honesto do dev; a demo experimental continua parada (nada novo para o demo_pick).
 
 # Resumo indices (ARQUIVO, custos CFD incluidos)
 
