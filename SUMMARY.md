@@ -66,8 +66,8 @@ Perpetuos (#133-#137): mesmo com custos 4x mais baixos nada passa. Os shorts int
 
 #138 (2026-11-21, 19h): a #118 em 4h abre 2x mais trades (1.2/semana, SOL 173) com win rate 59%, mas so +0.09R/trade: t 2.47, REPROVADA.
 
-Leitura honesta cripto (2026-11-23, sessao das :30 00h30):
-1. Ideias cripto testadas no total: 86 (#100-#172, K1, scalping, intraday, perpetuos). Mais testes = mais desconfianca num resultado isolado.
+Leitura honesta cripto (2026-11-23, sessao das :00 01h):
+1. Ideias cripto testadas no total: 90 (#100-#176, K1, scalping, intraday, perpetuos). Mais testes = mais desconfianca num resultado isolado.
 2. Melhor win rate com resultado positivo: 68% (#118 +0.33R, reprovada SOL < 60; #148 +0.14R). Na familia atual: 65% (#156, +0.24R no dev).
 3. A familia "moeda acima da media + BTC em alta + alvo 1R" tem t 4-5 em 2019-2024 mas ~0R em 2017-18 e no holdout (#155, #157): o dev explica quase tudo.
 4. Holdout ja gasto em cripto: K1, #100, #116, #155, #157. Nenhuma estrategia cripto esta aprovada.
@@ -77,8 +77,10 @@ Leitura honesta cripto (2026-11-23, sessao das :30 00h30):
 7. Ressaltos em LONG dentro da baixa (#169-#172) tambem PERDEM: win rate 49-59% mas -0.02 a -0.10R; 2022 e o pior ano (-8% a -42%).
    Ou seja, com BTC abaixo da media de 200 dias os shorts perdem fora de 2022 e os longs perdem em 2022: o filtro mistura 2 mercados
    (baixa longa como 2022 vs. quedas curtas em V como 2020/2023). Nenhuma estrategia para o regime atual passa; a demo continua parada.
-8. Proximo passo: separar os dois mercados com UMA regra fixa (ex.: media de 200 dias do BTC a descer = baixa longa -> shorts;
-   a subir = queda curta -> ressaltos), registada antes; e decisao do Antonio sobre o custo real da Kraken (0.80% taker).
+8. A separacao pela inclinacao da media 200 do BTC (#173-#176) NAO ajuda: shorts com a media a descer -0.02/-0.09R (2020 -6/-8%),
+   longs com a media a subir -0.09R (2022/2023 ainda -8% a -15%). No dev 2019-2024 nao ha vantagem em nenhum lado com BTC em baixa.
+9. Proximo passo: parar de procurar regras de baixa no dev (16 ideias ja, todas negativas) e decidir com o Antonio: demo parada em baixa
+   e aceitavel, ou testar so por pre 2017-2018 (inclui a baixa de 2018); e o custo real da Kraken (0.80% taker).
 
 # Resumo indices (ARQUIVO, custos CFD incluidos)
 

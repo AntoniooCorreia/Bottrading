@@ -784,3 +784,6 @@ Cada ideia = UMA mudanca (o filtro de inclinacao) sobre uma ideia ja testada est
 Hipotese: as perdas de 2022 dos longs e as de 2019/2020/2023 dos shorts desaparecem; risco: menos trades (< 60 por moeda nas shorts diarias).
 Fasquia: criterio oficial (>= 60 trades por moeda, positiva em cada, t >= 3.0, confirmacao >= 3/5); depois pre e holdout uma vez.
 Nota: no ultimo dado (31-10-2026) a media de 200 do BTC ainda sobe -> hoje o regime seria "correcao" (longs #175/#176 operariam).
+Resultado (dev 2019-2024, perp): as 4 REPROVADAS (t -2.20 a -0.64; win rate 47-55%; K87-K90). A inclinacao nao separa os mercados:
+os shorts com a media a descer ainda perdem em 2020 (-6% a -8%) e os longs com a media a subir perdem em 2022 e 2023 (ate -15%).
+Leitura: com o BTC abaixo da media de 200 dias nao ha vantagem mecanica no dev depois de custos de perpetuos, em nenhum dos lados.

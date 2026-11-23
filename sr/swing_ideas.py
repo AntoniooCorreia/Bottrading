@@ -1085,3 +1085,50 @@ for _n, _v in {
 }.items():
     IDEAS[_n] = _v
     EXITS[_n] = {"signal_exit": False}
+
+
+# ---------------- BAIXA SEPARADA PELA INCLINACAO DA MEDIA 200 DO BTC (2026-11-23, sessao 01h) ----------------
+def btc_sma_slope_up(index: pd.DatetimeIndex, n: int = 200, k: int = 20) -> pd.Series | None:
+    """True quando, no dia anterior fechado, a media de n dias do BTC estava acima do valor de k dias antes."""
+    if len(index) == 0:
+        return pd.Series(False, index=index, dtype=bool)
+    try:
+        from .swing import load_tf
+        btc_daily = load_tf("btc", "1d", None)
+    except Exception:
+        return None
+    if index.tz is None or len(btc_daily) < n + k + 1 or index[-1] < btc_daily.index[0] + pd.Timedelta(days=n + k):
+        return None
+    sma = btc_daily["close"].rolling(n).mean()
+    up = (sma > sma.shift(k)).astype(float).where(sma.shift(k).notna())
+    up.index = up.index + pd.Timedelta(days=1)
+    out = up.reindex(up.index.union(index)).ffill().reindex(index)
+    return out.fillna(0).astype(bool)
+
+
+def _slope_up(b, n: int = 200, k: int = 20):
+    r = btc_sma_slope_up(b.index, n, k)
+    if r is None:   # sem dados do BTC: inclinacao da propria serie (so passado)
+        s = b["close"].rolling(n).mean()
+        r = (s > s.shift(k)).shift(1).fillna(False).astype(bool)
+    return r.reindex(b.index).fillna(False).astype(bool)
+
+
+def with_slope(entry_fn, want_up: bool):
+    """Mantem o sinal de entry_fn so quando a media 200 do BTC esta a subir (want_up) ou a descer (not want_up)."""
+    def f(b):
+        s = entry_fn(b)
+        up = _slope_up(b)
+        mask = up if want_up else ~up
+        return s.where(mask, 0.0)
+    return f
+
+
+for _n, _v in {
+    "s-sma50-d-bear200dn-bracket-s2-mh3": (with_slope(sma_bear_entry(50), False), "1d", 2.0, 1.0, 3),
+    "s-sma600-4h-bear200dn-bracket": (with_slope(sma_bear_entry(600), False), "4h", 3.0, 1.0, 0),
+    "l-rsi2-4h-bear200up-s2-tp1-mh6": (with_slope(rsi2_bear_entry(10), True), "4h", 2.0, 1.0, 6),
+    "l-low30-4h-bear200up-s3-tp05-mh12": (with_slope(low_bear_entry(30), True), "4h", 3.0, 0.5, 12),
+}.items():
+    IDEAS[_n] = _v
+    EXITS[_n] = {"signal_exit": False}
