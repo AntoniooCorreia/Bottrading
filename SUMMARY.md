@@ -59,6 +59,7 @@
 | #185-#188 | 2026-11-23 | MERCADO EM BAIXA, shorts perp so depois de o ressalto falhar (RSI(2) > 90 recente + fecho abaixo do minimo anterior, diario e 4h) ou na rejeicao da EMA 20 descendente (diario e 4h); K99-K102 | -1.64 a +0.61 | 45-53% | -0.08 a +0.05 | -4.3% a +0.5%/ano | REPROVADAS: #185 positiva mas so 18-26 trades por moeda; em 4h e na rejeicao da media ~-0.04R |
 | #189-#192 | 2026-11-23 | MERCADO EM BAIXA, comprar o ressalto DEPOIS de comecar (rutura de maximo em long com BTC < media 200, perp): 20 velas 4h (1R, 1d), 20 dias (1R, 5d), 20 velas 4h (2R, 2d), 24 velas 1h + EMA 200 1h (2R, 24h); K103-K106 | +0.85 a +2.45 | 46-58% | +0.03 a +0.16 | -0.4% a +8.1%/ano | REPROVADAS (t < 3), mas e o 1.o caminho de baixa com R positivo nas 3 moedas e conf. 5/5; #191 (alvo 2R, 2 dias): t 2.45, +8.1%/ano, pior ano -1.4% |
 | #193-#196 | 2026-11-23 | MERCADO EM BAIXA, variantes da #191 (perp): max 5 dias, rutura de 10 velas, stop 1.5 ATR, stop 3 ATR; K107-K110 | +1.47 a +2.84 | 46-50% | +0.07 a +0.22 | +3.5% a +9.3%/ano | REPROVADAS (t < 3); todas pioram 2022 (pior ano -3% a -21%); #195 (stop 1.5): +9.3%/ano, pior ano -3.2% |
+| #197-#200 | 2026-11-23 | MERCADO EM BAIXA, filtros e 2.a estrategia da #191 (perp): volume > 1.5x, BTC tambem em rutura, short espelho, reteste do nivel rompido; K111-K116 | -0.16 a +3.34 | 44-53% | -0.01 a +0.24 | -0.2% a +8.2%/ano | REPROVADAS; **#197 (volume): t +3.34, conf. 5/5, win 53%, +8.2%/ano, sem ano negativo, mas SOL 54 < 60 trades** |
 | carteiras 8 moedas | 2026-11-22 | demo (#139+#144+#138) e curta (#139+#163+#164) em 8 moedas com --max-open | - | 52-58% | - | curta max 4: 179 trades/ano, +17%/ano, pior ano -1.0%, pior mes -10.4%, queda -22% | so diagnostico |
 
 Scalping (2026-11-21): ANTES de custos ha uma vantagem pequena (RSI(2) 15m long: win rate 69%, +0.05R; Bollinger 5m BTC +0.08R),
@@ -71,15 +72,15 @@ Perpetuos (#133-#137): mesmo com custos 4x mais baixos nada passa. Os shorts int
 
 #138 (2026-11-21, 19h): a #118 em 4h abre 2x mais trades (1.2/semana, SOL 173) com win rate 59%, mas so +0.09R/trade: t 2.47, REPROVADA.
 
-Leitura honesta cripto (2026-11-23, sessao das :00 20h, 3.a da noite de 23-11):
-1. Ideias cripto testadas no total: 110 (#100-#196, K1, scalping, intraday, perpetuos). Mais testes = mais desconfianca num resultado isolado.
+Leitura honesta cripto (2026-11-23, sessao das :30 20h30, 4.a da noite de 23-11):
+1. Ideias cripto testadas no total: 114 (#100-#200, K1, scalping, intraday, perpetuos). Mais testes = mais desconfianca num resultado isolado.
 2. Melhor win rate com resultado positivo: 68% (#118 +0.33R, reprovada SOL < 60; #148 +0.14R). Na familia atual: 65% (#156, +0.24R no dev).
 3. A familia "moeda acima da media + BTC em alta + alvo 1R" tem t 4-5 em 2019-2024 mas ~0R em 2017-18 e no holdout (#155, #157): o dev explica quase tudo.
 4. Holdout ja gasto em cripto: K1, #100, #116, #155, #157. Nenhuma estrategia cripto esta aprovada.
-5. Mercado em baixa: 32 ideias (#165-#196, todas perp). Shorts e compras em sobrevenda perdem (-0.10R a +0.05R): os ressaltos de baixa sao violentos.
-6. Comprar o ressalto DEPOIS de comecar (rutura de maximo com BTC em baixa) e o unico caminho com R positivo nas 3 moedas: #191 t 2.45, +8.1%/ano, pior ano -1.4%.
-7. As 4 vizinhas da #191 (#193-#196: mais tempo, rutura mais curta, stop 1.5 ou 3 ATR) ficam todas abaixo de t 3.0 e pioram 2022 (pior ano -3% a -21%).
-   A rutura em baixa ganha nos ressaltos em V (2020/2023) e empata/perde na baixa longa (2022). Ainda nada para a demo; ficar de fora continua o honesto.
+5. Mercado em baixa: 36 ideias (#165-#200, todas perp). Shorts (incl. #199) e compras em sobrevenda perdem: os ressaltos de baixa sao violentos.
+6. Comprar o ressalto DEPOIS de comecar (rutura de 20 velas de 4h com BTC em baixa, alvo 2R, max 2 dias) e o unico caminho positivo nas 3 moedas.
+7. #197 (+ volume da rutura > 1.5x): 1.a de baixa com t >= 3 (t +3.34, conf. 5/5, win 53%, +8.2%/ano, 2022 +1.5%, pior ano +0.5%), mas SOL 54 < 60
+   trades -> REPROVADA. E a 36.a ideia de baixa e a 3.a variante da #191: desconfiar. Nao se afina o filtro para chegar aos 60. Ainda nada para a demo.
 
 # Resumo indices (ARQUIVO, custos CFD incluidos)
 
