@@ -1058,3 +1058,30 @@ for _n, _v in {
 }.items():
     IDEAS[_n] = _v
     EXITS[_n] = {"signal_exit": False}
+
+
+# ---------------- MERCADO EM BAIXA: RESSALTOS EM LONG (2026-11-23, prioridade da noite) ----------------
+def rsi2_bear_entry(lo: float):
+    """RSI(2) < lo e BTC em baixa -> 1 (long). So para entrar (igual a familia rsi2 da demo, btc "bear")."""
+    def f(b):
+        r = _rsi(b["close"], 2)
+        return ((r < lo) & _btc_bear(b)).astype(float)
+    return f
+
+
+def low_bear_entry(n: int):
+    """Fecho e o mais baixo das ultimas n velas e BTC em baixa -> 1 (long). So para entrar (familia lowclose)."""
+    def f(b):
+        c = b["close"]
+        return ((c <= c.rolling(n).min()) & _btc_bear(b)).astype(float)
+    return f
+
+
+for _n, _v in {
+    "l-rsi2-d-bear-s2-tp05-mh2": (rsi2_bear_entry(10), "1d", 2.0, 0.5, 2),
+    "l-low10-d-bear-s2-tp1-mh3": (low_bear_entry(10), "1d", 2.0, 1.0, 3),
+    "l-rsi2-4h-bear-s2-tp1-mh6": (rsi2_bear_entry(10), "4h", 2.0, 1.0, 6),
+    "l-low30-4h-bear-s3-tp05-mh12": (low_bear_entry(30), "4h", 3.0, 0.5, 12),
+}.items():
+    IDEAS[_n] = _v
+    EXITS[_n] = {"signal_exit": False}

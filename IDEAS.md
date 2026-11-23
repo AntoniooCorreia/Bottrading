@@ -763,3 +763,7 @@ dias), sem saida pelo sinal (so alvo/stop/tempo), --venue perp, cabem nas famili
 - **#172 l-low30-4h-bear-s3-tp05-mh12**: fecho de 4h e o mais baixo das ultimas 30 velas (5 dias) + BTC em baixa. Stop 3 ATR(14) de 4h,
   alvo 0.5R, maximo 12 velas (2 dias). Hipotese: minimo de 5 dias em 4h com stop largo e alvo curto -> win rate alto.
 Fasquia: criterio oficial (>= 60 trades por moeda, positiva em cada, t >= 3.0, confirmacao >= 3/5); depois pre e holdout uma vez.
+Resultado (dev 2019-2024, perp): as 4 REPROVADAS (t -3.43 a -0.47; win rate 49-59%; K83-K86). 2022 e o pior ano em todas.
+Leitura: com o BTC abaixo da media de 200 dias, os shorts (#165-#168) perdem nas quedas curtas em V e os longs (#169-#172) perdem
+na baixa longa de 2022: o filtro junta dois mercados diferentes. Proxima ideia com fundamento: separa-los com uma regra fixa
+(inclinacao da media de 200 dias do BTC), a registar antes de correr.

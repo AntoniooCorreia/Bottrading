@@ -281,7 +281,7 @@ Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --p
 
 ## Ideias do agente (2026-11-23, cripto sessao :30 00h30; PRIORIDADE: mercado em baixa, ressaltos em long, perpetuos)
 Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --period dev --venue perp --push --num "#1xx" --nota ...`.
-- [ ] #169: l-rsi2-d-bear-s2-tp05-mh2
-- [ ] #170: l-low10-d-bear-s2-tp1-mh3
-- [ ] #171: l-rsi2-4h-bear-s2-tp1-mh6
-- [ ] #172: l-low30-4h-bear-s3-tp05-mh12
+- [x] #169: l-rsi2-d-bear-s2-tp05-mh2 -> REPROVADA (t -0.47; BTC +0.048R/76, ETH -0.041R/69, SOL -0.081R/54; win rate 59%; conf. 1/5; K83 -0.6%/ano, pior ano -8.3% (2022), pior mes -6.8%)
+- [x] #170: l-low10-d-bear-s2-tp1-mh3 -> REPROVADA (t -1.26; BTC +0.050R/73, ETH -0.073R/74, SOL -0.147R/65; win rate 55%; conf. 2/5; K84 -1.9%/ano, pior ano -14.6% (2022))
+- [x] #171: l-rsi2-4h-bear-s2-tp1-mh6 -> REPROVADA (t -3.43; BTC -0.092R/338, ETH -0.097R/350, SOL -0.064R/247; win rate 49%; conf. 1/5; K85 -10.4%/ano, 2022 -41.7%)
+- [x] #172: l-low30-4h-bear-s3-tp05-mh12 -> REPROVADA (t -3.35; BTC -0.052R/161, ETH -0.134R/170, SOL -0.111R/130; win rate 55%; conf. 0/5; K86 -5.7%/ano, 2022 -25.5%)
