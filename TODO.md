@@ -322,3 +322,9 @@ Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --p
 - [x] #194 l-dc10-4h-bear-s2-tp2-mh12 -> REPROVADA (t +1.47; BTC +0.097R/195, ETH +0.057R/185, SOL +0.057R/116; win 48%; conf. 5/5; K108 +4.5%/ano, pior ano -21.4% (2022))
 - [x] #195 l-dc20-4h-bear-s15-tp2-mh12 -> REPROVADA (t +2.74; BTC +0.174R/145, ETH +0.178R/140, SOL +0.199R/82; win 49%; conf. 4/5; K109 +9.3%/ano, pior ano -3.2%, pior mes -6.8%)
 - [x] #196 l-dc20-4h-bear-s3-tp2-mh12 -> REPROVADA (t +1.67; BTC +0.120R/123, ETH +0.072R/117, SOL +0.037R/73; win 50%; conf. 5/5; K110 +3.5%/ano, pior ano -10.0%)
+
+## Ideias do agente (2026-11-23, sessao 20h30): filtrar ruturas falsas da #191 (volume, BTC) e 2.a estrategia na carteira (perp)
+- [ ] #197 l-dc20-4h-bear-vol15-s2-tp2-mh12
+- [ ] #198 l-dc20-4h-bear-btcbo-s2-tp2-mh12
+- [ ] #199 s-dc20-4h-bear-s2-tp2-mh12
+- [ ] #200 l-dc20-4h-bear-retest-s2-tp2-mh12

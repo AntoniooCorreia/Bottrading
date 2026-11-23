@@ -898,3 +898,27 @@ Resultado (dev 2019-2024, perp): as 4 REPROVADAS (K107-K110). #193 t +2.84 (+8.2
 pior ano -21%), #195 t +2.74 (+9.3%/ano, pior ano -3.2%, 1.0 trades/semana), #196 t +1.67 (win 50%, pior ano -10%). Leitura: nenhuma vizinha da #191
 passa o t 3.0 e todas pioram 2022; a #191 parece estar perto de um maximo local (desconfiar dos seus t 2.45). A rutura de 4h com BTC em baixa
 ganha nos ressaltos em V (2020/2023) e perde ou empata na baixa longa (2022): o mesmo problema de regime das 24 anteriores, do outro lado.
+
+## 2026-11-23 cripto - sessao :30 (20h30) (4 ideias; ideias cripto testadas antes: ~110 (#100-#196); esta noite (desde 19h de 23-11): 16 de 20 com esta sessao) - registadas antes de correr
+PRIORIDADE DA NOITE (BTC abaixo da media de 200 dias -> demo experimental parada). `python best.py`: base geral K67 (#158); a melhor de baixa
+continua a ser a #191 (K105, l-dc20-4h-bear-s2-tp2-mh12, t +2.45, conf. 5/5, +8.1%/ano, pior ano -1.4%). Diagnostico K105:
+- 2022 (baixa longa): 118 trades, win 45%, -0.01R -> metade das trades da #191 sao em 2022 e sao ruturas falsas; 2020/2023 (V) dao +0.5 a +0.8R;
+- as vizinhas por parametros (#193-#196: tempo, rutura 10, stop 1.5/3) nao passam e pioram 2022 -> nao mexer mais nos numeros.
+- 0.9 trades/semana, mediana de 7 dias sem trade entre entradas.
+Por isso, 2 variantes que FILTRAM as ruturas falsas de 2022 com informacao nova (nao parametros), e 2 que ABREM MAIS TRADES com uma 2.a
+estrategia na mesma carteira (corridas sozinhas para o veredicto e juntas com a #191 para a carteira). Todas --venue perp, parametros fixos.
+- **#197 l-dc20-4h-bear-vol15-s2-tp2-mh12** (= #191 + volume): so entra se o volume da vela da rutura for > 1.5x a media do volume das 20 velas
+  anteriores. Hipotese: um ressalto verdadeiro (fecho de shorts em cascata, compradores novos) traz volume; as ruturas falsas de 2022 sao de
+  pouco volume. Ataca 2022; menos trades.
+- **#198 l-dc20-4h-bear-btcbo-s2-tp2-mh12** (= #191 + amplitude): so entra se o BTC tambem fechou uma vela de 4h acima do maximo das suas 20 velas
+  de 4h anteriores nesta vela ou nas 5 anteriores (ultimas 24h). Hipotese: os ressaltos que vao longe em cripto sao do mercado todo (o BTC lidera);
+  uma rutura isolada de uma altcoin com o BTC parado e ruido. Ataca 2022. (Para o BTC e quase igual a #191.)
+- **#199 s-dc20-4h-bear-s2-tp2-mh12** (MAIS TRADES, espelho da #191 em short): fecho de 4h abaixo do minimo das 20 velas anteriores + BTC em baixa
+  -> short. Stop 2 ATR(14) de 4h, alvo 2R, maximo 12 velas. Hipotese: as quedas de capitulacao em baixa vao longe (como os ressaltos); a #184
+  (alvo 1R, 6 velas, filtro EMA) dava ~0R, o alvo 2R deixa apanhar a perna toda. Pouco correlacionada com a #191 (lado oposto) -> mais trades.
+- **#200 l-dc20-4h-bear-retest-s2-tp2-mh12** (MAIS TRADES, entrada em recuo depois da rutura): depois de uma rutura da #191 (nas 12 velas
+  anteriores), entra long quando uma vela de 4h toca o nivel rompido (minimo <= maximo das 20 velas que foi quebrado) e fecha acima dele,
+  BTC em baixa. Stop 2 ATR(14) de 4h, alvo 2R, maximo 12 velas. Hipotese: "rutura e reteste" — o antigo maximo vira suporte; entra a preco
+  melhor que a #191 e da trades nos dias em que a #191 ja saiu.
+Fasquia: criterio oficial (>= 60 trades por moeda, positiva em cada, t >= 3.0, confirmacao >= 3/5); depois pre e holdout uma vez.
+Nota de desconfianca: 32 ideias de baixa ja testadas (#165-#196); sao variantes da melhor delas.
