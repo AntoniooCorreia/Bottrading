@@ -951,3 +951,9 @@ da demo (vol_mult ja suportado em sr/demo_spec.py).
   + volume > 1.5x. Hipotese: o mesmo filtro com alvo curto sobe o win rate (> 55%) e encurta as trades para o estilo day trade.
 Fasquia: criterio oficial (>= 60 trades por moeda, positiva em cada, t >= 3.0, confirmacao >= 3/5); depois pre e holdout uma vez.
 Nota de desconfianca: 36 ideias de baixa ja testadas; isto testa se o efeito do volume e geral ou sorte da #197.
+Resultado (dev 2019-2024, perp): as 4 REPROVADAS (K117-K121). #201 scalping 15m t -1.62 (pior ano -89.6% em 2022: o volume nao salva a rutura
+em 15m). #202 1h t +1.99, positiva nas 3 moedas, conf. 4/5, win 47%, 81 trades/ano, +6.0%/ano, pior ano -9.4% (quase passa -> SPECS, demo
+Day trade). #203 short 4h t +0.43 (antes -0.16); carteira #197+#203 (K121) +8.4%/ano mas pior ano -4.2% e pior mes -9.3% -> pior que a #197 so.
+#204 alvo 1R t +1.86, conf. 5/5, win 54%, pior ano -1.2% (quase passa -> SPECS); o alvo 1R corta o R da #197 para um terco sem subir o win rate.
+Leitura: o filtro de volume ajuda em todos os horizontes (melhora sempre a ideia de partida), mas so a #197 (4h, 2R, 2 dias) passa o t 3.0;
+o efeito e real mas pequeno; em 15m os custos dominam.
