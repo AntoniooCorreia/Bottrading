@@ -1160,3 +1160,9 @@ junto (max 2), e ambas tem TODOS os anos >= -0.1% com max 2. Os shorts e os ress
   juntas enchem os 2 lugares mais vezes que cada uma sozinha -> mais trades/semana (#230 ~1.0, #231 ~1.75) e mais %/ano que a #230 (+10.4%).
   Reprova como carteira se o pior mes < -5% ou pior ano < -5% ou %/ano <= +10.4% (nao melhora a #230).
 O criterio oficial (BTC/ETH/SOL) NAO muda.
+Resultado (dev 2019-2024, perp, 8 moedas, max 2 abertas): #234 (K151) +6.2%/ano (#230 sozinha +10.4%), pior ano -0.8% (2022), pior mes -7.4% (#230 -3.4%),
+win 45%, pior queda -14.2%, 93 trades/ano (~1.8/semana), so 24/70 meses positivos. REPROVADA como carteira.
+Leitura: as ruturas de 1h ocupam os 2 lugares antes das de 4h (que tem mais R por trade: +0.16R vs +0.12R) e tiram-lhes as melhores trades;
+e como disparam no mesmo movimento, juntar as duas so troca trades boas por trades piores. Em baixa, a #230 (swing, max 2) sozinha continua a melhor
+carteira consistente. Duas ruturas long nao sao "pouco correlacionadas": a 2.a estrategia tem de vir de outro tipo de sinal (todos os shorts e
+ressaltos em baixa ja reprovaram) ou esperar pelo regime de alta.

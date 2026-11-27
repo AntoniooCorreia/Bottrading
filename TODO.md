@@ -375,4 +375,4 @@ Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --p
 - [x] #233 carteira-8 l-dc24-1h-bear-vol20-s3-tp1-mh24 (#229 com alvo 1R, day trade 1h, 8 moedas, max 4) -> REPROVADA (t 8 moedas +2.82; win 54%; +0.062R/trade; K150 +8.0%/ano, pior ano -12.0%, pior mes -12.2%, 195 trades/ano)
 
 ## Ideias do agente (2026-11-27, sessao 22h): carteira swing + day trade com max 2 abertas (8 moedas, perp)
-- [ ] #234 carteira-8 #230 + #231 (l-dc20-4h-bear-vol15-s2-tp2-mh12 + l-dc24-1h-bear-vol20-s3-tp2-mh24, 8 moedas, max 2 abertas)
+- [x] #234 carteira-8 #230 + #231 (l-dc20-4h-bear-vol15-s2-tp2-mh12 + l-dc24-1h-bear-vol20-s3-tp2-mh24, 8 moedas, max 2 abertas) -> REPROVADA (win 45%; K151 +6.2%/ano, pior ano -0.8%, pior mes -7.4%, 93 trades/ano; pior que a #230 sozinha)
