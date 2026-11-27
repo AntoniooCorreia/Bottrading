@@ -71,6 +71,15 @@ SPECS: dict[str, dict] = {
                                             "entry": {"kind": "breakout", "n": 20}, "vol_mult": 1.5, "trend_ema": 0, "btc": "bear",
                                             "stop_atr": 2.0, "tp_r": 2.0, "max_hold": 12, "signal_exit": False,
                                             "coins": ["btc", "eth", "sol", "xrp", "ada", "doge", "link", "avax"], "max_open": 4},
+    # #226 / #227 (2026-11-27 19h): a #204 e a #218 em carteira de 8 moedas, regras iguais (positivas nas 8 moedas)
+    "l-dc20-4h-bear-vol15-s2-tp1-mh6-8m": {"num": "#226", "base": "l-dc20-4h-bear-vol15-s2-tp1-mh6", "tf": "4h", "side": 1,
+                                           "entry": {"kind": "breakout", "n": 20}, "vol_mult": 1.5, "trend_ema": 0, "btc": "bear",
+                                           "stop_atr": 2.0, "tp_r": 1.0, "max_hold": 6, "signal_exit": False,
+                                           "coins": ["btc", "eth", "sol", "xrp", "ada", "doge", "link", "avax"], "max_open": 4},
+    "l-dc10-4h-bear-vol15-s2-tp2-mh12-8m": {"num": "#227", "base": "l-dc10-4h-bear-vol15-s2-tp2-mh12", "tf": "4h", "side": 1,
+                                            "entry": {"kind": "breakout", "n": 10}, "vol_mult": 1.5, "trend_ema": 0, "btc": "bear",
+                                            "stop_atr": 2.0, "tp_r": 2.0, "max_hold": 12, "signal_exit": False,
+                                            "coins": ["btc", "eth", "sol", "xrp", "ada", "doge", "link", "avax"], "max_open": 4},
     "h-rsi2-1h-short": {"num": "#136", "tf": "1h", "side": -1, "entry": {"kind": "rsi2", "lo": 10, "hi": 70}, "trend_ema": 200,
                         "btc": "bear", "stop_atr": 3.0, "tp_r": 0.0, "max_hold": 24, "signal_exit": True},
     # ---- scalping (15m) ----

@@ -1095,3 +1095,9 @@ max 4 abertas, parametros iguais aos ja registados, nada afinado) as duas vizinh
   Hipotese: a #218 e positiva nas 3 moedas e 5/5 na confirmacao, com SOL 81 trades; em 8 moedas pode chegar a ~2-3 trades/semana com a mesma regra.
   Risco: pior mes -8.0% na #218 (pode piorar com mais trades abertas ao mesmo tempo).
 O criterio oficial (BTC/ETH/SOL) NAO muda: isto mede so a carteira. Comparar com a #221 (K138: +14.3%/ano, win 48%, pior ano -1.2%, pior mes -6.5%, ~1.5/semana).
+Resultado (dev 2019-2024, perp, 8 moedas, max 4 abertas): #226 (K144) positiva nas 8 moedas (+0.008R LINK a +0.162R ADA), t +2.79, win 54%, +0.077R/trade,
+carteira +10.8%/ano, TODOS os 6 anos positivos (pior 2019 +6.7%), pior mes -8.5%, pior queda -17.9%, 93 trades/ano (~1.8/semana), trades <= 24h.
+#227 (K143) positiva nas 8, t +2.99, win 46%, +0.112R/trade, +9.8%/ano, pior ano -5.7% (2019), pior mes -9.9%, 105 trades/ano.
+Leitura: com alvo 1R e saida em 24h a mesma rutura da o melhor perfil de consistencia visto ate agora (nenhum ano negativo, win > 50%), mas
+menos % ao ano que a #221 e um pior mes de -8.5% (varias trades abertas em simultaneo perdem juntas: moedas muito correlacionadas). Nenhuma passa
+o criterio oficial (t das 3 moedas < 3). Ambas entram em SPECS (positivas em todas). Proximo: atacar o pior mes (correlacao entre moedas: max 2 abertas?).
