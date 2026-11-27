@@ -3,7 +3,7 @@
 // Tudo em dolares (pares USD da Kraken; pedido do Antonio). 1% de risco por trade, 1 posicao por moeda, stop de 3 ATR, comissao Kraken 0.26%/lado.
 // Conta 2 = demo EXPERIMENTAL (2026-11-22): perpetuos simulados (long/short), estrategias escolhidas SOZINHAS pelo agente
 // (demo_pick.py -> state.demo_exp); sinais em engine.ts (igual a sr/demo_spec.py, testado). A conta 1 (K1) nao muda.
-// Dois modos (pg_cron):
+// Tres modos (pg_cron): ?mode=fast (de 5 em 5 min) = estrategias de scalping (5m/15m) das contas demo por estilo.
 //   ?mode=stops  (cada minuto)  -> so le o preco atual (1 pedido) e fecha posicoes cujo stop foi tocado
 //   sem mode     (de hora a hora) -> sinais de entrada/saida nas velas fechadas (como no backtest)
 import { createClient } from "jsr:@supabase/supabase-js@2";
@@ -12,7 +12,7 @@ import { atr as atrN, entryAt, exitAt, TF_MIN, type Spec } from "./engine.ts";
 const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 const COINS: Record<string, string> = { btc: "XBTUSD", eth: "ETHUSD", sol: "SOLUSD" };
 const FEE = 0.0026;
-type Bar = { t: number; o: number; h: number; l: number; c: number };
+type Bar = { t: number; o: number; h: number; l: number; c: number; v?: number };
 type Strat = { name: string; tf: 1440 | 240; kind: "donchian" | "sma"; a: number; b?: number };
 const STRATS: Strat[] = [
   { name: "k-donchian20-d", tf: 1440, kind: "donchian", a: 20, b: 10 },
@@ -27,7 +27,7 @@ async function ohlc(pair: string, interval: number): Promise<Bar[]> {
   const j = await r.json();
   if (j.error?.length) throw new Error(`Kraken ${pair}: ${j.error.join(",")}`);
   const key = Object.keys(j.result).find((k) => k !== "last")!;
-  const bars: Bar[] = j.result[key].map((x: any[]) => ({ t: x[0] * 1000, o: +x[1], h: +x[2], l: +x[3], c: +x[4] }));
+  const bars: Bar[] = j.result[key].map((x: any[]) => ({ t: x[0] * 1000, o: +x[1], h: +x[2], l: +x[3], c: +x[4], v: +x[6] }));
   return bars.slice(0, -1); // a ultima vela ainda nao fechou
 }
 async function ticker(): Promise<Record<string, number>> {
@@ -149,14 +149,26 @@ async function runHourly() {
   return { ok: true, balance, log, exp };
 }
 
-// ===================== CONTA 2: DEMO EXPERIMENTAL (perpetuos simulados) =====================
-type ExpCfg = { estrategias: (Spec & { ideia: string; num?: string })[]; fee: number; slip: number; funding_8h: number; risco: number };
+// ===================== CONTAS 2-4: DEMO EXPERIMENTAL POR ESTILO (perpetuos simulados) =====================
+// 2 = swing (dias), 3 = day trade (horas), 4 = scalping (minutos). O agente escolhe as estrategias (demo_pick.py -> state.demo_exp.contas).
+type ExpSpec = Spec & { ideia: string; num?: string };
+type Conta = { id: number; nome: string; estrategias: ExpSpec[] };
+type ExpCfg = { contas?: Conta[]; estrategias?: ExpSpec[]; fee: number; slip: number; funding_8h: number; risco: number };
 const DIR = (s: number) => (s === 1 ? "LONG" : "SHORT");
+const FAST = new Set(["5m", "15m"]);
+const DEF = { fee: 0.0005, slip: 0.0002, funding_8h: 0.0001, risco: 0.01 };
 async function expCfg(): Promise<ExpCfg | null> {
   const { data } = await sb.from("state").select("value").eq("key", "demo_exp").maybeSingle();
-  return data?.value?.estrategias?.length ? data.value : null;
+  const v = data?.value;
+  if (!v) return null;
+  if (!v.contas && v.estrategias?.length) v.contas = [{ id: 2, nome: "Experimental", estrategias: v.estrategias }];
+  return v;
 }
-async function closeExp(p: any, exitPx: number, reason: string, balance: number, cfg: { fee: number; slip: number; funding_8h: number }) {
+async function accName(id: number) {
+  const { data } = await sb.from("paper_account").select("name").eq("id", id).maybeSingle();
+  return data?.name ?? `Conta ${id}`;
+}
+async function closeExp(p: any, exitPx: number, reason: string, balance: number, cfg: typeof DEF, nome: string) {
   const qty = Number(p.qty), entry = Number(p.entry_price), side = Number(p.side);
   const hrs = (Date.now() - new Date(p.entry_time).getTime()) / 3600000;
   const fee = Number(p.fee_eur) + qty * exitPx * (cfg.fee + cfg.slip) + (hrs / 8) * cfg.funding_8h * qty * entry;
@@ -166,34 +178,36 @@ async function closeExp(p: any, exitPx: number, reason: string, balance: number,
     exit_price: exitPx, exit_reason: reason, pnl_eur: pnl, r, fee_eur: fee }).eq("id", p.id).eq("status", "open").select("id");
   if (!upd?.length) return null;
   balance += pnl;
-  await tg(`🧪 ${pnl >= 0 ? "✅" : "❌"} <b>Demo experimental: fechou ${DIR(side)} ${NAMES[p.coin]}</b> (${p.strategy})\n• Motivo: ${reason}\n• Entrada ${entry.toFixed(2)} → saida ${exitPx.toFixed(2)} $\n• Resultado: <b>${eur(pnl)}</b> (${r >= 0 ? "+" : ""}${r.toFixed(2)}R)\n• Saldo: ${balance.toFixed(2)} $`);
+  await tg(`🧪 ${pnl >= 0 ? "✅" : "❌"} <b>${nome}: fechou ${DIR(side)} ${NAMES[p.coin]}</b> (${p.strategy})\n• Motivo: ${reason}\n• Entrada ${entry.toFixed(2)} → saida ${exitPx.toFixed(2)} $\n• Resultado: <b>${eur(pnl)}</b> (${r >= 0 ? "+" : ""}${r.toFixed(2)}R)\n• Saldo: ${balance.toFixed(2)} $`);
   return { balance, pnl };
 }
 async function runStopsExp() {
-  const { data: opens } = await sb.from("paper_positions").select("*").eq("status", "open").eq("account", 2);
+  const { data: opens } = await sb.from("paper_positions").select("*").eq("status", "open").gte("account", 2);
   if (!opens?.length) return { open: 0 };
-  const cfg = (await expCfg()) ?? { fee: 0.0005, slip: 0.0002, funding_8h: 0.0001 } as any;
+  const cfg = { ...DEF, ...((await expCfg()) ?? {}) } as any;
   const px = await ticker();
-  const { data: acc } = await sb.from("paper_account").select("*").eq("id", 2).single();
-  let balance = Number(acc.balance), changed = false;
-  for (const p of opens) {
-    const price = px[p.coin], side = Number(p.side);
-    if (!price) continue;
-    let reason = "";
-    if (side === 1 ? price <= Number(p.stop) : price >= Number(p.stop)) reason = "stop";
-    else if (p.tp && (side === 1 ? price >= Number(p.tp) : price <= Number(p.tp))) reason = "alvo";
-    if (!reason) continue;
-    const res = await closeExp(p, price, reason, balance, cfg);
-    if (res) { balance = res.balance; changed = true; }
+  for (const acc of [...new Set(opens.map((p: any) => Number(p.account)))]) {
+    const { data: a } = await sb.from("paper_account").select("*").eq("id", acc).single();
+    let balance = Number(a.balance), changed = false;
+    for (const p of opens.filter((x: any) => Number(x.account) === acc)) {
+      const price = px[p.coin], side = Number(p.side);
+      if (!price) continue;
+      let reason = "";
+      if (side === 1 ? price <= Number(p.stop) : price >= Number(p.stop)) reason = "stop";
+      else if (p.tp && (side === 1 ? price >= Number(p.tp) : price <= Number(p.tp))) reason = "alvo";
+      if (!reason) continue;
+      const res = await closeExp(p, price, reason, balance, cfg, a.name ?? `Conta ${acc}`);
+      if (res) { balance = res.balance; changed = true; }
+    }
+    if (changed) await sb.from("paper_account").update({ balance }).eq("id", acc);
   }
-  if (changed) await sb.from("paper_account").update({ balance }).eq("id", 2);
   return { open: opens.length };
 }
-async function runHourlyExp() {
+// fast=true: so estrategias de 5m/15m (cron de 5 em 5 min); fast=false: as outras (cron de hora a hora)
+async function runExp(fast: boolean) {
   const cfg = await expCfg();
-  const log: string[] = [];
-  const { data: acc } = await sb.from("paper_account").select("*").eq("id", 2).single();
-  let balance = Number(acc.balance), unreal = 0;
+  const C = { ...DEF, ...(cfg ?? {}) } as any;
+  const out: Record<string, any> = {};
   const btcD = await ohlc("XBTUSD", 1440);
   const cache: Record<string, Record<number, Bar[]>> = {};
   const bars = async (coin: string, tf: number) => {
@@ -201,68 +215,82 @@ async function runHourlyExp() {
     if (!cache[coin][tf]) cache[coin][tf] = coin === "btc" && tf === 1440 ? btcD : await ohlc(COINS[coin], tf);
     return cache[coin][tf];
   };
-  // 1) gerir posicoes abertas (cada uma com a sua spec gravada)
-  const { data: opens } = await sb.from("paper_positions").select("*").eq("status", "open").eq("account", 2);
-  for (const p of opens ?? []) {
-    const s: Spec = p.spec, side = Number(p.side), tfm = TF_MIN[s.tf];
-    const h1 = await bars(p.coin, 60), price = h1[h1.length - 1].c;
-    const since = h1.filter((x) => x.t >= new Date(p.entry_time).getTime());
-    let exitPx: number | null = null, reason = "";
-    for (const x of since) {   // conservador: na mesma vela, o stop conta antes do alvo
-      if (side === 1 ? x.l <= Number(p.stop) : x.h >= Number(p.stop)) { exitPx = side === 1 ? Math.min(x.o, Number(p.stop)) : Math.max(x.o, Number(p.stop)); reason = "stop"; break; }
-      if (p.tp && (side === 1 ? x.h >= Number(p.tp) : x.l <= Number(p.tp))) { exitPx = Number(p.tp); reason = "alvo"; break; }
+  const { data: accs } = await sb.from("paper_account").select("*").gte("id", 2).order("id");
+  for (const a of accs ?? []) {
+    const nome = a.name ?? `Conta ${a.id}`, log: string[] = [];
+    let balance = Number(a.balance), unreal = 0;
+    const conta = cfg?.contas?.find((x) => Number(x.id) === Number(a.id));
+    // 1) gerir posicoes abertas desta conta (cada uma com a sua spec gravada)
+    const { data: opens } = await sb.from("paper_positions").select("*").eq("status", "open").eq("account", a.id);
+    for (const p of opens ?? []) {
+      const s: Spec = p.spec, side = Number(p.side), tfm = TF_MIN[s.tf];
+      if (FAST.has(s.tf) !== fast) {   // a outra corrida trata desta; aqui so conta para o saldo com posicoes
+        const h1 = await bars(p.coin, fast ? 5 : 60);
+        unreal += side * Number(p.qty) * (h1[h1.length - 1].c - Number(p.entry_price));
+        continue;
+      }
+      const fine = await bars(p.coin, fast ? 5 : 60), price = fine[fine.length - 1].c;
+      const since = fine.filter((x) => x.t >= new Date(p.entry_time).getTime());
+      let exitPx: number | null = null, reason = "";
+      for (const x of since) {   // conservador: na mesma vela, o stop conta antes do alvo
+        if (side === 1 ? x.l <= Number(p.stop) : x.h >= Number(p.stop)) { exitPx = side === 1 ? Math.min(x.o, Number(p.stop)) : Math.max(x.o, Number(p.stop)); reason = "stop"; break; }
+        if (p.tp && (side === 1 ? x.h >= Number(p.tp) : x.l <= Number(p.tp))) { exitPx = Number(p.tp); reason = "alvo"; break; }
+      }
+      if (exitPx === null) {
+        const b = await bars(p.coin, tfm);
+        const held = b.filter((x) => x.t >= new Date(p.entry_time).getTime() - 1).length;
+        if (s.max_hold && held >= s.max_hold) { exitPx = price; reason = `tempo maximo (${s.max_hold} velas)`; }
+        else if (exitAt(b, b.length - 1, s)) { exitPx = price; reason = "sinal de saida"; }
+      }
+      if (exitPx !== null) {
+        const res = await closeExp(p, exitPx, reason, balance, C, nome);
+        if (res) { balance = res.balance; log.push(`${p.coin} ${p.strategy}: ${reason}`); }
+        continue;
+      }
+      unreal += side * Number(p.qty) * (price - Number(p.entry_price));
     }
-    if (exitPx === null) {
-      const b = await bars(p.coin, tfm);
-      const held = b.filter((x) => x.t >= new Date(p.entry_time).getTime() - 1).length;   // velas do timeframe ja fechadas desde a entrada
-      if (s.max_hold && held >= s.max_hold) { exitPx = price; reason = `tempo maximo (${s.max_hold} velas)`; }
-      else if (exitAt(b, b.length - 1, s)) { exitPx = price; reason = "sinal de saida"; }
-    }
-    if (exitPx !== null) {
-      const res = await closeExp(p, exitPx, reason, balance, cfg ?? { fee: 0.0005, slip: 0.0002, funding_8h: 0.0001 });
-      if (res) { balance = res.balance; log.push(`${p.coin} ${p.strategy}: ${reason}`); }
-      continue;
-    }
-    unreal += side * Number(p.qty) * (price - Number(p.entry_price));
-  }
-  // 2) entradas das estrategias escolhidas pelo agente
-  if (cfg) {
-    const { data: stillOpen } = await sb.from("paper_positions").select("coin,strategy").eq("status", "open").eq("account", 2);
-    const busy = new Set((stillOpen ?? []).map((x: any) => `${x.coin}|${x.strategy}`));
-    for (const s of cfg.estrategias) {
-      const tfm = TF_MIN[s.tf];
-      for (const coin of Object.keys(COINS)) {
-        if (busy.has(`${coin}|${s.ideia}`)) continue;
-        const b = await bars(coin, tfm), last = b[b.length - 1];
-        const candleClose = last.t + tfm * 60000;
-        if (Date.now() - candleClose > 2 * 3600000) continue;   // so entra logo a seguir ao fecho da vela (como no backtest)
-        const { data: lc } = await sb.from("paper_positions").select("exit_time").eq("account", 2).eq("coin", coin)
-          .eq("strategy", s.ideia).eq("status", "closed").order("exit_time", { ascending: false }).limit(1).maybeSingle();
-        if (lc && new Date(lc.exit_time).getTime() >= candleClose) continue;
-        if (!entryAt(b, b.length - 1, s, btcD)) continue;
-        const h1 = await bars(coin, 60), price = h1[h1.length - 1].c;
-        const stopDist = s.stop_atr * atrN(b);
-        let risk = balance * cfg.risco, qty = risk / stopDist;
-        if (qty * price > balance) { qty = balance / price; risk = qty * stopDist; }   // no maximo 1x o saldo por posicao
-        const side = s.side, stop = price - side * stopDist, tp = s.tp_r > 0 ? price + side * s.tp_r * stopDist : null;
-        const fee = qty * price * (cfg.fee + cfg.slip);
-        await sb.from("paper_positions").insert({ account: 2, coin, strategy: s.ideia, side, entry_price: price, stop, tp, qty,
-          risk_eur: risk, fee_eur: fee, spec: s });
-        busy.add(`${coin}|${s.ideia}`);
-        await tg(`🧪 ${side === 1 ? "🟢" : "🔴"} <b>Demo experimental: ${DIR(side)} ${NAMES[coin]}</b> (${s.num ?? ""} ${s.ideia})\n• Preco: ${price.toFixed(2)} $\n• Stop: ${stop.toFixed(2)} $ (${(stopDist / price * 100).toFixed(1)}%)${tp ? `\n• Alvo: ${tp.toFixed(2)} $` : ""}\n• Risco: ${risk.toFixed(2)} $ (${(risk / balance * 100).toFixed(2)}% do saldo)\n• Estrategia escolhida pelo agente (nao aprovada; teste ao vivo)`);
-        log.push(`${coin}: entrou ${DIR(side)} ${s.ideia}`);
+    // 2) entradas das estrategias escolhidas pelo agente para esta conta
+    if (conta) {
+      const { data: stillOpen } = await sb.from("paper_positions").select("coin,strategy").eq("status", "open").eq("account", a.id);
+      const busy = new Set((stillOpen ?? []).map((x: any) => `${x.coin}|${x.strategy}`));
+      for (const s of conta.estrategias) {
+        if (FAST.has(s.tf) !== fast) continue;
+        const tfm = TF_MIN[s.tf];
+        for (const coin of Object.keys(COINS)) {
+          if (busy.has(`${coin}|${s.ideia}`)) continue;
+          const b = await bars(coin, tfm), last = b[b.length - 1];
+          const candleClose = last.t + tfm * 60000;
+          if (Date.now() - candleClose > Math.min(2 * 3600000, tfm * 60000)) continue;   // so logo a seguir ao fecho da vela
+          const { data: lc } = await sb.from("paper_positions").select("exit_time").eq("account", a.id).eq("coin", coin)
+            .eq("strategy", s.ideia).eq("status", "closed").order("exit_time", { ascending: false }).limit(1).maybeSingle();
+          if (lc && new Date(lc.exit_time).getTime() >= candleClose) continue;
+          if (!entryAt(b, b.length - 1, s, btcD)) continue;
+          const fine = await bars(coin, fast ? 5 : 60), price = fine[fine.length - 1].c;
+          const stopDist = s.stop_atr * atrN(b);
+          let risk = balance * C.risco, qty = risk / stopDist;
+          if (qty * price > balance) { qty = balance / price; risk = qty * stopDist; }   // no maximo 1x o saldo por posicao
+          const side = s.side, stop = price - side * stopDist, tp = s.tp_r > 0 ? price + side * s.tp_r * stopDist : null;
+          const fee = qty * price * (C.fee + C.slip);
+          await sb.from("paper_positions").insert({ account: a.id, coin, strategy: s.ideia, side, entry_price: price, stop, tp, qty,
+            risk_eur: risk, fee_eur: fee, spec: s });
+          busy.add(`${coin}|${s.ideia}`);
+          await tg(`🧪 ${side === 1 ? "🟢" : "🔴"} <b>${nome}: ${DIR(side)} ${NAMES[coin]}</b> (${s.num ?? ""} ${s.ideia})\n• Preco: ${price.toFixed(2)} $\n• Stop: ${stop.toFixed(2)} $ (${(stopDist / price * 100).toFixed(1)}%)${tp ? `\n• Alvo: ${tp.toFixed(2)} $` : ""}\n• Risco: ${risk.toFixed(2)} $ (${(risk / balance * 100).toFixed(2)}% do saldo)\n• Escolhida pelo agente (nao aprovada; teste ao vivo)`);
+          log.push(`${coin}: entrou ${DIR(side)} ${s.ideia}`);
+        }
       }
     }
+    await sb.from("paper_account").update({ balance, last_run: new Date().toISOString() }).eq("id", a.id);
+    if (!fast) await sb.from("paper_equity").insert({ balance, equity: balance + unreal, account: a.id });
+    out[a.id] = { balance, log };
   }
-  await sb.from("paper_account").update({ balance, last_run: new Date().toISOString() }).eq("id", 2);
-  await sb.from("paper_equity").insert({ balance, equity: balance + unreal, account: 2 });
-  return { balance, log };
+  return out;
 }
+async function runHourlyExp() { return await runExp(false); }
 
 Deno.serve(async (req) => {
   const mode = new URL(req.url).searchParams.get("mode");
   try {
-    const out = mode === "stops" ? await runStops() : await runHourly();
+    const out = mode === "stops" ? await runStops() : mode === "fast" ? { ok: true, mode: "fast", exp: await runExp(true) } : await runHourly();
     return new Response(JSON.stringify(out), { headers: { "Content-Type": "application/json" } });
   } catch (e) {
     if (mode !== "stops") await tg(`⚠️ <b>Demo: erro</b>\n${String(e).slice(0, 300)}`); // falhas do modo rapido nao enchem o Telegram

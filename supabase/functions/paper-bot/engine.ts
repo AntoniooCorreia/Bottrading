@@ -1,12 +1,12 @@
 // Motor de sinais da conta demo EXPERIMENTAL. Espelho exato de sr/demo_spec.py (tests/test_demo_spec.py compara os dois).
 // Sem dependencias: corre no Deno (Edge Function) e no node (teste).
-export type Bar = { t: number; o: number; h: number; l: number; c: number };
+export type Bar = { t: number; o: number; h: number; l: number; c: number; v?: number };
 export type Spec = {
-  tf: "1h" | "4h" | "1d"; side: 1 | -1;
+  tf: "5m" | "15m" | "1h" | "4h" | "1d"; side: 1 | -1; vol_mult?: number;
   entry: { kind: "breakout" | "rsi2" | "lowclose" | "above_sma"; n?: number; lo?: number; hi?: number };
   trend_ema: number; btc: "bull" | "bear" | "" | null; stop_atr: number; tp_r: number; max_hold: number; signal_exit: boolean;
 };
-export const TF_MIN: Record<string, number> = { "1h": 60, "4h": 240, "1d": 1440 };
+export const TF_MIN: Record<string, number> = { "5m": 5, "15m": 15, "1h": 60, "4h": 240, "1d": 1440 };
 
 export function emaSeries(c: number[], n: number): number[] {
   const a = 2 / (n + 1), out: number[] = [];
@@ -65,6 +65,12 @@ export function entryAt(b: Bar[], i: number, s: Spec, btcDaily: Bar[], cache: { 
     sig = s.side === 1 ? c[i] > m : c[i] < m;
   }
   if (!sig) return false;
+  if (s.vol_mult && b[i].v !== undefined) {
+    const n = e.n!;
+    if (i < n) return false;
+    const m = b.slice(i - n, i).reduce((a, x) => a + (x.v ?? 0), 0) / n;
+    if (!(b[i].v! > s.vol_mult * m)) return false;
+  }
   if (s.trend_ema) {
     const t = (cache.ema ??= emaSeries(c, s.trend_ema))[i];
     if (s.side === 1 ? !(c[i] > t) : !(c[i] < t)) return false;

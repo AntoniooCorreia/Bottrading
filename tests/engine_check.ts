@@ -4,7 +4,7 @@ import { entryAt, exitAt, type Bar } from "../supabase/functions/paper-bot/engin
 const cases = JSON.parse(readFileSync(process.argv[2], "utf8"));
 let bad = 0;
 for (const k of cases) {
-  const bars: Bar[] = k.bars.map((x: number[]) => ({ t: x[0], o: x[1], h: x[2], l: x[3], c: x[4] }));
+  const bars: Bar[] = k.bars.map((x: number[]) => ({ t: x[0], o: x[1], h: x[2], l: x[3], c: x[4], ...(x[5] != null ? { v: x[5] } : {}) }));
   const btc: Bar[] = k.btc.map((x: number[]) => ({ t: x[0], o: x[1], h: x[2], l: x[3], c: x[4] }));
   const cache = {}, n = bars.length, m = k.py_entry.length;
   for (let j = 0; j < m; j++) {

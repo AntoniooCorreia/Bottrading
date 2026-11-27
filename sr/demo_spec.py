@@ -9,6 +9,8 @@ acrescentar aqui + correr pytest. Familias de entrada:
   rsi2      RSI(2) < lo (long) / > 100-lo (short); com signal_exit sai quando RSI > hi (long) / < 100-hi (short)
   lowclose  fecho e o mais baixo das ultimas n velas (long)
   above_sma fecho acima da media de n velas (long) / abaixo da media (short, side -1)
+Filtro de volume opcional: vol_mult (volume da vela > vol_mult x media das n velas anteriores; n = entry.n).
+Estilo (para as contas demo): scalping = velas de 5m/15m; day trade = 1h/4h com tempo maximo <= 24h; swing = o resto.
 Filtros: trend_ema (fecho acima/abaixo da EMA de n velas, conforme o lado), btc ("bull"/"bear": BTC fechou o dia anterior
 acima/abaixo da media de 200 dias).
 """
@@ -17,7 +19,7 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
-TF_MIN = {"1h": 60, "4h": 240, "1d": 1440}
+TF_MIN = {"5m": 5, "15m": 15, "1h": 60, "4h": 240, "1d": 1440}
 
 SPECS: dict[str, dict] = {
     "h-dc24-1h": {"num": "#131/#133", "tf": "1h", "side": 1, "entry": {"kind": "breakout", "n": 24}, "trend_ema": 200,
@@ -44,6 +46,19 @@ SPECS: dict[str, dict] = {
     "k-sma50-d-bull-bracket-s2": {"num": "#144", "tf": "1d", "side": 1, "entry": {"kind": "above_sma", "n": 50},
                                   "trend_ema": 0, "btc": "bull", "stop_atr": 2.0, "tp_r": 1.0, "max_hold": 0,
                                   "signal_exit": False},
+    # ---- mercado em baixa (2026-11-23/26) ----
+    "l-dc20-4h-bear-s2-tp2-mh12": {"num": "#191", "tf": "4h", "side": 1, "entry": {"kind": "breakout", "n": 20}, "trend_ema": 0,
+                                   "btc": "bear", "stop_atr": 2.0, "tp_r": 2.0, "max_hold": 12, "signal_exit": False},
+    "l-dc20-4h-bear-vol15-s2-tp2-mh12": {"num": "#197", "tf": "4h", "side": 1, "entry": {"kind": "breakout", "n": 20},
+                                         "vol_mult": 1.5, "trend_ema": 0, "btc": "bear", "stop_atr": 2.0, "tp_r": 2.0,
+                                         "max_hold": 12, "signal_exit": False},
+    "h-rsi2-1h-short": {"num": "#136", "tf": "1h", "side": -1, "entry": {"kind": "rsi2", "lo": 10, "hi": 70}, "trend_ema": 200,
+                        "btc": "bear", "stop_atr": 3.0, "tp_r": 0.0, "max_hold": 24, "signal_exit": True},
+    # ---- scalping (15m) ----
+    "s-rsi2-15m-long": {"num": "#124", "tf": "15m", "side": 1, "entry": {"kind": "rsi2", "lo": 5, "hi": 60}, "trend_ema": 200,
+                        "btc": "", "stop_atr": 2.0, "tp_r": 0.0, "max_hold": 16, "signal_exit": True},
+    "s-rsi2-15m-short": {"num": "#125", "tf": "15m", "side": -1, "entry": {"kind": "rsi2", "lo": 5, "hi": 60}, "trend_ema": 200,
+                         "btc": "", "stop_atr": 2.0, "tp_r": 0.0, "max_hold": 16, "signal_exit": True},
     "k-sma50-d-bull-bracket-s2-mh3": {"num": "#163", "tf": "1d", "side": 1, "entry": {"kind": "above_sma", "n": 50},
                                       "trend_ema": 0, "btc": "bull", "stop_atr": 2.0, "tp_r": 1.0, "max_hold": 3,
                                       "signal_exit": False},
@@ -85,6 +100,9 @@ def entry_signal(b: pd.DataFrame, spec: dict, btc_daily: pd.DataFrame) -> pd.Ser
         sig = ((c > m) if side == 1 else (c < m)) & m.notna()
     else:
         raise ValueError(e["kind"])
+    if spec.get("vol_mult") and "volume" in b:
+        v = b["volume"]
+        sig = sig & (v > spec["vol_mult"] * v.rolling(e["n"]).mean().shift(1))
     if spec.get("trend_ema"):
         t = ema(c, spec["trend_ema"])
         sig = sig & ((c > t) if side == 1 else (c < t))
@@ -102,3 +120,12 @@ def exit_signal(b: pd.DataFrame, spec: dict) -> pd.Series:
         r = rsi(b["close"], 2)
         return ((r > e["hi"]) if side == 1 else (r < 100 - e["hi"])).fillna(False)
     raise ValueError(e["kind"])
+
+
+def style(spec: dict) -> str:
+    """scalp (5m/15m), day (1h/4h com saida em <= 24h) ou swing (o resto)."""
+    tf = spec["tf"]
+    if tf in ("5m", "15m"):
+        return "scalp"
+    hold_h = spec.get("max_hold", 0) * TF_MIN[tf] / 60
+    return "day" if tf in ("1h", "4h") and 0 < hold_h <= 24 else "swing"

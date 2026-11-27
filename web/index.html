@@ -597,9 +597,22 @@ function vPlano(){
 const CN={btc:"Bitcoin (BTC)",eth:"Ethereum (ETH)",sol:"Solana (SOL)"};
 function vDemo(){
   const D0=S.demo; if(!D0||!D0.accs) return `<div class="card"><div class="empty">A carregar a conta demo…</div></div>`;
-  const AC=S.demoAcc||1, X=AC===2;
+  const AC=S.demoAcc||1, X=AC>=2;
+  const cfg=(S.stc&&S.stc.demo_exp&&S.stc.demo_exp.value)||null;
+  const contaOf=id=>cfg?((cfg.contas||[]).find(c=>+c.id===+id)||(id===2&&!cfg.contas&&cfg.estrategias?{id:2,estrategias:cfg.estrategias,aviso:cfg.aviso}:null)):null;
+  const ICON={1:"📌",2:"🐢",3:"⚡",4:"🎯"};
+  const accLabel=a=>`${ICON[a.id]||"🧪"} ${a.id===1?"K1 (referência)":esc(a.name||("Conta "+a.id))}`;
+  const accStats=a=>{const P=D0.pos.filter(p=>(p.account||1)===a.id), op=P.filter(p=>p.status==="open"), cl=P.filter(p=>p.status==="closed");
+    const px=D0.px||{}; const un=op.reduce((s,p)=>s+(px[p.coin]?(+(p.side||1))*(+p.qty)*(px[p.coin]-(+p.entry_price)):0),0);
+    const eq=(+a.balance)+un; return {eq,ret:(eq/(+a.start_balance)-1)*100,n:cl.length,w:cl.filter(p=>+p.pnl_eur>0).length,open:op.length};};
+  const ranked=[...D0.accs].sort((x,y)=>accStats(y).ret-accStats(x).ret);
+  const tabs=`<div class="card"><h2>As contas demo lado a lado</h2><p class="hint">Cada conta tem 100 000 $ a fingir e preços reais da Kraken. K1 = a referência (spot, só long). As outras simulam perpétuos (long e short) e é o agente que escolhe as estratégias de cada estilo. Ordenadas por resultado. Toca numa conta para abrir o espaço dela.</p>
+    <div class="scroll"><table class="t"><thead><tr><th>Conta</th><th class="num">Saldo</th><th class="num">Resultado</th><th class="num">Trades</th><th class="num">Win rate</th><th class="num">Abertas</th><th>Agora</th></tr></thead><tbody>
+    ${ranked.map(a=>{const t=accStats(a), c=contaOf(a.id); const st=t.open?`<span class="badge ok">em trade</span>`:a.id!==1&&(!c||!(c.estrategias||[]).length)?`<span class="badge neu">sem estratégias</span>`:`<span class="badge neu">à espera de sinal</span>`;
+      return `<tr class="click ${a.id===AC?"sel":""}" onclick="S.demoAcc=${a.id};render();loadExpSig()"><td><b>${accLabel(a)}</b></td><td class="num">${nf(t.eq,0)} $</td><td class="num ${cls(t.ret)}">${pc(t.ret,2)}</td><td class="num">${t.n}</td><td class="num">${t.n?Math.round(t.w/t.n*100)+"%":"—"}</td><td class="num">${t.open}</td><td>${st}</td></tr>`;}).join("")}
+    </tbody></table></div></div>
+    <div style="margin:0 0 12px">${seg(D0.accs.map(a=>[String(a.id),accLabel(a)]),String(AC),"(v=>{S.demoAcc=+v;render();loadExpSig()})")}</div>`;
   const D={...D0,acc:D0.accs.find(x=>x.id===AC),pos:D0.pos.filter(p=>(p.account||1)===AC),eq:(D0.eq||[]).filter(e=>(e.account||1)===AC)};
-  const tabs=`<div style="margin-bottom:12px">${seg([["1","K1 (referência)"],["2","🧪 Experimental (o agente escolhe)"]],String(AC),"(v=>{S.demoAcc=+v;render();if(+v===2&&!(S.demo&&S.demo.expSig))loadExpSig()})")}</div>`;
   if(!D.acc) return tabs+`<div class="card"><div class="empty">Conta ainda não criada.</div></div>`;
   const a=D.acc||{balance:100000,start_balance:100000}, open=D.pos.filter(p=>p.status==="open"), closed=D.pos.filter(p=>p.status==="closed");
   const px=D.px||{}; const unreal=open.reduce((s,p)=>s+(px[p.coin]?(+(p.side||1))*(+p.qty)*(px[p.coin]-(+p.entry_price)):0),0);
@@ -618,17 +631,20 @@ function vDemo(){
       <td class="num">${nf(+p.entry_price,2)} $</td><td class="num">${nf(+p.stop,2)} $</td><td class="num">${cur?nf(cur,2)+" $":"—"}</td>
       <td class="num ${cls(pnl)}"><b>${pnl==null?"—":(pnl>=0?"+":"−")+nf(Math.abs(pnl),2)+" $"}</b>${p.r!=null?`<div class="small muted">${rr(+p.r)}</div>`:""}</td>
       <td>${p.status==="open"?"aberta":esc(p.exit_reason||"")}</td></tr>`;};
-  const cfg=(S.stc&&S.stc.demo_exp&&S.stc.demo_exp.value)||null;
-  const how=X?`<div class="card"><h2>Como funciona a demo experimental</h2><div class="small" style="color:var(--text-2)">
-      <p style="margin-top:0">Conta separada de <b>100 000 $</b> que simula <b>perpétuos da Kraken</b> (long e short, comissão 0,05% + 0,02% de slippage por lado e funding de 0,01% a cada 8h). <b>Quem escolhe as estratégias é o agente</b>: todas as noites corre <code>demo_pick.py</code> e fica com as que ganham nas 3 moedas no backtest de 2019–2024 com estes custos, por ordem de t, até ~3 trades por semana. <b>Não são estratégias aprovadas</b>: isto é um teste ao vivo com dinheiro a fingir. A K1 continua igual na outra conta.</p>
-      ${cfg?`<p><b>Agora a correr</b> (escolhidas a ${esc(cfg.escolhida||"")}):</p><ul style="margin:0 0 8px;padding-left:18px">${cfg.estrategias.map(e=>`<li><b>${esc(e.num||"")} ${esc(e.ideia)}</b> · velas de ${esc(e.tf)} · ${e.side===1?"long":"short"} · stop ${e.stop_atr} ATR${e.tp_r?` · alvo ${e.tp_r}R`:""}${e.max_hold?` · máx. ${e.max_hold} velas`:""} — backtest: ${nf(e.trades_semana,1)} trades/semana, win rate ${nf(e.win,0)}%, ${rr(e.r_trade,3)} por trade</li>`).join("")}</ul><p style="margin-bottom:0" class="muted">${esc(cfg.porque||"")}</p>${cfg.aviso?`<p style="margin:8px 0 0"><span class="badge bad">⚠ ${esc(cfg.aviso)}</span></p>`:""}`:`<p style="margin-bottom:0">O agente ainda não escolheu estratégias.</p>`}</div></div>`:"";
+  const conta=X?contaOf(AC):null;
+  const STY={2:"swing — trades de dias (velas diárias e de 4h)",3:"day trade — trades de horas, fecham no máximo em ~1 dia (velas de 1h/4h)",4:"scalping — trades de minutos a poucas horas (velas de 15 minutos)"};
+  const how=X?`<div class="card"><h2>${accLabel(D.acc)} — o que esta conta está a fazer</h2><div class="small" style="color:var(--text-2)">
+      <p style="margin-top:0"><b>Estilo:</b> ${STY[AC]||"experimental"}. Simula <b>perpétuos da Kraken</b> (long e short; comissão 0,05% + 0,02% de slippage por lado; funding 0,01% a cada 8h), 1% de risco por trade. <b>Quem escolhe as estratégias é o agente</b> (<code>demo_pick.py</code>): primeiro as que ganham nas 3 moedas no backtest de 2019–2024; se nenhuma delas consegue operar no mercado de agora, junta a melhor que consiga, mesmo que não passe, <b>só para veres o bot ao vivo</b>.</p>
+      <p style="margin:0 0 6px"><b>Agora:</b> ${open.length?`${open.length} trade(s) aberta(s), vê em "Posições abertas".`:`sem trades abertas, à espera que todas as condições de uma estratégia fiquem ✅ (vê "O que falta para abrir trade").`} ${cfg&&cfg.escolhida?`Estratégias escolhidas a ${esc(cfg.escolhida)}.`:""}</p>
+      ${conta&&(conta.estrategias||[]).length?`<ul style="margin:0 0 8px;padding-left:18px">${conta.estrategias.map(e=>`<li><b>${esc(e.num||"")} ${esc(e.ideia)}</b> · velas de ${esc(e.tf)} · ${e.side===1?"long":"short"} · stop ${e.stop_atr} ATR${e.tp_r?` · alvo ${e.tp_r}R`:""}${e.max_hold?` · máx. ${e.max_hold} velas`:""}<br><span class="muted">backtest 2019–24: ${e.trades_semana!=null?nf(+e.trades_semana,1)+" trades/semana, ":""}${e.win!=null?"win rate "+nf(+e.win,0)+"%, ":""}${e.r_trade!=null?rr(+e.r_trade,3)+" por trade":""}</span> ${String(e.estado||"").startsWith("passa")?`<span class="badge ok">passa as regras da demo</span>`:`<span class="badge bad">não passa no backtest · só para ver ao vivo</span>`}</li>`).join("")}</ul>`:`<p style="margin-bottom:0">O agente ainda não escolheu estratégias para esta conta.</p>`}
+      ${conta&&conta.aviso?`<p style="margin:8px 0 0"><span class="badge mid" style="white-space:normal">⚠ ${esc(conta.aviso)}</span></p>`:""}</div></div>`:"";
   return tabs+`<div class="kpis">${kpi("Saldo (com trades abertas)",nf(eq,2)+" $",`começou com ${nf(+a.start_balance,0)} $`, cls(eq-(+a.start_balance)))}
     ${kpi("Rentabilidade",pc(ret,2),"desde o início da demo",cls(ret))}
     ${kpi("Trades fechadas",closed.length,closed.length?`${wins} ganhas (${Math.round(wins/closed.length*100)}%)`:"ainda nenhuma")}
     ${kpi("Abertas agora",open.length,`${X?"1 por moeda e estratégia":"máximo 1 por moeda"} · última verificação ${last}`)}</div>${how}
     <div class="card"><h2>Preços ao vivo</h2><p class="hint">Kraken, em dólares. Atualiza de 5 em 5 segundos${D.pxAt?" · "+D.pxAt.toLocaleTimeString("pt-PT"):""}. Variação desde a abertura do dia.</p>
       <div class="kpis sm" style="margin:0">${["btc","eth","sol"].map(c=>{const o=open.find(p=>p.coin===c); return `<div class="kpi"><div class="k">${CN[c]}</div><div class="v">${px[c]?nf(px[c],2)+" $":"—"}</div><div class="s"><span class="${cls((D.chg||{})[c])}">${pc((D.chg||{})[c],2)}</span>${o?` · em posição, stop ${nf(+o.stop,2)} $`:" · sem posição"}</div></div>`;}).join("")}</div></div>
-    ${X?expSigCard(D,open):sigCard(D,open)}
+    ${X?expSigCard(D,open,AC):sigCard(D,open)}
     ${X?"":`<div class="card"><h2>Como funciona</h2><div class="small" style="color:var(--text-2)">
       <p style="margin-top:0">De hora a hora (quando fecha cada vela) o bot lê os <b>preços reais da Kraken</b> (BTC, ETH, SOL em dólares) e aplica as estratégias de tendência <b>K1</b>: compra quando o preço rompe máximos ou fica acima da média, e vende quando a tendência acaba ou o stop é tocado (o stop é vigiado a cada minuto). <b>Nenhuma ordem real é enviada</b>: as trades são simuladas aqui, com a comissão da Kraken (0,26% por lado).</p>
       <p style="margin-bottom:0">Risco de 1% do saldo por trade, stop a 3 ATR, no máximo 1 posição por moeda e 1/3 do saldo por moeda (sem alavancagem). Cada compra e venda chega também ao Telegram.</p></div></div>`}
@@ -660,15 +676,16 @@ function sigCard(D,open){
 }
 /* demo experimental: o que falta para cada estrategia escolhida pelo agente abrir trade (mesmas regras do engine.ts) */
 async function loadExpSig(){
-  const cfg=(S.stc&&S.stc.demo_exp&&S.stc.demo_exp.value)||null; if(!cfg||!cfg.estrategias) return;
-  const pairs={btc:"XBTUSD",eth:"ETHUSD",sol:"SOLUSD"}, TFM={"1h":60,"4h":240,"1d":1440}, cache={};
+  const cfg=(S.stc&&S.stc.demo_exp&&S.stc.demo_exp.value)||null; if(!cfg) return;
+  const contas=cfg.contas||(cfg.estrategias?[{id:2,estrategias:cfg.estrategias}]:[]);
+  const pairs={btc:"XBTUSD",eth:"ETHUSD",sol:"SOLUSD"}, TFM={"5m":5,"15m":15,"1h":60,"4h":240,"1d":1440}, cache={};
   const get=async(p,i)=>{const k=p+i; if(!cache[k]){const j=await fetch(`https://api.kraken.com/0/public/OHLC?pair=${p}&interval=${i}`,{cache:"no-store"}).then(r=>r.json());
-    const key=Object.keys(j.result).find(x=>x!=="last"); cache[k]=j.result[key].slice(0,-1).map(r=>({t:r[0]*1000,h:+r[2],l:+r[3],c:+r[4]}));} return cache[k];};
+    const key=Object.keys(j.result).find(x=>x!=="last"); cache[k]=j.result[key].slice(0,-1).map(r=>({t:r[0]*1000,h:+r[2],l:+r[3],c:+r[4],v:+r[6]}));} return cache[k];};
   try{
     const btcD=await get("XBTUSD",1440), bc=btcD.map(x=>x.c), bavg=bc.slice(-200).reduce((a,x)=>a+x,0)/200;
     const regime={close:bc[bc.length-1],lvl:bavg,bull:bc[bc.length-1]>bavg};
     const rows=[];
-    for(const e of cfg.estrategias){
+    for(const conta of contas) for(const e of (conta.estrategias||[])){
       const tfm=TFM[e.tf];
       for(const [coin,pair] of Object.entries(pairs)){
         const b=await get(pair,tfm), c=b.map(x=>x.c), last=b[b.length-1], conds=[];
@@ -677,21 +694,24 @@ async function loadExpSig(){
         else if(E.kind==="breakout"){const prev=b.slice(-E.n-1,-1); const m=side===1?Math.max(...prev.map(x=>x.h)):Math.min(...prev.map(x=>x.l));
           conds.push({txt:`${coin.toUpperCase()} fechar ${side===1?"acima do máximo":"abaixo do mínimo"} das últimas ${E.n} velas de ${e.tf}`,lvl:m,cur:last.c,ok:side===1?last.c>m:last.c<m,up:side===1});}
         else if(E.kind==="lowclose"){const m=Math.min(...c.slice(-E.n)); conds.push({txt:`${coin.toUpperCase()} fechar no mínimo das últimas ${E.n} velas`,lvl:m,cur:last.c,ok:last.c<=m,up:false});}
-        else if(E.kind==="rsi2"){conds.push({txt:`RSI(2) ${side===1?"abaixo de "+E.lo:"acima de "+(100-E.lo)}`,lvl:null,cur:null,ok:null});}
+        else if(E.kind==="rsi2"){let up=0,dn=0; for(let i=1;i<c.length;i++){const d=c[i]-c[i-1],u=Math.max(d,0),w=Math.max(-d,0); if(i===1){up=u;dn=w;}else{up=.5*u+.5*up;dn=.5*w+.5*dn;}}
+          const r=dn?100-100/(1+up/dn):100; conds.push({txt:`RSI(2) de ${e.tf} ${side===1?"abaixo de "+E.lo:"acima de "+(100-E.lo)} (agora ${nf(r,0)})`,lvl:null,cur:null,ok:side===1?r<E.lo:r>100-E.lo});}
+        if(e.vol_mult){const n=20, m=b.slice(-n-1,-1).reduce((q,x)=>q+x.v,0)/n; conds.push({txt:`volume da vela > ${e.vol_mult}x a média de 20 (agora ${m?nf(last.v/m,1):"—"}x)`,lvl:null,cur:null,ok:m>0&&last.v>e.vol_mult*m});}
         if(e.trend_ema){const a=2/(e.trend_ema+1); let m=c[0]; c.forEach(x=>m=a*x+(1-a)*m); conds.push({txt:`${coin.toUpperCase()} ${side===1?"acima":"abaixo"} da EMA ${e.trend_ema} de ${e.tf}`,lvl:m,cur:last.c,ok:side===1?last.c>m:last.c<m,up:side===1});}
         if(e.btc) conds.push({txt:`BTC fechar o dia ${e.btc==="bull"?"acima":"abaixo"} da média de 200 dias`,lvl:regime.lvl,cur:regime.close,ok:e.btc==="bull"?regime.bull:!regime.bull,up:e.btc==="bull"});
-        rows.push({e,coin,conds,next:last.t+2*tfm*60000});
+        rows.push({acc:+conta.id,e,coin,conds,next:last.t+2*tfm*60000});
       }
     }
     S.demo={...(S.demo||{}),expSig:{rows,at:new Date()}}; if(S.route==="demo") render();
   }catch(err){console.error(err);}
 }
-function expSigCard(D,open){
-  const G=D.expSig; if(!G) return `<div class="card"><h2>O que falta para abrir trade</h2><div class="empty">A calcular…</div></div>`;
+function expSigCard(D,open,acc){
+  const G0=D.expSig; if(!G0) return `<div class="card"><h2>O que falta para abrir trade</h2><div class="empty">A calcular…</div></div>`;
+  const G={...G0,rows:G0.rows.filter(r=>(r.acc||2)===acc)}; if(!G.rows.length) return `<div class="card"><h2>O que falta para abrir trade</h2><div class="empty">Sem estratégias escolhidas para esta conta.</div></div>`;
   const px=D.px||{}; const fmt=t=>new Date(t).toLocaleString("pt-PT",{weekday:"short",hour:"2-digit",minute:"2-digit"});
   const byS={}; G.rows.forEach(r=>(byS[r.e.ideia]=byS[r.e.ideia]||[]).push(r));
   return `<div class="card"><h2>O que falta para abrir trade</h2>
-    <p class="hint">Para cada estratégia escolhida pelo agente e cada moeda: as condições que têm de estar todas ✅ <b>no fecho da vela</b>. "falta +19%" = o preço tem de subir 19%. O bot decide logo a seguir ao fecho (velas diárias: 00:03 UTC). Atualizado ${G.at.toLocaleTimeString("pt-PT")}.</p>
+    <p class="hint">Para cada estratégia escolhida pelo agente e cada moeda: as condições que têm de estar todas ✅ <b>no fecho da vela</b>. "falta +19%" = o preço tem de subir 19%. O bot decide logo a seguir ao fecho (velas diárias: 00:03 UTC; 4h e 1h: 3 min depois da hora; 15m: até 5 min depois). Atualizado ${G.at.toLocaleTimeString("pt-PT")}.</p>
     ${Object.entries(byS).map(([id,rs])=>{const e=rs[0].e; return `<h2 style="font-size:14px;margin:14px 0 6px">${esc(e.num||"")} <code>${esc(id)}</code> <span class="small muted">· velas de ${esc(e.tf)} · ${e.side===1?"long":"short"}</span></h2>
       <div class="scroll"><table class="t"><thead><tr><th>Moeda</th><th>Condições</th><th>Estado</th><th>Próxima decisão</th></tr></thead><tbody>
       ${rs.map(r=>{const o=open.find(p=>p.coin===r.coin&&p.strategy===id); const all=r.conds.every(c=>c.ok);

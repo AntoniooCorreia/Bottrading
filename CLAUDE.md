@@ -39,6 +39,17 @@ paper-bot, 100 000 USD, perpetuos simulados (long/short). As estrategias sao esc
   engine.ts com o Python). Familia nova = mexer em engine.ts + demo_spec.py + testes; NAO faças deploy da Edge Function (o Antonio/Claude do chat faz).
 - A conta 1 (K1) nao muda sem o OK do Antonio. A demo experimental nao e aprovacao; ao fim de 2-3 meses compara-se com o backtest.
 
+## DEMO POR ESTILO + ROTACAO DE ESTILOS (pedido do Antonio, 2026-11-27)
+A demo experimental tem agora 3 contas de 100 000 USD (perpetuos simulados): conta 2 = Swing (dias), conta 3 = Day trade (horas,
+max ~24h), conta 4 = Scalping (velas 5m/15m). O estilo de cada spec sai de sr/demo_spec.py style(). `python demo_pick.py --push`
+enche as 3 contas sozinho: primeiro as que passam as regras da demo; se nenhuma opera no regime atual do BTC, junta a melhor que
+opere, marcada "nao passa no backtest (so para ver ao vivo)". O Antonio quer VER trades ao vivo e comparar os estilos no painel.
+- Tudo o que PASSA ou QUASE passa (positivo nas 3 moedas com custos de perpetuos) e cabe nas familias de SPECS entra em SPECS + pytest
+  + `demo_pick.py --push` no fim da sessao.
+- Em CADA noite, as ideias tem de rodar pelos 3 estilos: pelo menos 1 de scalping (5m/15m), 1 de day trade (1h/4h, max 24h) e 1 de
+  swing (diario/4h, dias). Sempre --venue perp, --num, carteira no painel. Scalping em spot continua proibido (custos matam).
+- Cron paper-bot-5min (?mode=fast) trata das estrategias de 5m/15m; nao e preciso deploy para specs novas nas familias existentes.
+
 ## PRIORIDADE DA NOITE (pedido do Antonio, 2026-11-23): ESTRATEGIAS PARA MERCADO EM BAIXA -> DEMO EXPERIMENTAL A OPERAR JA
 O BTC esta ~17-19% abaixo da media de 200 dias e TODAS as estrategias aprovadas para a demo precisam de BTC acima dela: a demo esta
 parada. O Antonio quer ver trades. Enquanto o BTC estiver abaixo da media de 200 dias, TODAS as ideias da noite sao para esse regime

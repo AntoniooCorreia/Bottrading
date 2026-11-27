@@ -7,7 +7,7 @@ Regras (fixas, nao afinar):
   - pelo menos 1 trade por semana (BTC+ETH+SOL juntos);
   - entre as que passam, ordena por t junto e junta estrategias (no maximo 3) ate a soma chegar a 3 trades/semana.
     Cada estrategia tem as suas posicoes (1 por moeda) e 1% de risco por trade.
-  - So troca a lista se a nova 1.a estrategia tiver t pelo menos 0.3 acima da atual 1.a (evita andar a saltar).
+  - (2026-11-26) Uma conta demo por ESTILO: 2 = swing (dias), 3 = day trade (horas), 4 = scalping (minutos); ver pick_style.
   - REGIME ATUAL (2026-11-23): le o BTC na Kraken. Se nenhuma das escolhidas pode operar no regime de agora (ex.: todas precisam de
     BTC acima da media de 200 dias e ele esta abaixo), junta a melhor que passa as regras E opera no regime atual. Se nao houver,
     avisa (a demo fica parada) e regista-o no doc.
@@ -26,7 +26,7 @@ import urllib.request
 import pandas as pd
 
 from sr import supa
-from sr.demo_spec import SPECS
+from sr.demo_spec import SPECS, style
 
 WEEKS_DEV = (pd.Timestamp("2024-12-31") - pd.Timestamp("2019-01-01")).days / 7
 
@@ -73,61 +73,68 @@ def current() -> dict | None:
         return None
 
 
+ACCOUNTS = [(2, "swing", "Swing (dias)"), (3, "day", "Day trade (horas)"), (4, "scalp", "Scalping (minutos)")]
+
+
+def pick_style(res: list[dict], st: str, reg: str | None) -> tuple[list[dict], str]:
+    """Escolhe as estrategias de UM estilo (pedido do Antonio, 2026-11-26: uma conta demo por estilo, sempre com algo a correr):
+    1) as que ganham nas 3 moedas (ok), por t, sem repetir a mesma entrada, ate ~3 trades/semana;
+    2) se nenhuma das escolhidas opera no regime atual do BTC, junta a melhor (por t) que opere agora, mesmo que nao passe:
+       fica marcada 'nao passa no backtest - so para ver ao vivo'."""
+    mine = [r for r in res if style(SPECS[r["ideia"]]) == st]
+    fam = lambda r: json.dumps([SPECS[r["ideia"]].get(k) for k in ("tf", "side", "entry", "btc", "vol_mult")])
+    active = lambda r: SPECS[r["ideia"]].get("btc") in (None, "", reg)
+    pick: list[dict] = []
+    for r in [x for x in mine if x["ok"]]:
+        if sum(x["trades_semana"] for x in pick) >= 3 or len(pick) >= 3:
+            break
+        if fam(r) not in {fam(x) for x in pick}:
+            pick.append(r)
+    aviso = ""
+    if reg and not any(active(r) for r in pick):
+        extra = sorted([r for r in mine if active(r) and r not in pick], key=lambda r: (not r["ok"], -r["t"]))
+        if extra:
+            pick.append(extra[0])
+            if not extra[0]["ok"]:
+                aviso = (f"Nenhuma estrategia {st} que passa opera com o BTC em regime '{reg}'; para haver trades ao vivo corre "
+                         f"{extra[0]['num']} {extra[0]['ideia']}, que NAO passa no backtest ({'; '.join(extra[0]['motivos'])}).")
+        else:
+            aviso = f"Nenhuma estrategia {st} opera com o BTC em regime '{reg}': esta conta fica parada."
+    for r in pick:
+        r["estado"] = "passa as regras da demo" if r["ok"] else "nao passa no backtest (so para ver ao vivo)"
+    return pick, aviso
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--push", action="store_true")
     a = ap.parse_args()
     res = [evaluate(n) for n in SPECS]
     res.sort(key=lambda r: (not r["ok"], -r["t"]))
-    print("ideia                          ok   t      R/trade  win%  trades/sem  motivos")
+    print("estilo ideia                              ok   t      R/trade  win%  trades/sem  motivos")
     for r in res:
-        print(f"{r['ideia']:<30} {'SIM' if r['ok'] else 'nao':<4} {r['t']:+.2f}  {r['r_trade']:+.3f}   {r['win']:>4.0f}  {r['trades_semana']:>6.1f}     {'; '.join(r['motivos'])}")
-    ok = [r for r in res if r["ok"]]
-    if not ok:
-        print("\nNenhuma ideia cumpre as regras da demo experimental: fica a atual.")
-        return
-    pick = [ok[0]]
-    fam = lambda r: json.dumps([SPECS[r["ideia"]][k] for k in ("tf", "side", "entry", "btc")])
-    for r in ok[1:]:
-        if sum(x["trades_semana"] for x in pick) >= 3 or len(pick) >= 3:
-            break
-        if fam(r) in {fam(x) for x in pick}:   # mesma entrada (so muda stop/tempo) = mesmas trades em dobro: salta
-            continue
-        pick.append(r)
+        print(f"{style(SPECS[r['ideia']]):<6} {r['ideia']:<34} {'SIM' if r['ok'] else 'nao':<4} {r['t']:+.2f}  {r['r_trade']:+.3f}   "
+              f"{r['win']:>4.0f}  {r['trades_semana']:>6.1f}     {'; '.join(r['motivos'])}")
     reg = btc_regime_now()
-    aviso = ""
-    active = lambda r: SPECS[r["ideia"]].get("btc") in (None, "", reg)
-    if reg and not any(active(r) for r in pick):
-        extra = next((r for r in ok if active(r) and r not in pick), None)
-        if extra:
-            pick.append(extra)
-        else:
-            aviso = (f"Nenhuma estrategia que passa as regras opera com o BTC em regime '{reg}': "
-                     "a demo experimental fica parada ate o regime mudar.")
-            print("\nAVISO:", aviso)
-    cur = current()
-    if cur and cur.get("estrategias"):
-        cur_first = cur["estrategias"][0]["ideia"]
-        cur_r = next((r for r in res if r["ideia"] == cur_first), None)
-        same = [x["ideia"] for x in cur["estrategias"]] == [x["ideia"] for x in pick]
-        if not same and cur_r and cur_r["ok"] and pick[0]["ideia"] != cur_first and pick[0]["t"] < cur_r["t"] + 0.3:
-            print(f"\nMantem a lista atual (1.a {cur_first}, t {cur_r['t']:+.2f}).")
-            return
-    tpw = sum(x["trades_semana"] for x in pick)
-    doc = {"estrategias": [{"ideia": r["ideia"], **SPECS[r["ideia"]], "t": r["t"], "trades_semana": r["trades_semana"],
-                            "win": r["win"], "r_trade": r["r_trade"]} for r in pick],
+    contas = []
+    for acc, st, nome in ACCOUNTS:
+        pick, aviso = pick_style(res, st, reg)
+        tpw = sum(x["trades_semana"] for x in pick)
+        contas.append({"id": acc, "estilo": st, "nome": nome, "aviso": aviso,
+                       "estrategias": [{"ideia": r["ideia"], **SPECS[r["ideia"]], "t": r["t"], "trades_semana": r["trades_semana"],
+                                        "win": r["win"], "r_trade": r["r_trade"], "estado": r["estado"]} for r in pick],
+                       "porque": f"~{tpw:.1f} trades/semana no backtest 2019-2024 (custos de perpetuos). " + "; ".join(
+                           f"{r['num']} {r['ideia']}: t {r['t']:+.2f}, win {r['win']:.0f}%, {r['r_trade']:+.3f}R ({r['estado']})" for r in pick)})
+        print(f"\n[{nome}] " + contas[-1]["porque"] + (f"\n  AVISO: {aviso}" if aviso else ""))
+    doc = {"contas": contas, "estrategias": contas[0]["estrategias"], "porque": contas[0]["porque"], "aviso": contas[0]["aviso"],
            "venue": "perp", "fee": 0.0005, "slip": 0.0002, "funding_8h": 0.0001, "risco": 0.01,
            "escolhida": pd.Timestamp.now(tz="Europe/Lisbon").strftime("%Y-%m-%d %H:%M"),
-           "porque": "Escolha automatica: estrategias que ganham nas 3 moedas com custos de perpetuos (2019-2024), por ordem de t, "
-                     f"ate ~3 trades/semana, sem repetir a mesma regra de entrada. Juntas: ~{tpw:.1f} trades/semana. " + "; ".join(
-                         f"{r['num']} {r['ideia']}: t {r['t']:+.2f}, {r['trades_semana']}/sem, win {r['win']:.0f}%, {r['r_trade']:+.3f}R"
-                         for r in pick),
-           "aprovada": False, "candidatas": res, "regime_btc": reg, "aviso": aviso}
-    print(f"\nESCOLHIDAS: {doc['porque']}")
+           "aprovada": False, "candidatas": res, "regime_btc": reg}
     if a.push:
         print("gravado no painel:", supa.set_state("demo_exp", doc))
     with open("results/demo_exp.json", "w") as f:
         json.dump(doc, f)
+
 
 if __name__ == "__main__":
     main()
