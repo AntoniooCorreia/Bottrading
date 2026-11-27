@@ -63,6 +63,14 @@ Se passar o criterio oficial: acrescenta a sr/demo_spec.py SPECS (familias ja su
 fecho abaixo da media; btc "bear"), corre pytest e `python demo_pick.py --push` (o demo_pick ja junta sozinho uma estrategia que
 opere no regime atual). Nao faças deploy da Edge Function (nao e preciso para estas familias).
 
+## NOITE INTENSIVA 26->27-11 (pedido do Antonio, 2026-11-27 01:45; SUBSTITUI o LIMITE REDUZIDO so nesta noite)
+Sessoes as 02:00, 02:30, 03:00, 03:30 e 04:00 (Lisboa). Ate 4 ideias por sessao e 20 na noite (conta desde as 19:00 de 26-11,
+so seccoes do agente). Roda pelos 3 estilos (scalping 5m/15m, day trade 1h/4h, swing), sempre --venue perp, --num, carteira no painel,
+prioridade ao regime de BTC em baixa. Nenhuma sessao comeca ideias novas depois das 04:40; tudo acabado ate as 05:00.
+A sessao das 04:00 (a ultima) faz no fim `python demo_pick.py --push` e `python sync.py --log fim "Resumo da noite 26-27/11: N testes, X passaram"`
+com UM ponto (-b) por teste da noite inteira (todas as sessoes): "#1xx nome (estilo): PASSA|REPROVADA, win rate, R por trade, trades/semana"
+e no fim -b "Demo: o que cada conta (Swing/Day trade/Scalping) corre agora" e -b "Proximo passo". O --log fim vai para o Telegram.
+
 LIMITE REDUZIDO (pedido do Antonio, 2026-11-23, uso semanal a 50%): ate ao fim da semana o limite e 10 ideias por noite (nao 20) e
 3 por sessao; so correm as sessoes das :00 (as das :30 estao desligadas). Gasta pouco: nada de reler ficheiros grandes sem necessidade.
 CONTAGEM DO LIMITE DA NOITE (corrigido 2026-11-23; SUBSTITUI o "conta as entradas de hoje" do prompt): a noite vai das 19:00 as 07:00.
