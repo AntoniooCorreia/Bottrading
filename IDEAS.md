@@ -1007,3 +1007,24 @@ carteira +2.5%/ano, pior ano -10.8%); #210 1h t -1.36 (win 43%, pior ano -12.7%)
 #212 15m no contexto da #202 t -1.43 (conf. 2/5). Leitura: o contexto da #197 nao passa vantagem aos recuos: depois da rutura com volume o preco
 continua sem dar recuo, e quando o RSI(2) cai abaixo de 10 e porque o ressalto ja falhou (comprar a fraqueza dentro de uma baixa perde, como
 nas ideias de sobrevenda #166-#172). O ganho da #197 vem de SEGURAR a trade da rutura. Nada entra em SPECS. Scalping 15m em baixa: 0 de 4.
+
+## 2026-11-27 cripto - sessao :30 (03h30, noite intensiva) (4 ideias; ideias cripto testadas antes: ~126 (#100-#212); esta noite (desde 19h de 26-11): 16 de 20 com esta sessao) - registadas antes de correr
+PRIORIDADE: BTC abaixo da media de 200 dias. `python best.py`: base geral K67 (#158, so opera com BTC em alta); a melhor de BAIXA continua a #197
+(K111, rutura de 20 velas de 4h com volume > 1.5x: t +3.34, win 53%, nenhum ano negativo, mas SOL 54 trades < 60, 0.6 trades/semana).
+O que falha: as ruturas de canal (maximo de N velas) em velas curtas sao quase todas ruido; o recuo e a capitulacao perdem. A licao das 3 sessoes
+da noite: em baixa ganha-se a SEGURAR o movimento forte na direcao da vela (momentum de curto prazo), nao a comprar fraqueza.
+Ideia nova (familia nunca testada em cripto): a RUTURA DE VOLATILIDADE de Larry Williams (muito usada em BTC): o nivel de rutura e a ABERTURA do dia
+(UTC) + 0.5 x a amplitude (maximo - minimo) do dia anterior. Diferente do canal de N velas: o nivel adapta-se a volatilidade recente e mede um
+movimento grande DENTRO do dia (o "dia de tendencia"), que costuma continuar ate ao fim da sessao. So o 1.o sinal de cada dia. k = 0.5 (o valor
+classico, fixo). Testada em 3 horizontes (um por estilo) e o espelho em short (a direcao da tendencia de baixa). Todas --venue perp, BTC em baixa.
+- **#213 l-vbo05-1h-bear-s3-tp2-mh24** (DAY TRADE): fecho de 1h > abertura do dia UTC + 0.5 x amplitude do dia anterior (1.o sinal do dia), BTC em baixa
+  -> long. Stop 3 ATR(14) de 1h, alvo 2R, maximo 24 velas (24h). Hipotese: o dia de tendencia para cima dentro da baixa (fecho de shorts) continua.
+- **#214 s-vbo05-1h-bear-s3-tp2-mh24** (DAY TRADE short): fecho de 1h < abertura do dia - 0.5 x amplitude do dia anterior (1.o do dia), BTC em baixa
+  -> short. Stop 3 ATR, alvo 2R, max 24h. Hipotese: o dia de tendencia para baixo a favor da tendencia maior continua (testa a direcao).
+- **#215 l-vbo05-15m-bear-s3-tp2-mh32** (SCALPING): o mesmo nivel que a #213, mas em velas de 15m (entra mais cedo), stop 3 ATR(14) de 15m, alvo 2R,
+  maximo 32 velas (8h). Hipotese: a mesma vantagem com stop mais curto; se perder, confirma que em 15m os custos dominam.
+- **#216 l-wvbo05-4h-bear-s2-tp2-mh12** (SWING): versao semanal: fecho de 4h > abertura da semana (segunda 00h UTC) + 0.5 x amplitude da semana
+  anterior (1.o sinal da semana), BTC em baixa -> long. Stop 2 ATR(14) de 4h, alvo 2R, maximo 12 velas (2 dias), como a #197.
+Fasquia: criterio oficial (>= 60 trades por moeda, positiva em cada, t >= 3.0, confirmacao >= 3/5); depois pre e holdout uma vez.
+Nota: familia nova para a demo (nao esta em SPECS); se passar, precisa de engine.ts + demo_spec.py + testes, sem deploy.
+Nota de desconfianca: 48 ideias de baixa ja testadas (#165-#212).
