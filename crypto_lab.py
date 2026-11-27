@@ -228,6 +228,17 @@ def next_label() -> str:
         with urllib.request.urlopen(req, timeout=20) as r:
             keys = [x["key"] for x in json.load(r)]
         nums = [int(m.group(1)) for k in keys if (m := re.fullmatch(r"portfolio_K(\d+)", k))]
+        # o painel so guarda as 30 melhores (as outras sao podadas): conta tambem os ficheiros locais e as podadas
+        import glob as _g
+        nums += [int(m.group(1)) for f in _g.glob("results/carteiras/K*.json") if (m := re.search(r"K(\d+)\.json$", f))]
+        try:
+            rq = urllib.request.Request(f"{supa.URL}/rest/v1/rpc/max_bk_label", data=b"{}", method="POST",
+                                        headers={"apikey": supa.PUBLISHABLE, "Authorization": f"Bearer {supa.PUBLISHABLE}",
+                                                 "Content-Type": "application/json"})
+            with urllib.request.urlopen(rq, timeout=20) as r2:
+                nums.append(int(json.load(r2)))
+        except Exception:
+            pass
         return f"K{max(nums + [1]) + 1}"
     except Exception as e:
         print(f"[supabase] nao li as carteiras ({e}); usa --label")

@@ -50,6 +50,14 @@ opere, marcada "nao passa no backtest (so para ver ao vivo)". O Antonio quer VER
   swing (diario/4h, dias). Sempre --venue perp, --num, carteira no painel. Scalping em spot continua proibido (custos matam).
 - Cron paper-bot-5min (?mode=fast) trata das estrategias de 5m/15m; nao e preciso deploy para specs novas nas familias existentes.
 
+## NOMES #BK / #D E SO 30 TESTES NO PAINEL (pedido do Antonio, 2026-11-27)
+- Testes de backtesting = #BK<n> (a carteira K138 aparece como #BK138); contas demo = #D1 (K1), #D2 Swing, #D3 Day trade, #D4 Scalping.
+  No diario, Telegram, SUMMARY e commits escreve SEMPRE #BK<n> para carteiras de backtesting e #D<n> para a demo (internamente o
+  ficheiro continua results/carteiras/K<n>.json e a chave portfolio_K<n>; o --label continua K<n>). As estrategias mantem #2xx.
+- O painel mostra so as 30 melhores #BK (pontuacao do best.py); as reprovadas fora do top 30 sao retiradas sozinhas (funcao
+  private.prune_backtests no Supabase; ficam em arquivo.backtests_podados e no git). NAO voltes a enviar carteiras podadas.
+- Calendario: as demos aparecem no seletor de carteiras do painel como #D, #D1..#D4 (trades fechadas).
+
 ## DEPOIS DA NOITE INTENSIVA (2026-11-27, chat com o Antonio: "faz os proximos passos")
 - #221 = #197 em carteira de 8 moedas (spec "l-dc20-4h-bear-vol15-s2-tp2-mh12-8m" com coins + max_open 4) corre na demo Swing; a Edge Function
   ja trata 8 moedas (spec.coins) e max_open. Testes de carteira em 8 moedas: `crypto_lab.py --coins btc,eth,sol,xrp,ada,doge,link,avax

@@ -278,12 +278,27 @@ function setAcc(v){S.acc=Math.max(100,+v||100000);store("bt_acc",S.acc);render()
 S.full={};   /* carteiras completas (com trades), so as que forem abertas */
 const pfKey=P=>P.ref?"portfolio":P.arquivo?"arq_portfolio_"+P.label:"portfolio_"+P.label;
 function withFull(P){const f=S.full[pfKey(P)]; return f&&f.value?{...P,...f.value}:P;}
-function portfolios(){const d=S.data; if(!d) return []; return [d.portfolio?{id:"ref",...d.portfolio,ref:true}:null,...d.extra.map(p=>({id:p.label,...p})),...(S.arq||[]).map(p=>({id:"arq_"+p.label,...p,arquivo:true}))].filter(Boolean).map(withFull);}
+/* nomes (pedido do Antonio, 2026-11-27): testes de backtesting = #BK<n> (eram K<n>), contas demo = #D<n> */
+const tag=P=>P.demo?P.label:/^K\d+$/.test(P.label||"")?"#BK"+P.label.slice(1):(P.label||"");
+const DEMO_NOME={1:"K1 referência (spot)",2:"Swing",3:"Day trade",4:"Scalping"};
+function demoPfs(){const D=S.demo; if(!D||!D.accs) return [];
+  const mk=(id,accs,nome)=>{const P=D.pos.filter(p=>accs.includes(p.account||1)&&p.status==="closed"&&p.exit_time);
+    const start=accs.reduce((a,i)=>a+(+(D.accs.find(x=>x.id===i)||{}).start_balance||100000),0);
+    const T=P.map(p=>[ymd(new Date(p.entry_time)),ymd(new Date(p.exit_time)),p.coin,"#D"+(p.account||1)+" "+p.strategy,(+p.pnl_eur)/start*100]).sort((a,b)=>a[1]<b[1]?-1:1);
+    const pa={},pm={}; T.forEach(t=>{pa[t[1].slice(0,4)]=(pa[t[1].slice(0,4)]||0)+t[4]; pm[t[1].slice(0,7)]=(pm[t[1].slice(0,7)]||0)+t[4];});
+    let eq=0,pk=0,dd=0; T.forEach(t=>{eq+=t[4]; pk=Math.max(pk,eq); dd=Math.min(dd,eq-pk);});
+    const days=T.length?Math.max(7,(Date.now()-pd(T[0][0]))/864e5):7, ys=Object.values(pa), ms=Object.values(pm);
+    return {id,label:id,demo:true,mercado:"crypto",period:"demo",nota:nome,trades:T,por_ano:pa,media:ys.length?ys.reduce((a,x)=>a+x,0)/ys.length:0,
+      pior_ano:ys.length?Math.min(...ys):0,pior_mes:ms.length?Math.min(...ms):0,dd,trades_ano:T.length/days*365,ideas:[...new Set(T.map(t=>t[3]))],markets:[...new Set(T.map(t=>t[2]))]};};
+  const ex=D.accs.filter(a=>a.id>=2).map(a=>a.id);
+  return [mk("#D",ex,"todas as demos experimentais"),...D.accs.map(a=>mk("#D"+a.id,[a.id],DEMO_NOME[a.id]||a.name))];}
+function portfolios(){const d=S.data; if(!d) return []; return [d.portfolio?{id:"ref",...d.portfolio,ref:true}:null,...d.extra.map(p=>({id:p.label,...p})),...(S.arq||[]).map(p=>({id:"arq_"+p.label,...p,arquivo:true}))].filter(Boolean).map(withFull).concat(demoPfs());}
 function curPf(){const L=portfolios(); return L.find(p=>p.id===S.pf)||L[0]||null;}
-function ensureFull(P){if(!P||P.trades) return; const k=pfKey(P); if(S.full[k]) return; S.full[k]={loading:true};
+function ensureFull(P){if(!P||P.trades||P.demo) return; const k=pfKey(P); if(S.full[k]) return; S.full[k]={loading:true};
   q("state?select=value&key=eq."+encodeURIComponent(k)).then(r=>{S.full[k]={value:r[0]?r[0].value:{trades:[]}}; render();}).catch(()=>{delete S.full[k];});}
 function pfName(P){const n=P.markets&&P.markets.length?P.markets.length:new Set((P.por_indice||[]).map(r=>r.indice)).size;
-  return (P.aviso?"⚠ ":"")+(P.label?P.label+" · ":"")+(P.ref?"Referência · demo":P.arquivo?"Arquivo índices":"Carteira")+" ("+n+(P.mercado==="crypto"?" moedas":" índices")+")";}
+  if(P.demo) return "📅 "+P.label+" · Demo "+P.nota+" ("+P.trades.length+" trades fechadas)";
+  return (P.aviso?"⚠ ":"")+(P.label?tag(P)+" · ":"")+(P.ref?"Referência · demo":P.arquivo?"Arquivo índices":"Backtesting")+" ("+n+(P.mercado==="crypto"?" moedas":" índices")+")";}
 /* agrega trades por dia de saida: {date:{r,n,w,list}} */
 function dayMap(trades){const m={}; for(const t of trades){const k=t[1]; const o=m[k]||(m[k]={r:0,n:0,w:0,list:[]}); o.r+=t[4]; o.n++; if(t[4]>0)o.w++; o.list.push(t);} return m;}
 function filtTrades(P,mk,idea){return (P.trades||[]).filter(t=>(mk==="all"||t[2]===mk)&&(idea==="all"||t[3]===idea));}
@@ -601,7 +616,7 @@ function vDemo(){
   const cfg=(S.stc&&S.stc.demo_exp&&S.stc.demo_exp.value)||null;
   const contaOf=id=>cfg?((cfg.contas||[]).find(c=>+c.id===+id)||(id===2&&!cfg.contas&&cfg.estrategias?{id:2,estrategias:cfg.estrategias,aviso:cfg.aviso}:null)):null;
   const ICON={1:"📌",2:"🐢",3:"⚡",4:"🎯"};
-  const accLabel=a=>`${ICON[a.id]||"🧪"} ${a.id===1?"K1 (referência)":esc(a.name||("Conta "+a.id))}`;
+  const accLabel=a=>`${ICON[a.id]||"🧪"} #D${a.id} ${a.id===1?"K1 (referência)":esc(a.name||("Conta "+a.id))}`;
   const accStats=a=>{const P=D0.pos.filter(p=>(p.account||1)===a.id), op=P.filter(p=>p.status==="open"), cl=P.filter(p=>p.status==="closed");
     const px=D0.px||{}; const un=op.reduce((s,p)=>s+(px[p.coin]?(+(p.side||1))*(+p.qty)*(px[p.coin]-(+p.entry_price)):0),0);
     const eq=(+a.balance)+un; return {eq,ret:(eq/(+a.start_balance)-1)*100,n:cl.length,w:cl.filter(p=>+p.pnl_eur>0).length,open:op.length};};
@@ -611,7 +626,7 @@ function vDemo(){
     ${ranked.map(a=>{const t=accStats(a), c=contaOf(a.id); const st=t.open?`<span class="badge ok">em trade</span>`:a.id!==1&&(!c||!(c.estrategias||[]).length)?`<span class="badge neu">sem estratégias</span>`:`<span class="badge neu">à espera de sinal</span>`;
       return `<tr class="click ${a.id===AC?"sel":""}" onclick="S.demoAcc=${a.id};render();loadExpSig()"><td><b>${accLabel(a)}</b></td><td class="num">${nf(t.eq,0)} $</td><td class="num ${cls(t.ret)}">${pc(t.ret,2)}</td><td class="num">${t.n}</td><td class="num">${t.n?Math.round(t.w/t.n*100)+"%":"—"}</td><td class="num">${t.open}</td><td>${st}</td></tr>`;}).join("")}
     </tbody></table></div></div>
-    <div style="margin:0 0 12px">${seg(D0.accs.map(a=>[String(a.id),accLabel(a)]),String(AC),"(v=>{S.demoAcc=+v;render();loadExpSig()})")}</div>`;
+    <div style="margin:0 0 12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">${seg(D0.accs.map(a=>[String(a.id),accLabel(a)]),String(AC),"(v=>{S.demoAcc=+v;render();loadExpSig()})")}<a class="btn" href="#calendario" onclick="setPf('#D${AC}')" style="text-decoration:none">📅 Calendário desta conta</a><a class="btn" href="#calendario" onclick="setPf('#D')" style="text-decoration:none">📅 Todas as demos</a></div>`;
   const D={...D0,acc:D0.accs.find(x=>x.id===AC),pos:D0.pos.filter(p=>(p.account||1)===AC),eq:(D0.eq||[]).filter(e=>(e.account||1)===AC)};
   if(!D.acc) return tabs+`<div class="card"><div class="empty">Conta ainda não criada.</div></div>`;
   const a=D.acc||{balance:100000,start_balance:100000}, open=D.pos.filter(p=>p.status==="open"), closed=D.pos.filter(p=>p.status==="closed");
@@ -795,16 +810,24 @@ function scoreAll(L){const pool=L.filter(x=>x.p.mercado==="crypto"&&x.p.period==
   L.forEach(x=>{if(!x.m) x.m=pfMetrics(x.p);}); return pool;}
 function vCarteiras(){
   const f=S.pfF||"all", m=S.pfM||"all";
-  const L=portfolios().map(p=>({p,e:evalPf(p)})); const pool=scoreAll(L); const by=S.pfS||"pont";
+  const L0=portfolios().filter(p=>!p.demo).map(p=>({p,e:evalPf(p)})); const pool0=scoreAll(L0); const by=S.pfS||"pont";
+  /* so as 30 melhores ficam no painel (pedido do Antonio); a K1 e as que passam o criterio oficial ficam sempre */
+  const keep=new Set([...pool0].sort((a,b)=>b.sc-a.sc).slice(0,30).map(x=>x.p)); const L=L0.filter(x=>!pool0.includes(x)||keep.has(x.p)||x.p.oficial_passa||x.p.label==="K1");
+  const pool=pool0.filter(x=>L.includes(x)), podadas=L0.length-L.length;
   L.sort(by==="pont"?(a,b)=>(b.sc??-1)-(a.sc??-1)||b.e.score-a.e.score:(a,b)=>b.e.score-a.e.score);
   const top=[...pool].sort((a,b)=>b.sc-a.sc)[0];
   const cnt=k=>L.filter(x=>x.e.st===k).length;
   const vis=L.filter(x=>(f==="all"||x.e.st===f)&&(m==="all"||(m==="crypto"?x.p.mercado==="crypto":x.p.mercado!=="crypto")));
   const B={aprovada:["ok","Aprovada"],quase:["mid","Quase"],reprovada:["bad","Reprovada"]};
   const ic=v=>v===true?"✅":v===false?"❌":"⚪";
-  return `${top?`<div class="card" style="border-left:4px solid var(--accent)"><div class="card-head"><div><h2>🏆 Melhor teste: ${esc(top.p.label)} · pontuação ${top.sc}/100</h2><p class="hint">Pontuação = média do lugar em <b>win rate</b>, <b>% total acumulado</b> e <b>melhor ano</b>, entre os ${pool.length} testes cripto de 2019–2024 (100 = o melhor nos três). É esta a base que o agente usa para tentar melhorar.</p></div><a class="btn" href="#inicio" onclick="setPf('${esc(top.p.id)}')" style="text-decoration:none">Abrir</a></div>
-    <div class="kpis sm" style="margin-bottom:6px">${kpi("Win rate",nf(top.m.win,0)+"%","")}${kpi("Total acumulado",pc(top.m.tot,0),"",cls(top.m.tot))}${kpi("Melhor ano",pc(top.m.best),"",cls(top.m.best))}${kpi("Trades por semana",nf(top.p.trades_ano/52,1),"objetivo 2–3")}</div>
-    <div class="small muted">${esc(top.p.nota||"")} · ${esc(top.e.why)}</div></div>`:""}<div class="kpis">${kpi("Carteiras testadas",L.length,"cada teste do agente é uma carteira")}${kpi("Aprovadas",cnt("aprovada"),"cumprem todos os objetivos",cnt("aprovada")?"pos":"")}${kpi("Quase",cnt("quase"),"falham 1 ou 2 objetivos")}${kpi("Reprovadas",cnt("reprovada"),"falham objetivos ou a validação",cnt("reprovada")?"neg":"")}</div>
+  const top5=[...pool].sort((a,b)=>b.sc-a.sc).slice(0,5), N=pool0.length;
+  const lugar=(x,k)=>1+pool0.filter(y=>y.m[k]>x.m[k]).length;
+  const porque=x=>{const ok=x.e.C.filter(c=>c.ok===true).map(c=>c.nome.toLowerCase()), ko=x.e.C.filter(c=>c.ok===false).map(c=>c.nome.toLowerCase()+" ("+c.val+")");
+    return `Win rate <b>${nf(x.m.win,0)}%</b> (${lugar(x,"win")}.º de ${N}) · total <b class="${cls(x.m.tot)}">${pc(x.m.tot,0)}</b> (${lugar(x,"tot")}.º) · melhor ano <b>${pc(x.m.best)}</b> (${lugar(x,"best")}.º) · pior ano ${pc(x.p.pior_ano)} · ${nf(x.p.trades_ano/52,1)} trades/semana.`+
+      (ok.length?`<br>✅ Cumpre: ${esc(ok.join(", "))}.`:"")+(ko.length?`<br>❌ Falta: ${esc(ko.join("; "))}.`:"");};
+  return `${top5.length?`<div class="card" style="border-left:4px solid var(--accent)"><h2>🏆 Os 5 melhores testes de backtesting e porquê</h2><p class="hint">Pontuação = média do lugar em <b>win rate</b>, <b>% total acumulado</b> e <b>melhor ano</b> entre os ${N} testes cripto de 2019–2024 (100 = o melhor nos três). O 1.º é a base que o agente tenta melhorar. Melhor pontuação não é aprovação: para isso tem de passar o critério oficial, o 2017–18 e o holdout.</p>
+    ${top5.map((x,i)=>`<div class="pfc ${({aprovada:"ok",quase:"mid",reprovada:"bad"})[x.e.st]}" style="margin-top:10px"><div class="hd"><span class="rk">${["🥇","🥈","🥉","4.º","5.º"][i]}</span><a class="nm" href="#inicio" onclick="setPf('${esc(x.p.id)}')">${esc(tag(x.p))}</a><span class="badge neu">${x.sc} pts</span><span class="small muted" style="margin-left:auto">${esc(x.p.criado||"")}</span></div>
+      <div class="small muted" style="margin:2px 0 4px">${esc(x.p.nota||(x.p.ideas||[]).join(" + "))}</div><div class="small">${porque(x)}</div></div>`).join("")}</div>`:""}<div class="kpis">${kpi("Testes no painel (#BK)",L.length,podadas?`só os 30 melhores · ${podadas} reprovados retirados`:"cada teste é uma carteira")}${kpi("Aprovadas",cnt("aprovada"),"cumprem todos os objetivos",cnt("aprovada")?"pos":"")}${kpi("Quase",cnt("quase"),"falham 1 ou 2 objetivos")}${kpi("Reprovadas",cnt("reprovada"),"falham objetivos ou a validação",cnt("reprovada")?"neg":"")}</div>
   <div class="card"><div class="card-head"><div><h2>Ranking de carteiras</h2><p class="hint">Ordena por pontuação (win rate + total acumulado + melhor ano) ou pelos objetivos. Objetivos: estratégias validadas, pre 2017–18 ≥ 0, holdout positivo, ≥ +14%/ano, pior ano > −10%, pior mês > −5%, win rate ≥ 50%, 2–3 trades/semana. ⚪ = ainda não medido. Toca no nome para abrir a carteira no resto do painel.</p></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">${seg([["pont","Por pontuação"],["obj","Por objetivos"]],by,"(v=>{S.pfS=v;render()})")}${seg([["all","Todas"],["aprovada","Aprovadas"],["quase","Quase"],["reprovada","Reprovadas"]],f,"(v=>{S.pfF=v;render()})")}${seg([["all","Tudo"],["crypto","Cripto"],["idx","Índices (arquivo)"]],m,"(v=>{S.pfM=v;render()})")}</div></div>
   ${vis.map(({p,e})=>`<div class="pfc ${B[e.st][0]}"><div class="hd"><span class="rk">#${L.indexOf(L.find(x=>x.p===p))+1}</span><a class="nm" href="#inicio" onclick="setPf('${esc(p.id)}')">${esc(pfName(p))}</a><span class="badge ${B[e.st][0]}">${B[e.st][1]}</span>${(()=>{const x=L.find(y=>y.p===p);return x&&x.sc!=null?`<span class="badge neu">${x.sc} pts</span>`:"";})()}${p.id===(curPf()||{}).id?`<span class="badge neu">escolhida</span>`:""}<span class="small muted" style="margin-left:auto">${esc(p.criado||"")}${p.period?" · período "+esc(p.period):""}</span></div>
