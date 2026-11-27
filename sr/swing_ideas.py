@@ -1349,10 +1349,13 @@ for _n, _v in {
     "l-dc24-1h-bear-vol15-s3-tp2-mh24": (dc_bull_in_bear_vol_ema_entry(24, 1.5, 200), "1h", 3.0, 2.0, 24),
     "s-dc20-4h-bear-vol15-s2-tp2-mh12": (dc_bear_vol_entry(20, 1.5), "4h", 2.0, 2.0, 12),
     "l-dc20-4h-bear-vol15-s2-tp1-mh6": (dc_bull_in_bear_vol_entry(20, 1.5), "4h", 2.0, 1.0, 6),
+    # #229 (2026-11-27 20h): a #202 com volume > 2x (mudanca #224 aplicada pelo diario na #D3), para a carteira de 8 moedas
+    "l-dc24-1h-bear-vol20-s3-tp2-mh24": (dc_bull_in_bear_vol_ema_entry(24, 2.0, 200), "1h", 3.0, 2.0, 24),
 }.items():
     IDEAS[_n] = _v
     EXITS[_n] = {"signal_exit": False}
-NO_MIN_RISK.update({"l-dc96-15m-bear-vol15-s3-tp2-mh32", "l-dc24-1h-bear-vol15-s3-tp2-mh24"})   # como a #192 (intraday)
+NO_MIN_RISK.update({"l-dc96-15m-bear-vol15-s3-tp2-mh32", "l-dc24-1h-bear-vol15-s3-tp2-mh24",
+                    "l-dc24-1h-bear-vol20-s3-tp2-mh24"})   # como a #192 (intraday)
 
 
 # ---------------- CAPITULACAO COM VOLUME (SELLING CLIMAX) EM BAIXA (2026-11-27, sessao 02h30) ----------------

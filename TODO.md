@@ -363,3 +363,8 @@ Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --p
 - [x] #225 diario da demo s-rsi2-15m-long~lo3 (scalping) -> REJEITADA pelo journal_lab (-0.119 -> -0.113R/trade, nao sobe 0.02R)
 - [x] #226 carteira-8 #204 l-dc20-4h-bear-vol15-s2-tp1-mh6 (day trade 4h, 8 moedas, max 4 abertas) -> REPROVADA no criterio (t 8 moedas +2.79; positiva nas 8; win 54%; K144 +10.8%/ano, TODOS os anos positivos (pior +6.7%), pior mes -8.5%, ~1.8/semana) -> SPECS
 - [x] #227 carteira-8 #218 l-dc10-4h-bear-vol15-s2-tp2-mh12 (swing 4h, 8 moedas, max 4 abertas) -> REPROVADA (t 8 moedas +2.99; positiva nas 8; win 46%; K143 +9.8%/ano, pior ano -5.7%, pior mes -9.9%, ~2/semana) -> SPECS
+
+## Ideias do agente (2026-11-27, sessao 20h): pior mes das carteiras de 8 moedas (max 2 abertas) + #224 em 8 moedas (perp)
+- [ ] #228 carteira-8 #226 l-dc20-4h-bear-vol15-s2-tp1-mh6 (day trade 4h, 8 moedas, max 2 abertas)
+- [ ] #229 carteira-8 #224 l-dc24-1h-bear-vol20-s3-tp2-mh24 (day trade 1h, 8 moedas, max 4 abertas)
+- [ ] #230 carteira-8 #221 l-dc20-4h-bear-vol15-s2-tp2-mh12 (swing 4h, 8 moedas, max 2 abertas)

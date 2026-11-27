@@ -197,6 +197,8 @@ def save_run(a, name: str, o: dict, rr: dict | None, conf: dict) -> None:
     variant = name + ("-perp" if a.venue == "perp" else "")
     if sorted(a.coins.split(",")) != sorted(MAIN_COINS):
         variant += f"-{len(a.coins.split(','))}m"  # carteira com outras moedas: nao pisa o teste original
+    if a.max_open and a.max_open != 4:
+        variant += f"-mo{a.max_open}"  # (2026-11-27) limite de abertas diferente do usado ate aqui (4): nao pisa o teste original
     per, yearly, curves, periods, allt = {}, {}, {}, {}, []
     for k, tr in rr["tr"].items():
         b = rr["b"][k]

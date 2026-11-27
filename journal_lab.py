@@ -78,6 +78,8 @@ def run(name: str, spec: dict, num: str, push: bool, nota: str) -> dict:
     finally:
         sys.argv = old
     suf = f"-{len(coins)}m" if sorted(coins) != sorted(MAIN_COINS) else ""
+    if spec.get("max_open") and spec["max_open"] != 4:
+        suf += f"-mo{spec['max_open']}"  # igual ao crypto_lab.save_run
     d = json.load(open(f"results/runs/{name}-perp{suf}__dev.json"))
     m = d["markets"]
     n = sum(v["n"] for v in m.values())

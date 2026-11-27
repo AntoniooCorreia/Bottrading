@@ -35,6 +35,8 @@ def evaluate(name: str) -> dict:
     sp = SPECS[name]
     base, coins = sp.get("base", name), sp.get("coins") or ["btc", "eth", "sol"]
     suf = f"-{len(coins)}m" if sorted(coins) != ["btc", "eth", "sol"] else ""
+    if sp.get("max_open") and sp["max_open"] != 4:
+        suf += f"-mo{sp['max_open']}"  # igual ao crypto_lab.save_run
     f = f"results/runs/{base}-perp{suf}__dev.json"
     if not os.path.exists(f):
         cmd = [sys.executable, "crypto_lab.py", "--ideas", base, "--period", "dev", "--venue", "perp",
