@@ -1059,3 +1059,10 @@ pior mes -4.6%, mas SOL 54 < 60 (igual a #197: segurar mais tempo quase nao muda
 pior ano -3.4%, pior mes -8.0% (quase passa). #219 15m t -0.50 (pior ano -12.9%; scalping em baixa 0 de 6). #220 1h t +0.52 (SOL negativa).
 Leitura: o contexto da #197 nao melhora ruturas curtas (como nao melhorou recuos): a vantagem esta na propria vela de 4h com volume. Mais trades
 na mesma familia (canal 10) diluem o t. #217 e #218 entram em SPECS (familia breakout, ja suportada); nao mudam a demo (t abaixo da atual + 0.3).
+
+## 2026-11-27 (Claude, chat com o Antonio: "faz os proximos passos")
+- **#221 carteira-8 #197** (SWING, MAIS TRADES, nao e afinacao): a MESMA #197 (l-dc20-4h-bear-vol15-s2-tp2-mh12, parametros iguais) corrida como
+  carteira nas 8 moedas (BTC, ETH, SOL, XRP, ADA, DOGE, LINK, AVAX), perp, maximo 4 trades abertas. Hipotese: a vantagem da #197 aparece em
+  4/5 moedas de confirmacao; em 8 moedas a carteira passa de ~0.6 para ~1.5 trades/semana sem mudar a regra. O criterio oficial NAO muda
+  (BTC/ETH/SOL >= 60 continua a falhar por SOL 54): isto mede so a carteira para a demo.
+- **#222 carteira-8 #217** (igual, com a #217 = #197 com maximo 4 dias).
