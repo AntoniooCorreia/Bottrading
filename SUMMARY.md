@@ -62,6 +62,7 @@
 | #197-#200 | 2026-11-23 | MERCADO EM BAIXA, filtros e 2.a estrategia da #191 (perp): volume > 1.5x, BTC tambem em rutura, short espelho, reteste do nivel rompido; K111-K116 | -0.16 a +3.34 | 44-53% | -0.01 a +0.24 | -0.2% a +8.2%/ano | REPROVADAS; **#197 (volume): t +3.34, conf. 5/5, win 53%, +8.2%/ano, sem ano negativo, mas SOL 54 < 60 trades** |
 | #201-#204 | 2026-11-27 | MERCADO EM BAIXA, o volume da #197 noutros horizontes (perp): scalping 15m rutura 24h, day trade 1h (#192 + volume), short 4h (#199 + volume), alvo 1R em 24h (#189 + volume); K117-K121 | -1.62 a +1.99 | 41-54% | -0.05 a +0.09 | -16% a +6.0%/ano | REPROVADAS; #202 e #204 positivas nas 3 moedas (quase passam) -> SPECS da demo; #202 corre na conta Day trade |
 | #213-#216 | 2026-11-27 | MERCADO EM BAIXA, rutura de volatilidade de Williams (abertura do dia/semana + 0.5x amplitude anterior, perp): long 1h, short 1h, long 15m, long semanal 4h; K130-K133 | -0.29 a +1.85 | 43-54% | -0.01 a +0.19 | -3.0% a +7.1%/ano | REPROVADAS; #213 (1h) e #216 (semanal) positivas nas 3 moedas e conf. 3/5 (quase passam), mas familia nao existe na demo |
+| #217-#220 | 2026-11-27 | MERCADO EM BAIXA, vizinhas e contexto da #197 (perp): #197 com 4 dias, #197 com canal 10, rutura 15m e 1h so no contexto da #197; K134-K137 | -0.50 a +3.27 | 40-50% | -0.03 a +0.28 | -1.3% a +8.5%/ano | REPROVADAS; #217 t 3.27 conf. 4/5 sem ano < -3.1% mas SOL 54 < 60; #218 t 2.43 conf. 5/5, SOL 81 (entram em SPECS) |
 | carteiras 8 moedas | 2026-11-22 | demo (#139+#144+#138) e curta (#139+#163+#164) em 8 moedas com --max-open | - | 52-58% | - | curta max 4: 179 trades/ano, +17%/ano, pior ano -1.0%, pior mes -10.4%, queda -22% | so diagnostico |
 
 Scalping (2026-11-21): ANTES de custos ha uma vantagem pequena (RSI(2) 15m long: win rate 69%, +0.05R; Bollinger 5m BTC +0.08R),
@@ -74,16 +75,16 @@ Perpetuos (#133-#137): mesmo com custos 4x mais baixos nada passa. Os shorts int
 
 #138 (2026-11-21, 19h): a #118 em 4h abre 2x mais trades (1.2/semana, SOL 173) com win rate 59%, mas so +0.09R/trade: t 2.47, REPROVADA.
 
-Leitura honesta cripto (2026-11-27, sessao das 03h30, 4.a da noite intensiva 26-27/11):
-1. Ideias cripto testadas no total: 130 (#100-#216, K1, scalping, intraday, perpetuos). Mais testes = mais desconfianca num resultado isolado.
+Leitura honesta cripto (2026-11-27, sessao das 04h, ultima da noite intensiva 26-27/11):
+1. Ideias cripto testadas no total: 134 (#100-#220, K1, scalping, intraday, perpetuos). Mais testes = mais desconfianca num resultado isolado.
 2. Melhor win rate com resultado positivo: 68% (#118 +0.33R, reprovada SOL < 60; #148 +0.14R). Na familia atual: 65% (#156, +0.24R no dev).
 3. A familia "moeda acima da media + BTC em alta + alvo 1R" tem t 4-5 em 2019-2024 mas ~0R em 2017-18 e no holdout (#155, #157): o dev explica quase tudo.
 4. Holdout ja gasto em cripto: K1, #100, #116, #155, #157. Nenhuma estrategia cripto esta aprovada.
-5. Mercado em baixa: 52 ideias (#165-#216, todas perp). Shorts, sobrevenda, capitulacao com volume (#205-#207) e recuos depois da rutura
-   (#209-#212) perdem. So ganha o LONG no movimento forte para cima (rutura de canal com volume #197; rutura de volatilidade #213/#216).
-6. A #197 (4h, volume, 2R, 2 dias) continua a unica com t >= 3 (SOL 54 < 60). #213 (1h, t 1.60) e #216 (semanal, t 1.85, pior mes -3.5%)
-   sao positivas nas 3 moedas mas fracas; a rutura de volatilidade e uma familia que a demo ainda nao corre.
-7. Em 15m (#201, #205, #209, #212, #215) os custos e o ruido matam tudo: scalping em baixa 0 de 5. Demo Day trade: #131/#133 + #202 (nao aprovada).
+5. Mercado em baixa: 56 ideias (#165-#220, todas perp). Shorts, sobrevenda, capitulacao (#205-#207), recuos (#209-#212) e ruturas curtas
+   dentro do contexto da #197 (#219/#220) perdem ou ficam em ~0. So ganha o LONG que SEGURA a rutura de 4h com volume (#197/#217/#218).
+6. #197 (t 3.34) e #217 (= #197 com 4 dias, t 3.27, pior ano -3.1%) passam o t mas falham por SOL 54 < 60 trades; a #218 (canal 10) da
+   SOL 81 e conf. 5/5 mas t cai para 2.43: mais trades diluem a vantagem. Vizinhas da #197 a passar seriam afinacao: desconfianca alta.
+7. Em 15m (#201, #205, #209, #212, #215, #219) os custos e o ruido matam tudo: scalping em baixa 0 de 6. Demo: ver demo_pick.py.
 
 # Resumo indices (ARQUIVO, custos CFD incluidos)
 

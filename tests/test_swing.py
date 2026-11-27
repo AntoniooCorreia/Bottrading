@@ -11,7 +11,8 @@ CAL = {"l-dc96-15m-bear-vol15-s3-tp2-mh32": ("2000-01-03", 30000), "fomc-holiday
        "rsi2-cash-1h": ("2000-01-03", 60000), "h-squeeze-1h": ("2000-01-03", 30000), "r-hi10-dd-d": ("1950-01-03", 20000), "r-hi10-dd-4h": ("1950-01-03", 40000), "r-capit-d": ("1950-01-03", 20000), "r-btc-reclaim20-d": ("1950-01-03", 20000),
        "l-rsi2-4h-bear-ema200-s2-tp1-mh6": ("2000-01-03", 12000),
        "l-pb15m-ctx197-rsi2-s3-tp2-mh32": ("2000-01-03", 60000), "l-pb15m-ctx202-rsi2-s3-tp2-mh32": ("2000-01-03", 30000),
-       "l-pb1h-ctx197-rsi2-s3-tp2-mh24": ("2000-01-03", 20000), "l-vbo05-15m-bear-s3-tp2-mh32": ("2000-01-03", 60000)}
+       "l-pb1h-ctx197-rsi2-s3-tp2-mh24": ("2000-01-03", 20000), "l-vbo05-15m-bear-s3-tp2-mh32": ("2000-01-03", 60000),
+       "l-dc96-15m-ctx197-vol15-s3-tp2-mh32": ("2000-01-03", 60000), "l-dc24-1h-ctx197-vol15-s3-tp2-mh24": ("2000-01-03", 40000)}
 
 
 def synth_d(n=3000, seed=0, tf="1d", start="2000-01-03"):
@@ -37,8 +38,15 @@ def synth_d(n=3000, seed=0, tf="1d", start="2000-01-03"):
     return pd.DataFrame({"open": o, "high": h, "low": l, "close": c}, index=idx)
 
 
+# Ideias que nas velas sinteticas (sem BTC: regime da propria serie, media de 200 velas de 15m = 50h) nao dao sinais.
+# As pecas estao testadas noutras ideias (#201, #197 e o _htf_context nas #209/#220) e ha um teste proprio abaixo.
+SYNTH_NO_SIGNALS = {"l-dc96-15m-ctx197-vol15-s3-tp2-mh32": "0 sinais sinteticos (regime de 50h contradiz a rutura de 24h); ver test_ctx_entry_15m"}
+
+
 @pytest.mark.parametrize("name", sorted(IDEAS))
 def test_swing_random_walk_no_edge(name):
+    if name in SYNTH_NO_SIGNALS:
+        pytest.skip(SYNTH_NO_SIGNALS[name])
     fn, tf, st, tp, mh = IDEAS[name]
     rs = []
     for s in range(6):
@@ -54,6 +62,8 @@ def test_swing_random_walk_no_edge(name):
 
 @pytest.mark.parametrize("name", sorted(IDEAS))
 def test_swing_no_lookahead(name):
+    if name in SYNTH_NO_SIGNALS:
+        pytest.skip(SYNTH_NO_SIGNALS[name])
     fn, tf, st, tp, mh = IDEAS[name]
     st0, n0 = CAL.get(name, ("2000-01-03", 12000 if tf in ("5m", "15m") else 3000))
     b = synth_d(n=n0, seed=9, tf=tf, start=st0)
@@ -210,3 +220,24 @@ def test_lose_hold_and_exit_fn():
     xf = run_positions(b, pos, 2.0, 0.0, 0.0, 1.0, 0, 0.0, signal_exit=False, exit_fn=lambda _b: xm)
     assert len(xf) > len(base)
     assert set(xf["exit"]) & set(b.index[::50])
+
+
+def test_ctx_entry_15m():
+    """ctx_entry em 15m com contexto de 4h e entrada sem regime: sem lookahead e sem vantagem no passeio aleatorio."""
+    from sr.swing_ideas import ctx_entry, _htf_context
+    ctx_fn = lambda x: x["close"] > x["high"].rolling(20).max().shift(1)
+    ent_fn = lambda x: (x["close"] > x["high"].rolling(96).max().shift(1)).astype(float)
+    fn = ctx_entry(ctx_fn, "4h", 6, ent_fn)
+    rs = []
+    for s in range(6):
+        b = synth_d(n=30000, seed=s, tf="15m", start="2000-01-03")
+        rs.append(run_positions(b, fn(b), 3.0, 0.0, 0.0, 2.0, 32, min_risk_cost=0.0, signal_exit=False)["gross_R"].to_numpy())
+    r = np.concatenate(rs)
+    assert len(r) > 50
+    assert abs(r.mean() / (r.std(ddof=1) / np.sqrt(len(r)))) < 3.0
+    b = synth_d(n=30000, seed=9, tf="15m", start="2000-01-03")
+    cut = b.index[len(b) // 2]
+    full = _htf_context(b, ctx_fn, "4h", 6)
+    part = _htf_context(b[b.index <= cut], ctx_fn, "4h", 6)
+    lim = cut - pd.Timedelta(hours=4)
+    assert (full[full.index < lim] == part[part.index < lim]).all()

@@ -1463,3 +1463,26 @@ for _n, _v in {
     IDEAS[_n] = _v
     EXITS[_n] = {"signal_exit": False}
 NO_MIN_RISK.update({"l-vbo05-1h-bear-s3-tp2-mh24", "s-vbo05-1h-bear-s3-tp2-mh24", "l-vbo05-15m-bear-s3-tp2-mh32"})   # intraday
+
+
+# ---------------- CONTINUACAO NO CONTEXTO DA #197 + VIZINHAS DA #197 (2026-11-27, sessao 04h) ----------------
+def ctx_entry(ctx_fn, tf: str, look: int, entry_fn):
+    """Contexto (sinal ctx_fn em velas de tf, numa das ultimas look velas JA FECHADAS) + sinal entry_fn da vela atual -> 1 (long)."""
+    def f(b):
+        ctx = _htf_context(b, ctx_fn, tf, look)
+        sig = ctx & entry_fn(b).astype(bool)
+        return sig.fillna(False).astype(float)
+    return f
+
+
+for _n, _v in {
+    "l-dc20-4h-bear-vol15-s2-tp2-mh24": (dc_bull_in_bear_vol_entry(20, 1.5), "4h", 2.0, 2.0, 24),
+    "l-dc10-4h-bear-vol15-s2-tp2-mh12": (dc_bull_in_bear_vol_entry(10, 1.5), "4h", 2.0, 2.0, 12),
+    "l-dc96-15m-ctx197-vol15-s3-tp2-mh32": (ctx_entry(dc_bull_in_bear_vol_entry(20, 1.5), "4h", 6,
+                                                      dc_bull_in_bear_vol_ema_entry(96, 1.5)), "15m", 3.0, 2.0, 32),
+    "l-dc24-1h-ctx197-vol15-s3-tp2-mh24": (ctx_entry(dc_bull_in_bear_vol_entry(20, 1.5), "4h", 6,
+                                                     dc_bull_in_bear_vol_ema_entry(24, 1.5, 200)), "1h", 3.0, 2.0, 24),
+}.items():
+    IDEAS[_n] = _v
+    EXITS[_n] = {"signal_exit": False}
+NO_MIN_RISK.update({"l-dc96-15m-ctx197-vol15-s3-tp2-mh32", "l-dc24-1h-ctx197-vol15-s3-tp2-mh24"})   # intraday

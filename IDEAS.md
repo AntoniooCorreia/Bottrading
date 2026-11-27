@@ -1054,3 +1054,8 @@ ja confirmado) em scalping e day trade. Cada uma = ideia anterior + UMA mudanca.
   (t 1.99, positiva nas 3) tira as ruturas de 1h fora de um ressalto confirmado.
 Fasquia: criterio oficial (>= 60 trades por moeda, positiva em cada, t >= 3.0, confirmacao >= 3/5); depois pre e holdout uma vez.
 Nota de desconfianca: 52 ideias de baixa ja testadas (#165-#216); #217/#218 sao vizinhas da #197 (se passarem, desconfiar de afinacao).
+Resultado (dev 2019-2024, perp): as 4 REPROVADAS (K134-K137). #217 (4 dias) t +3.27, positiva nas 3 (+0.28R, win 50%), conf. 4/5, +8.5%/ano, pior ano -3.1%,
+pior mes -4.6%, mas SOL 54 < 60 (igual a #197: segurar mais tempo quase nao muda nada). #218 (canal 10) t +2.43, conf. 5/5, SOL 81 trades, +6.0%/ano,
+pior ano -3.4%, pior mes -8.0% (quase passa). #219 15m t -0.50 (pior ano -12.9%; scalping em baixa 0 de 6). #220 1h t +0.52 (SOL negativa).
+Leitura: o contexto da #197 nao melhora ruturas curtas (como nao melhorou recuos): a vantagem esta na propria vela de 4h com volume. Mais trades
+na mesma familia (canal 10) diluem o t. #217 e #218 entram em SPECS (familia breakout, ja suportada); nao mudam a demo (t abaixo da atual + 0.3).
