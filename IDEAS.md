@@ -957,3 +957,22 @@ Day trade). #203 short 4h t +0.43 (antes -0.16); carteira #197+#203 (K121) +8.4%
 #204 alvo 1R t +1.86, conf. 5/5, win 54%, pior ano -1.2% (quase passa -> SPECS); o alvo 1R corta o R da #197 para um terco sem subir o win rate.
 Leitura: o filtro de volume ajuda em todos os horizontes (melhora sempre a ideia de partida), mas so a #197 (4h, 2R, 2 dias) passa o t 3.0;
 o efeito e real mas pequeno; em 15m os custos dominam.
+
+## 2026-11-27 cripto - sessao :30 (02h30, noite intensiva) (4 ideias; ideias cripto testadas antes: ~118 (#100-#204); esta noite (desde 19h de 26-11): 8 de 20 com esta sessao) - registadas antes de correr
+PRIORIDADE: BTC abaixo da media de 200 dias. `python best.py`: base geral K67 (#158, so opera com BTC em alta); a melhor de BAIXA continua a #197
+(K111, rutura de 20 velas de 4h com volume > 1.5x, t +3.34, win 53%, nenhum ano negativo, mas SOL 54 trades < 60).
+O que falha: todas as entradas de baixa ate agora sao RUTURAS (comprar forca); o volume ajuda sempre mas falta frequencia e em 15m os custos
+dominam. Nunca testamos o lado oposto do mesmo sinal de volume: a CAPITULACAO (selling climax de Wyckoff): numa baixa, o fundo de curto prazo
+aparece numa vela que faz um minimo novo com volume muito acima do normal e fecha na metade de cima da propria vela (os vendedores forcados
+despejam, os compradores absorvem). E informacao nova (minimo novo + volume + rejeicao), nao parametros da #197. Para ver se e geral, o
+MESMO sinal em 3 horizontes (um por estilo) e o espelho em short (upthrust: maximo novo com volume que fecha na metade de baixo).
+Parametros fixos copiados das ideias irmas (volume 1.5x, stops/alvos/tempos de #201/#202/#197). Todas --venue perp.
+- **#205 l-climax96-15m-bear-vol15-s3-tp2-mh32** (SCALPING): vela de 15m com minimo < minimo das 96 velas anteriores (24h), volume > 1.5x a media
+  das 96 anteriores e fecho >= meio da vela ((fecho-minimo)/(maximo-minimo) >= 0.5), BTC em baixa -> long. Stop 3 ATR(14) de 15m, alvo 2R, max 32 velas (8h).
+- **#206 l-climax24-1h-bear-vol15-s3-tp2-mh24** (DAY TRADE): o mesmo em 1h, minimo de 24 velas, media de volume de 24. Stop 3 ATR, alvo 2R, max 24h.
+- **#207 l-climax20-4h-bear-vol15-s2-tp2-mh12** (SWING): o mesmo em 4h, 20 velas. Stop 2 ATR, alvo 2R, max 12 velas (2 dias). Pouco correlacionada
+  com a #197 (compra no fundo, a #197 compra a rutura) -> candidata a 2.a estrategia da carteira (MAIS TRADES).
+- **#208 s-upthrust20-4h-bear-vol15-s2-tp2-mh12** (SWING short): vela de 4h com maximo > maximo das 20 anteriores, volume > 1.5x e fecho <= meio da
+  vela, BTC em baixa -> short. Stop 2 ATR, alvo 2R, max 12 velas. Hipotese: o ressalto que falha com volume (compradores apanhados) volta a cair.
+Fasquia: criterio oficial (>= 60 trades por moeda, positiva em cada, t >= 3.0, confirmacao >= 3/5); depois pre e holdout uma vez.
+Nota de desconfianca: 40 ideias de baixa ja testadas (#165-#204).

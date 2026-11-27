@@ -334,3 +334,9 @@ Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --p
 - [x] #202 l-dc24-1h-bear-vol15-s3-tp2-mh24 (day trade 1h) -> REPROVADA (t +1.99; BTC +0.113R/231, ETH +0.087R/232, SOL +0.061R/142; win 47%; conf. 4/5; K117 +6.0%/ano, pior ano -9.4%); quase passa -> SPECS
 - [x] #203 s-dc20-4h-bear-vol15-s2-tp2-mh12 (swing 4h short) -> REPROVADA (t +0.43; BTC -0.013R/85, ETH +0.015R/100, SOL +0.104R/71; win 45%; conf. 4/5; K118 +1.4%/ano, pior ano -9.5%); #197+#203 K121 +8.4%/ano, pior ano -4.2%
 - [x] #204 l-dc20-4h-bear-vol15-s2-tp1-mh6 (day trade 4h) -> REPROVADA (t +1.86; BTC +0.077R/130, ETH +0.094R/116, SOL +0.069R/73; win 54%; conf. 5/5; K119 +2.3%/ano, pior ano -1.2%); quase passa -> SPECS
+
+## Ideias do agente (2026-11-27, sessao 02h30): capitulacao com volume (selling climax) em baixa, 3 estilos + upthrust em short (perp)
+- [ ] #205 l-climax96-15m-bear-vol15-s3-tp2-mh32 (scalping 15m)
+- [ ] #206 l-climax24-1h-bear-vol15-s3-tp2-mh24 (day trade 1h)
+- [ ] #207 l-climax20-4h-bear-vol15-s2-tp2-mh12 (swing 4h)
+- [ ] #208 s-upthrust20-4h-bear-vol15-s2-tp2-mh12 (swing 4h short)
