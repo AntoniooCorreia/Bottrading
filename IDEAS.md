@@ -1080,3 +1080,18 @@ e no pre; continua a NAO passar o criterio oficial (SOL 54 < 60) e o holdout 202
 
 - **#224 diario da demo** (l-dc24-1h-bear-vol15-s3-tp2-mh24): vai testar Pedir volume 2.0x a media na rutura (era 1.5). Proposta por 1 perda(s) ao vivo. Regra fixa do journal_lab.py: aplica se R/trade sobe >= 0.02R, t >= t atual + 0.3 e trades >= 50%.
   Resultado #224: #224: antes t +1.99, +0.091R/trade, win 47%, 605 trades -> depois t +2.46, +0.125R/trade, win 49%, 506 trades (BTC +0.15R, ETH +0.13R, SOL +0.07R). APLICADA: a demo passa a usar a variante.
+
+- **#225 diario da demo** (s-rsi2-15m-long): vai testar So entrar com RSI(2) abaixo de 3 (era 5): sobrevenda mais extrema. Proposta por 1 perda(s) ao vivo. Regra fixa do journal_lab.py: aplica se R/trade sobe >= 0.02R, t >= t atual + 0.3 e trades >= 50%.
+  Resultado #225: #225: antes t -15.95, -0.119R/trade, win 56%, 7091 trades -> depois t -10.79, -0.113R/trade, win 56%, 3821 trades (BTC -0.16R, ETH -0.12R, SOL -0.05R). REJEITADA (R por trade nao subiu 0.02R): a estrategia fica como esta.
+
+## 2026-11-27 cripto - sessao :00 (19h) (3 ideias com a #225 do diario; ideias cripto testadas antes: ~134 (#100-#225); esta noite (desde 19h de 27-11): 3 de 10 com esta sessao; limite reduzido) - registadas antes de correr
+BTC continua abaixo da media de 200 dias: ideias para baixa. Scalping parado (0 de 6 em baixa). Licao da #221: a vantagem das ruturas de 4h com volume
+aparece em 8 moedas e a carteira de 8 moedas dobra a frequencia SEM mudar a regra. Esta sessao aplica a mesma medicao (carteira de 8 moedas,
+max 4 abertas, parametros iguais aos ja registados, nada afinado) as duas vizinhas que QUASE passaram e eram positivas em todas as moedas de confirmacao.
+- **#226 carteira-8 #204** (DAY TRADE, 4h, max 6 velas = 24h, MAIS TRADES e WIN RATE): l-dc20-4h-bear-vol15-s2-tp1-mh6 (alvo 1R) nas 8 moedas, max 4 abertas.
+  Hipotese: a #204 tem win 54%, confirmacao 5/5 e pior ano -1.2%, mas poucas trades (t 1.86). Em 8 moedas a frequencia ~2.5x e o t sobe se a vantagem e real.
+  Objetivo: win rate >= 50% com pior ano perto de 0 e trades curtas (o Antonio nao quer ficar dias em trade).
+- **#227 carteira-8 #218** (SWING, MAIS TRADES): l-dc10-4h-bear-vol15-s2-tp2-mh12 (canal de 10 velas de 4h) nas 8 moedas, max 4 abertas.
+  Hipotese: a #218 e positiva nas 3 moedas e 5/5 na confirmacao, com SOL 81 trades; em 8 moedas pode chegar a ~2-3 trades/semana com a mesma regra.
+  Risco: pior mes -8.0% na #218 (pode piorar com mais trades abertas ao mesmo tempo).
+O criterio oficial (BTC/ETH/SOL) NAO muda: isto mede so a carteira. Comparar com a #221 (K138: +14.3%/ano, win 48%, pior ano -1.2%, pior mes -6.5%, ~1.5/semana).

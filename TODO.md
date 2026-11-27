@@ -358,3 +358,8 @@ Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --p
 - [x] #218 l-dc10-4h-bear-vol15-s2-tp2-mh12 (swing 4h, canal 10) -> REPROVADA (t +2.43; BTC +0.186R/143, ETH +0.114R/139, SOL +0.132R/81; win 50%; conf. 5/5; K135 +6.0%/ano, pior ano -3.4%, pior mes -8.0%)
 - [x] #219 l-dc96-15m-ctx197-vol15-s3-tp2-mh32 (scalping 15m) -> REPROVADA (t -0.50; BTC +0.046R/103, ETH -0.034R/107, SOL -0.156R/67; win 40%; conf. 1/5; K137 -1.3%/ano, pior ano -12.9%)
 - [x] #220 l-dc24-1h-ctx197-vol15-s3-tp2-mh24 (day trade 1h) -> REPROVADA (t +0.52; BTC +0.204R/58, ETH -0.010R/62, SOL -0.111R/35; win 41%; conf. 2/5; K136 +0.2%/ano, pior ano -9.7%)
+
+## Ideias do agente (2026-11-27, sessao 19h): carteira de 8 moedas das vizinhas da #197 (perp)
+- [x] #225 diario da demo s-rsi2-15m-long~lo3 (scalping) -> REJEITADA pelo journal_lab (-0.119 -> -0.113R/trade, nao sobe 0.02R)
+- [ ] #226 carteira-8 #204 l-dc20-4h-bear-vol15-s2-tp1-mh6 (day trade 4h, 8 moedas, max 4 abertas)
+- [ ] #227 carteira-8 #218 l-dc10-4h-bear-vol15-s2-tp2-mh12 (swing 4h, 8 moedas, max 4 abertas)
