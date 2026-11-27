@@ -631,6 +631,23 @@ function vDemo(){
       <td class="num">${nf(+p.entry_price,2)} $</td><td class="num">${nf(+p.stop,2)} $</td><td class="num">${cur?nf(cur,2)+" $":"—"}</td>
       <td class="num ${cls(pnl)}"><b>${pnl==null?"—":(pnl>=0?"+":"−")+nf(Math.abs(pnl),2)+" $"}</b>${p.r!=null?`<div class="small muted">${rr(+p.r)}</div>`:""}</td>
       <td>${p.status==="open"?"aberta":esc(p.exit_reason||"")}</td></tr>`;};
+  const TFM_={"5m":5,"15m":15,"1h":60,"4h":240,"1d":1440};
+  const orow=p=>{const sd=+(p.side||1), e=+p.entry_price, st=+p.stop, tp=p.tp?+p.tp:null, q=+p.qty, f=+p.fee_eur||0, cur=px[p.coin];
+    const risk=Math.abs(e-st); const rNow=cur&&risk?sd*(cur-e)/risk:null; const pnl=cur?sd*q*(cur-e)-f:null;
+    const atStop=sd*q*(st-e)-2*f, atTp=tp?sd*q*(tp-e)-2*f:null;
+    const pct=x=>(x/e-1)*100*sd, dist=x=>cur?((x/cur-1)*100):null;
+    const sp=p.spec||{}, mh=+sp.max_hold||0, tfm=TFM_[sp.tf]||0, until=mh&&tfm?new Date(new Date(p.entry_time).getTime()+(mh+1)*tfm*60000):null;
+    const fmt=d=>d.toLocaleString("pt-PT",{weekday:"short",day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"});
+    const left=until?Math.max(0,(until-Date.now())/3600000):null;
+    const prog=tp&&cur?Math.max(0,Math.min(100,(sd*(cur-st))/(sd*(tp-st))*100)):null;
+    return `<tr><td><b>${CN[p.coin]||p.coin}</b><div class="small"><span class="badge ${sd===1?"ok":"bad"}">${sd===1?"LONG":"SHORT"}</span></div></td>
+      <td><code>${esc(p.strategy)}</code>${sp.num?`<div class="small muted">${esc(sp.num)}</div>`:""}</td>
+      <td class="num">${nf(e,2)} $<div class="small muted">${new Date(p.entry_time).toLocaleString("pt-PT",{dateStyle:"short",timeStyle:"short"})}</div></td>
+      <td class="num neg">${nf(st,2)} $<div class="small">${cur?`a ${nf(Math.abs(dist(st)),1)}% · `:""}−1R ≈ ${nf(Math.abs(atStop),0)} $</div></td>
+      <td class="num pos">${tp?`<b>${nf(tp,2)} $</b><div class="small">${cur?`falta ${nf(Math.abs(dist(tp)),1)}% · `:""}+${nf(sd*(tp-e)/risk,1)}R ≈ +${nf(atTp,0)} $</div>`:`<span class="muted">sem alvo</span><div class="small muted">sai pelo sinal</div>`}</td>
+      <td class="num">${cur?nf(cur,2)+" $":"—"}${prog!=null?`<div style="height:6px;background:var(--surface-2);border-radius:3px;margin-top:4px;min-width:70px" title="do stop (esquerda) ao alvo (direita)"><div style="height:6px;width:${prog}%;background:${rNow>=0?"var(--pos)":"var(--neg)"};border-radius:3px"></div></div>`:""}</td>
+      <td class="num ${cls(pnl)}"><b>${pnl==null?"—":(pnl>=0?"+":"−")+nf(Math.abs(pnl),2)+" $"}</b>${rNow!=null?`<div class="small">${rNow>=0?"+":""}${nf(rNow,2)}R</div>`:""}</td>
+      <td class="small">${until?`${fmt(until)}<div class="muted">${left<1?"menos de 1h":"faltam "+nf(left,0)+"h"}</div>`:`<span class="muted">sem tempo máximo</span>`}</td></tr>`;};
   const conta=X?contaOf(AC):null;
   const STY={2:"swing — trades de dias (velas diárias e de 4h)",3:"day trade — trades de horas, fecham no máximo em ~1 dia (velas de 1h/4h)",4:"scalping — trades de minutos a poucas horas (velas de 15 minutos)"};
   const how=X?`<div class="card"><h2>${accLabel(D.acc)} — o que esta conta está a fazer</h2><div class="small" style="color:var(--text-2)">
@@ -649,7 +666,7 @@ function vDemo(){
       <p style="margin-top:0">De hora a hora (quando fecha cada vela) o bot lê os <b>preços reais da Kraken</b> (BTC, ETH, SOL em dólares) e aplica as estratégias de tendência <b>K1</b>: compra quando o preço rompe máximos ou fica acima da média, e vende quando a tendência acaba ou o stop é tocado (o stop é vigiado a cada minuto). <b>Nenhuma ordem real é enviada</b>: as trades são simuladas aqui, com a comissão da Kraken (0,26% por lado).</p>
       <p style="margin-bottom:0">Risco de 1% do saldo por trade, stop a 3 ATR, no máximo 1 posição por moeda e 1/3 do saldo por moeda (sem alavancagem). Cada compra e venda chega também ao Telegram.</p></div></div>`}
     ${chart?`<div class="card"><h2>Evolução do saldo</h2>${chart}</div>`:""}
-    <div class="card"><h2>Posições abertas</h2>${open.length?`<div class="scroll"><table class="t"><thead><tr><th>Moeda</th><th>Estratégia</th><th>Entrada</th><th class="num">Preço entrada</th><th class="num">Stop</th><th class="num">Preço atual</th><th class="num">Resultado</th><th>Estado</th></tr></thead><tbody>${open.map(row).join("")}</tbody></table></div>`:`<div class="empty">Sem posições abertas. ${X?"À espera dos sinais das estratégias escolhidas pelo agente.":"O bot está à espera de uma tendência de subida em BTC, ETH ou SOL."}</div>`}</div>
+    <div class="card"><h2>Posições abertas</h2>${open.length?`<div class="scroll"><p class="hint">A trade fecha no que acontecer primeiro: <b>alvo (TP)</b> = ganho, <b>stop</b> = perda de 1R (1% da conta), ou o <b>tempo máximo</b> (fecha ao preço do momento). A barra mostra onde o preço está entre o stop e o alvo.</p><table class="t"><thead><tr><th>Moeda</th><th>Estratégia</th><th class="num">Entrada</th><th class="num">Stop (SL)</th><th class="num">Alvo (TP)</th><th class="num">Agora</th><th class="num">Resultado</th><th>Fecha no máximo</th></tr></thead><tbody>${open.map(orow).join("")}</tbody></table></div>`:`<div class="empty">Sem posições abertas. ${X?"À espera dos sinais das estratégias escolhidas pelo agente.":"O bot está à espera de uma tendência de subida em BTC, ETH ou SOL."}</div>`}</div>
     <div class="card"><h2>Trades fechadas</h2>${closed.length?`<div class="scroll"><table class="t"><thead><tr><th>Moeda</th><th>Estratégia</th><th>Entrada</th><th class="num">Preço entrada</th><th class="num">Stop</th><th class="num">Saída</th><th class="num">Resultado</th><th>Motivo</th></tr></thead><tbody>${closed.slice().reverse().map(row).join("")}</tbody></table></div>`:`<div class="empty">Ainda nenhuma trade fechada.</div>`}</div>`;
 }
 /* o que falta para LONG (as 4 estrategias da K1) e para SHORT (espelho, so informativo: spot na Kraken nao permite short) */
