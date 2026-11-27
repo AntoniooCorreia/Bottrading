@@ -1034,3 +1034,23 @@ baixa 0 de 5). #216 semanal 4h t +1.85, positiva nas 3 (+0.19R, win 54%), conf. 
 Leitura: a rutura de volatilidade confirma o padrao da noite (em baixa ganha o LONG no movimento forte, 4h/1h melhor que 15m, short pior), mas
 nenhuma chega ao t 3.0. #213 e #216 quase passam, mas a familia (abertura do periodo + k x amplitude) NAO existe na demo (sr/demo_spec.py):
 nao entram em SPECS sem mexer no engine.ts (fica como proximo passo para o chat).
+
+## 2026-11-27 cripto - sessao :00 (04h, noite intensiva, ultima) (4 ideias; ideias cripto testadas antes: ~130 (#100-#216); esta noite (desde 19h de 26-11): 20 de 20 com esta sessao) - registadas antes de correr
+PRIORIDADE: BTC abaixo da media de 200 dias. Base de baixa: #197 (K111, rutura de 20 velas de 4h com volume > 1.5x, BTC em baixa, stop 2 ATR, alvo 2R,
+max 12 velas: t +3.34, win 53%, nenhum ano negativo, mas SOL 54 trades < 60, 0.6 trades/semana).
+O que falha: frequencia (SOL < 60) e, nas velas curtas, ruido. Licao da noite: em baixa ganha-se a SEGURAR o movimento forte na direcao da rutura;
+os recuos (#209-#212) e as capitulacoes (#205-#208) perdem. Plano: (a) testar se segurar mais tempo ajuda (o ganho vem de segurar), (b) mais ruturas
+com o mesmo filtro de volume, (c) usar o contexto da #197 nao para recuos mas para CONTINUACAO (rutura curta com volume dentro de um ressalto de 4h
+ja confirmado) em scalping e day trade. Cada uma = ideia anterior + UMA mudanca. Parametros fixos. Todas --venue perp.
+- **#217 l-dc20-4h-bear-vol15-s2-tp2-mh24** (SWING): = #197 com maximo de 24 velas de 4h (4 dias) em vez de 12. Hipotese: parte das trades da #197
+  sai pelo tempo antes do alvo 2R; se o ganho vem de segurar, mais tempo sobe o R por trade sem baixar o win rate.
+- **#218 l-dc10-4h-bear-vol15-s2-tp2-mh12** (SWING, MAIS TRADES): = #197 com rutura de 10 velas de 4h (40h) em vez de 20. Hipotese: o volume e que separa
+  as ruturas verdadeiras; um canal mais curto da mais sinais (SOL > 60) e o filtro de volume mantem a qualidade.
+- **#219 l-dc96-15m-ctx197-vol15-s3-tp2-mh32** (SCALPING, MAIS TRADES): = #201 (rutura de 96 velas de 15m com volume > 1.5x, BTC em baixa, stop 3 ATR,
+  alvo 2R, max 32 velas) + so quando o sinal da #197 disparou numa das ultimas 6 velas de 4h FECHADAS (24h). Hipotese: a #201 perdia em ruido; dentro
+  de um ressalto de 4h confirmado, a rutura de 15m e continuacao (a direcao certa, segundo a noite), nao ruido.
+- **#220 l-dc24-1h-ctx197-vol15-s3-tp2-mh24** (DAY TRADE, MAIS TRADES): = #202 (rutura de 24 velas de 1h com volume > 1.5x, acima da EMA 200 de 1h,
+  BTC em baixa, stop 3 ATR, alvo 2R, max 24h) + contexto da #197 nas ultimas 6 velas de 4h fechadas. Hipotese: o mesmo filtro de qualidade na #202
+  (t 1.99, positiva nas 3) tira as ruturas de 1h fora de um ressalto confirmado.
+Fasquia: criterio oficial (>= 60 trades por moeda, positiva em cada, t >= 3.0, confirmacao >= 3/5); depois pre e holdout uma vez.
+Nota de desconfianca: 52 ideias de baixa ja testadas (#165-#216); #217/#218 sao vizinhas da #197 (se passarem, desconfiar de afinacao).
