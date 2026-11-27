@@ -1353,3 +1353,35 @@ for _n, _v in {
     IDEAS[_n] = _v
     EXITS[_n] = {"signal_exit": False}
 NO_MIN_RISK.update({"l-dc96-15m-bear-vol15-s3-tp2-mh32", "l-dc24-1h-bear-vol15-s3-tp2-mh24"})   # como a #192 (intraday)
+
+
+# ---------------- CAPITULACAO COM VOLUME (SELLING CLIMAX) EM BAIXA (2026-11-27, sessao 02h30) ----------------
+def climax_bear_entry(n: int, vol_mult: float, side: int = 1):
+    """side=1: minimo < minimo das n velas anteriores, volume > vol_mult x media das n anteriores, fecho na metade de cima
+    da vela, BTC em baixa -> 1 (long). side=-1 (upthrust): maximo > maximo das n anteriores, volume > vol_mult x media,
+    fecho na metade de baixo, BTC em baixa -> -1 (short)."""
+    def f(b):
+        c, h, l = b["close"], b["high"], b["low"]
+        rng = (h - l).where(h > l)
+        pos = (c - l) / rng
+        if side == 1:
+            sig = (l < l.rolling(n).min().shift(1)) & (pos >= 0.5)
+        else:
+            sig = (h > h.rolling(n).max().shift(1)) & (pos <= 0.5)
+        sig = sig & _btc_bear(b)
+        if "volume" in b:
+            v = b["volume"]
+            sig = sig & (v > vol_mult * v.rolling(n).mean().shift(1))
+        return side * sig.fillna(False).astype(float)
+    return f
+
+
+for _n, _v in {
+    "l-climax96-15m-bear-vol15-s3-tp2-mh32": (climax_bear_entry(96, 1.5), "15m", 3.0, 2.0, 32),
+    "l-climax24-1h-bear-vol15-s3-tp2-mh24": (climax_bear_entry(24, 1.5), "1h", 3.0, 2.0, 24),
+    "l-climax20-4h-bear-vol15-s2-tp2-mh12": (climax_bear_entry(20, 1.5), "4h", 2.0, 2.0, 12),
+    "s-upthrust20-4h-bear-vol15-s2-tp2-mh12": (climax_bear_entry(20, 1.5, -1), "4h", 2.0, 2.0, 12),
+}.items():
+    IDEAS[_n] = _v
+    EXITS[_n] = {"signal_exit": False}
+NO_MIN_RISK.update({"l-climax96-15m-bear-vol15-s3-tp2-mh32", "l-climax24-1h-bear-vol15-s3-tp2-mh24"})   # como a #201/#202 (intraday)

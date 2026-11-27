@@ -73,15 +73,15 @@ Perpetuos (#133-#137): mesmo com custos 4x mais baixos nada passa. Os shorts int
 
 #138 (2026-11-21, 19h): a #118 em 4h abre 2x mais trades (1.2/semana, SOL 173) com win rate 59%, mas so +0.09R/trade: t 2.47, REPROVADA.
 
-Leitura honesta cripto (2026-11-27, sessao das 02h, 1.a da noite intensiva 26-27/11):
-1. Ideias cripto testadas no total: 118 (#100-#204, K1, scalping, intraday, perpetuos). Mais testes = mais desconfianca num resultado isolado.
+Leitura honesta cripto (2026-11-27, sessao das 02h30, 2.a da noite intensiva 26-27/11):
+1. Ideias cripto testadas no total: 122 (#100-#208, K1, scalping, intraday, perpetuos). Mais testes = mais desconfianca num resultado isolado.
 2. Melhor win rate com resultado positivo: 68% (#118 +0.33R, reprovada SOL < 60; #148 +0.14R). Na familia atual: 65% (#156, +0.24R no dev).
 3. A familia "moeda acima da media + BTC em alta + alvo 1R" tem t 4-5 em 2019-2024 mas ~0R em 2017-18 e no holdout (#155, #157): o dev explica quase tudo.
 4. Holdout ja gasto em cripto: K1, #100, #116, #155, #157. Nenhuma estrategia cripto esta aprovada.
-5. Mercado em baixa: 40 ideias (#165-#204, todas perp). Shorts e compras em sobrevenda perdem: os ressaltos de baixa sao violentos.
+5. Mercado em baixa: 44 ideias (#165-#208, todas perp). Shorts, compras em sobrevenda e compras na capitulacao com volume (#205-#207) perdem.
 6. Comprar o ressalto DEPOIS de comecar (rutura com BTC em baixa) e o unico caminho positivo nas 3 moedas; o volume > 1.5x melhora-o
-   em todos os horizontes (#192 t 1.33 -> #202 1.99; #199 -0.16 -> #203 +0.43), mas so a #197 (4h, 2R, 2 dias) chega a t 3 (SOL 54 < 60).
-7. Em 15m (#201) os custos e o ruido matam tudo (-89.6% em 2022). Demo Day trade: #131/#133 + #202 (opera com BTC em baixa; nao aprovada).
+   em todos os horizontes, mas so a #197 (4h, 2R, 2 dias) chega a t 3 (SOL 54 < 60). O volume confirma a direcao da vela que rompe.
+7. Em 15m (#201, #205) os custos e o ruido matam tudo. Demo Day trade: #131/#133 + #202 (opera com BTC em baixa; nao aprovada).
 
 # Resumo indices (ARQUIVO, custos CFD incluidos)
 

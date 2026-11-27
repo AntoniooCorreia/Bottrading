@@ -976,3 +976,8 @@ Parametros fixos copiados das ideias irmas (volume 1.5x, stops/alvos/tempos de #
   vela, BTC em baixa -> short. Stop 2 ATR, alvo 2R, max 12 velas. Hipotese: o ressalto que falha com volume (compradores apanhados) volta a cair.
 Fasquia: criterio oficial (>= 60 trades por moeda, positiva em cada, t >= 3.0, confirmacao >= 3/5); depois pre e holdout uma vez.
 Nota de desconfianca: 40 ideias de baixa ja testadas (#165-#204).
+Resultado (dev 2019-2024, perp): as 4 REPROVADAS (K122-K125), nenhuma positiva nas 3 moedas. #205 15m t -5.06 (-0.13R, pior ano -83%); #206 1h
+t -2.93 (-0.11R, pior ano -31%); #207 4h t +0.09 (so o BTC positivo, +0.17R; ETH/SOL negativas; conf. 0/5); #208 upthrust short t -0.91 (win 40%).
+Leitura: em baixa, comprar o minimo novo com volume e apanhar a faca a cair em todos os horizontes (pior quanto mais curto); o maximo novo com
+volume tambem nao e armadilha (o short perde). Ou seja, o volume em cripto confirma a DIRECAO da vela que rompe: a #197 (comprar a rutura para
+cima com volume) e o lado certo; nao ha "absorcao" mecanica a explorar. Nada entra em SPECS. Scalping 15m em baixa: 0 de 2 tentativas com volume.
