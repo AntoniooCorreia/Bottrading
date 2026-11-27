@@ -1423,3 +1423,43 @@ for _n, _v in {
     IDEAS[_n] = _v
     EXITS[_n] = {"signal_exit": False}
 NO_MIN_RISK.update({"l-pb15m-ctx197-rsi2-s3-tp2-mh32", "l-pb1h-ctx197-rsi2-s3-tp2-mh24", "l-pb15m-ctx202-rsi2-s3-tp2-mh32"})   # intraday
+
+
+# ---------------- RUTURA DE VOLATILIDADE DE WILLIAMS EM BAIXA (2026-11-27, sessao 03h30) ----------------
+def vbo_entry(k: float, period: str = "1D", side: int = 1):
+    """Nivel = abertura do periodo (dia/semana UTC) +/- k x amplitude (maximo - minimo) do periodo anterior.
+    side=1: fecho > abertura + k x amplitude -> 1 (long); side=-1: fecho < abertura - k x amplitude -> -1 (short).
+    So o 1.o sinal de cada periodo e com BTC em baixa. A abertura do periodo e a da 1.a vela do periodo (conhecida);
+    a amplitude e a do periodo anterior ja fechado (sem lookahead)."""
+    def f(b):
+        c = b["close"]
+        if period == "1W":
+            key = (b.index - pd.to_timedelta(b.index.dayofweek, unit="D")).normalize()
+        else:
+            key = b.index.normalize()
+        key = pd.Series(key, index=b.index)
+        g = b.groupby(key)
+        per = pd.DataFrame({"open": g["open"].first(), "high": g["high"].max(), "low": g["low"].min()})
+        rng_prev = (per["high"] - per["low"]).shift(1)
+        op = key.map(per["open"])
+        rp = key.map(rng_prev)
+        if side == 1:
+            raw = c > op + k * rp
+        else:
+            raw = c < op - k * rp
+        raw = (raw & rp.notna()).fillna(False)
+        first = raw & (raw.astype(int).groupby(key).cumsum() == 1)
+        sig = first & _btc_bear(b)
+        return side * sig.astype(float)
+    return f
+
+
+for _n, _v in {
+    "l-vbo05-1h-bear-s3-tp2-mh24": (vbo_entry(0.5), "1h", 3.0, 2.0, 24),
+    "s-vbo05-1h-bear-s3-tp2-mh24": (vbo_entry(0.5, side=-1), "1h", 3.0, 2.0, 24),
+    "l-vbo05-15m-bear-s3-tp2-mh32": (vbo_entry(0.5), "15m", 3.0, 2.0, 32),
+    "l-wvbo05-4h-bear-s2-tp2-mh12": (vbo_entry(0.5, "1W"), "4h", 2.0, 2.0, 12),
+}.items():
+    IDEAS[_n] = _v
+    EXITS[_n] = {"signal_exit": False}
+NO_MIN_RISK.update({"l-vbo05-1h-bear-s3-tp2-mh24", "s-vbo05-1h-bear-s3-tp2-mh24", "l-vbo05-15m-bear-s3-tp2-mh32"})   # intraday
