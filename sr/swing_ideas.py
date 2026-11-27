@@ -1317,3 +1317,39 @@ for _n, _v in {
 }.items():
     IDEAS[_n] = _v
     EXITS[_n] = {"signal_exit": False}
+
+
+# ---------------- O FILTRO DE VOLUME DA #197 NOUTROS HORIZONTES (2026-11-27, sessao 02h) ----------------
+def dc_bull_in_bear_vol_ema_entry(n: int, vol_mult: float, ema_n: int = 0):
+    """Rutura de n velas + volume > vol_mult x media das n anteriores + BTC em baixa (+ fecho acima da EMA(ema_n)) -> 1 (long)."""
+    base = dc_bull_in_bear_vol_entry(n, vol_mult)
+
+    def f(b):
+        sig = base(b).astype(bool)
+        if ema_n:
+            sig = sig & (b["close"] > _ema(b["close"], ema_n))
+        return sig.astype(float)
+    return f
+
+
+def dc_bear_vol_entry(n: int, vol_mult: float):
+    """#199 + volume da vela da quebra > vol_mult x media das n anteriores -> -1 (short)."""
+    def f(b):
+        c = b["close"]
+        sig = (c < b["low"].rolling(n).min().shift(1)) & _btc_bear(b)
+        if "volume" in b:
+            v = b["volume"]
+            sig = sig & (v > vol_mult * v.rolling(n).mean().shift(1))
+        return -sig.astype(float)
+    return f
+
+
+for _n, _v in {
+    "l-dc96-15m-bear-vol15-s3-tp2-mh32": (dc_bull_in_bear_vol_ema_entry(96, 1.5), "15m", 3.0, 2.0, 32),
+    "l-dc24-1h-bear-vol15-s3-tp2-mh24": (dc_bull_in_bear_vol_ema_entry(24, 1.5, 200), "1h", 3.0, 2.0, 24),
+    "s-dc20-4h-bear-vol15-s2-tp2-mh12": (dc_bear_vol_entry(20, 1.5), "4h", 2.0, 2.0, 12),
+    "l-dc20-4h-bear-vol15-s2-tp1-mh6": (dc_bull_in_bear_vol_entry(20, 1.5), "4h", 2.0, 1.0, 6),
+}.items():
+    IDEAS[_n] = _v
+    EXITS[_n] = {"signal_exit": False}
+NO_MIN_RISK.update({"l-dc96-15m-bear-vol15-s3-tp2-mh32", "l-dc24-1h-bear-vol15-s3-tp2-mh24"})   # como a #192 (intraday)

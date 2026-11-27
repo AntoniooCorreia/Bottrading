@@ -328,3 +328,9 @@ Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --p
 - [x] #198 l-dc20-4h-bear-btcbo-s2-tp2-mh12 -> REPROVADA (t +2.16; BTC +0.109R/136, ETH +0.217R/96, SOL +0.126R/53; win 48%; conf. 4/5; K114 +6.9%/ano, pior ano -2.9%)
 - [x] #199 s-dc20-4h-bear-s2-tp2-mh12 -> REPROVADA (t -0.16; BTC -0.085R/114, ETH -0.064R/126, SOL +0.157R/93; win 44%; conf. 4/5; K112 -0.2%/ano, pior ano -18% (2021)); carteira #191+#199 K115 +6.0%/ano, pior ano -17.9%
 - [x] #200 l-dc20-4h-bear-retest-s2-tp2-mh12 -> REPROVADA (t +1.71; BTC +0.148R/82, ETH +0.222R/93, SOL -0.092R/58; win 50%; conf. 3/5; K113 +3.6%/ano, pior ano -10.3%); carteira #191+#200 K116 +7.2%/ano, pior ano -1.1%, 53 trades/ano
+
+## Ideias do agente (2026-11-27, sessao 02h): o filtro de volume da #197 noutros horizontes (perp; scalping, day trade, swing)
+- [ ] #201 l-dc96-15m-bear-vol15-s3-tp2-mh32 (scalping 15m)
+- [ ] #202 l-dc24-1h-bear-vol15-s3-tp2-mh24 (day trade 1h)
+- [ ] #203 s-dc20-4h-bear-vol15-s2-tp2-mh12 (swing 4h short; carteira com a #197)
+- [ ] #204 l-dc20-4h-bear-vol15-s2-tp1-mh6 (day trade 4h, max 24h)

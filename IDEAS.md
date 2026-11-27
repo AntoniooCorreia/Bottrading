@@ -930,3 +930,24 @@ nao filtra melhor que o volume. #199 (short espelho) t -0.16: shorts de rutura e
 fica pior (pior ano -17.9%). #200 (reteste) t +1.71, SOL negativa; a carteira #191+#200 (K116) abre +30% de trades (53/ano) com pior ano -1.1%
 mas +7.2%/ano (menos que a #191 sozinha por trade). Mudanca no motor: load_crypto passa a ler o volume (so usado pela #197; resultados antigos iguais,
 #191 re-corrida da t +2.45 igual).
+
+## 2026-11-27 cripto - sessao :00 (02h, noite intensiva) (4 ideias; ideias cripto testadas antes: ~114 (#100-#200); esta noite (desde 19h de 26-11): 4 de 20 com esta sessao) - registadas antes de correr
+PRIORIDADE: BTC abaixo da media de 200 dias. `python best.py`: base geral K67 (#158, so opera com BTC em alta); a melhor ideia de BAIXA e a
+#197 (K111, l-dc20-4h-bear-vol15-s2-tp2-mh12): t +3.34, conf. 5/5, win 53%, +0.24R, nenhum ano negativo, mas SOL 54 trades (< 60).
+O que falha / o que aprendemos: o filtro de volume (> 1.5x a media das n velas anteriores) foi a UNICA mudanca que tirou as ruturas falsas
+de 2022 (de -0.01R para +0.24R por trade); falta-lhe frequencia (0.6 trades/semana). Nao se mexe no limiar (1.5x) nem na rutura (20).
+Plano: levar o MESMO filtro de volume (1.5x, fixo) a outros horizontes, um por estilo, para ganhar trades e ver se o efeito e geral
+(se for so na #197, desconfiar). Cada uma = ideia anterior + UMA mudanca (o volume). Todas --venue perp, parametros fixos, familia breakout
+da demo (vol_mult ja suportado em sr/demo_spec.py).
+- **#201 l-dc96-15m-bear-vol15-s3-tp2-mh32** (SCALPING, MAIS TRADES): fecho de 15m acima do maximo das 96 velas de 15m anteriores (24h) com
+  volume > 1.5x a media das 96 anteriores, BTC em baixa -> long. Stop 3 ATR(14) de 15m, alvo 2R, maximo 32 velas (8h). Hipotese: a rutura de
+  24h (#133/#192) com o filtro que separa ressaltos verdadeiros (fecho de shorts, volume) do ruido; perp custa 0.14% ida e volta.
+- **#202 l-dc24-1h-bear-vol15-s3-tp2-mh24** (DAY TRADE, MAIS TRADES): = #192 (rutura de 24 velas de 1h, EMA 200 de 1h, BTC em baixa, stop 3 ATR,
+  alvo 2R, max 24h) + volume > 1.5x a media das 24 anteriores. Hipotese: o volume fez a #191 passar de t 2.45 para 3.34; a #192 tinha o mesmo defeito.
+- **#203 s-dc20-4h-bear-vol15-s2-tp2-mh12** (SWING, 2.a estrategia, MAIS TRADES na carteira): = #199 (short na quebra do minimo de 20 velas de 4h,
+  BTC em baixa, stop 2 ATR, alvo 2R, max 2 dias) + volume > 1.5x. Hipotese: a capitulacao verdadeira vem com volume; as quebras de pouco volume
+  sao as que revertem (2021 -18% na #199). Corrida sozinha (veredicto) e junta com a #197 (carteira).
+- **#204 l-dc20-4h-bear-vol15-s2-tp1-mh6** (DAY TRADE 4h, max 24h): = #189 (rutura de 20 velas de 4h, BTC em baixa, stop 2 ATR, alvo 1R, max 6 velas)
+  + volume > 1.5x. Hipotese: o mesmo filtro com alvo curto sobe o win rate (> 55%) e encurta as trades para o estilo day trade.
+Fasquia: criterio oficial (>= 60 trades por moeda, positiva em cada, t >= 3.0, confirmacao >= 3/5); depois pre e holdout uma vez.
+Nota de desconfianca: 36 ideias de baixa ja testadas; isto testa se o efeito do volume e geral ou sorte da #197.
