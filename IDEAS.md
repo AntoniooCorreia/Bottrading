@@ -1002,3 +1002,8 @@ Parametros fixos: RSI(2) < 10, contexto = sinal nas ultimas 6 velas de 4h (24h),
   Hipotese: a #202 e positiva nas 3 moedas (t 1.99) e dispara ~81/ano: mais contextos -> mais trades de scalping.
 Fasquia: criterio oficial (>= 60 trades por moeda, positiva em cada, t >= 3.0, confirmacao >= 3/5); depois pre e holdout uma vez.
 Nota de desconfianca: 44 ideias de baixa ja testadas (#165-#208).
+Resultado (dev 2019-2024, perp): as 4 REPROVADAS (K126-K129), nenhuma positiva nas 3 moedas. #209 15m t -1.84 (BTC -0.15R, win 47%, 2.3 trades/moeda/sem.;
+carteira +2.5%/ano, pior ano -10.8%); #210 1h t -1.36 (win 43%, pior ano -12.7%); #211 4h t +0.40 (ETH/SOL positivas, BTC negativa, so 14-23 trades por moeda);
+#212 15m no contexto da #202 t -1.43 (conf. 2/5). Leitura: o contexto da #197 nao passa vantagem aos recuos: depois da rutura com volume o preco
+continua sem dar recuo, e quando o RSI(2) cai abaixo de 10 e porque o ressalto ja falhou (comprar a fraqueza dentro de uma baixa perde, como
+nas ideias de sobrevenda #166-#172). O ganho da #197 vem de SEGURAR a trade da rutura. Nada entra em SPECS. Scalping 15m em baixa: 0 de 4.

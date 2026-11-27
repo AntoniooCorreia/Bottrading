@@ -340,3 +340,9 @@ Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --p
 - [x] #206 l-climax24-1h-bear-vol15-s3-tp2-mh24 (day trade 1h) -> REPROVADA (t -2.93; BTC -0.032R/289, ETH -0.137R/275, SOL -0.167R/200; win 42%; conf. 0/5; K123 -7.7%/ano, pior ano -31.0%)
 - [x] #207 l-climax20-4h-bear-vol15-s2-tp2-mh12 (swing 4h) -> REPROVADA (t +0.09; BTC +0.174R/76, ETH -0.064R/78, SOL -0.114R/60; win 48%; conf. 0/5; K124 +0.4%/ano, pior ano -6.3%)
 - [x] #208 s-upthrust20-4h-bear-vol15-s2-tp2-mh12 (swing 4h short) -> REPROVADA (t -0.91; BTC -0.025R/66, ETH -0.121R/71, SOL -0.041R/34; win 40%; conf. 1/5; K125 -1.7%/ano, pior ano -8.2%)
+
+## Ideias do agente (2026-11-27, sessao 03h): recuo RSI(2) < 10 dentro do contexto da #197 (4h) / #202 (1h), 3 estilos (perp)
+- [x] #209 l-pb15m-ctx197-rsi2-s3-tp2-mh32 (scalping 15m) -> REPROVADA (t -1.84; BTC -0.147R/329, ETH -0.028R/293, SOL +0.031R/184; win 47%; conf. 3/5; K128 +2.5%/ano, pior ano -10.8%)
+- [x] #210 l-pb1h-ctx197-rsi2-s3-tp2-mh24 (day trade 1h) -> REPROVADA (t -1.36; BTC -0.078R/94, ETH -0.112R/79, SOL -0.017R/51; win 43%; conf. 4/5; K127 -1.9%/ano, pior ano -12.7%)
+- [x] #211 l-pb4h-ctx197-rsi2-s2-tp2-mh12 (swing 4h) -> REPROVADA (t +0.40; BTC -0.048R/21, ETH +0.118R/23, SOL +0.088R/14; win 48%; conf. 4/5; K126 +0.3%/ano, pior ano -3.8%)
+- [x] #212 l-pb15m-ctx202-rsi2-s3-tp2-mh32 (scalping 15m) -> REPROVADA (t -1.43; BTC -0.038R/358, ETH -0.097R/405, SOL +0.030R/263; win 46%; conf. 2/5; K129 +0.6%/ano, pior ano -10.3%)

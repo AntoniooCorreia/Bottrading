@@ -1385,3 +1385,41 @@ for _n, _v in {
     IDEAS[_n] = _v
     EXITS[_n] = {"signal_exit": False}
 NO_MIN_RISK.update({"l-climax96-15m-bear-vol15-s3-tp2-mh32", "l-climax24-1h-bear-vol15-s3-tp2-mh24"})   # como a #201/#202 (intraday)
+
+
+# ---------------- RECUO RSI(2) DENTRO DO CONTEXTO DA #197 / #202 (2026-11-27, sessao 03h) ----------------
+_HTF_AGG = {"open": "first", "high": "max", "low": "min", "close": "last", "volume": "sum"}
+
+
+def _htf_context(b, ctx_fn, tf: str, look: int):
+    """True nas velas de b em que o sinal ctx_fn (calculado em velas de tf feitas a partir de b) disparou numa das ultimas
+    `look` velas de tf JA FECHADAS. Uma vela de tf com inicio T so conta a partir da vela de b com inicio >= T + tf."""
+    td = pd.Timedelta(tf)
+    if len(b) > 1 and (b.index[1] - b.index[0]) >= td:     # b ja esta em tf: so velas anteriores
+        sig = ctx_fn(b).astype(bool)
+        return sig.astype(float).rolling(look, min_periods=1).max().shift(1).fillna(0).astype(bool)
+    agg = {k: v for k, v in _HTF_AGG.items() if k in b}
+    h = b.resample(tf, label="left", closed="left").agg(agg).dropna(subset=["close"])
+    sig = ctx_fn(h).astype(bool).astype(float).rolling(look, min_periods=1).max()
+    sig.index = sig.index + td
+    return sig.reindex(b.index, method="ffill").fillna(0).astype(bool)
+
+
+def pb_ctx_entry(ctx_fn, tf: str, look: int, rsi_max: float = 10.0):
+    """Contexto (sinal de tf nas ultimas look velas fechadas) + RSI(2) da vela atual < rsi_max + BTC em baixa -> 1 (long)."""
+    def f(b):
+        ctx = _htf_context(b, ctx_fn, tf, look)
+        sig = ctx & (_rsi(b["close"], 2) < rsi_max) & _btc_bear(b)
+        return sig.fillna(False).astype(float)
+    return f
+
+
+for _n, _v in {
+    "l-pb15m-ctx197-rsi2-s3-tp2-mh32": (pb_ctx_entry(dc_bull_in_bear_vol_entry(20, 1.5), "4h", 6), "15m", 3.0, 2.0, 32),
+    "l-pb1h-ctx197-rsi2-s3-tp2-mh24": (pb_ctx_entry(dc_bull_in_bear_vol_entry(20, 1.5), "4h", 6), "1h", 3.0, 2.0, 24),
+    "l-pb4h-ctx197-rsi2-s2-tp2-mh12": (pb_ctx_entry(dc_bull_in_bear_vol_entry(20, 1.5), "4h", 6), "4h", 2.0, 2.0, 12),
+    "l-pb15m-ctx202-rsi2-s3-tp2-mh32": (pb_ctx_entry(dc_bull_in_bear_vol_ema_entry(24, 1.5, 200), "1h", 12), "15m", 3.0, 2.0, 32),
+}.items():
+    IDEAS[_n] = _v
+    EXITS[_n] = {"signal_exit": False}
+NO_MIN_RISK.update({"l-pb15m-ctx197-rsi2-s3-tp2-mh32", "l-pb1h-ctx197-rsi2-s3-tp2-mh24", "l-pb15m-ctx202-rsi2-s3-tp2-mh32"})   # intraday
