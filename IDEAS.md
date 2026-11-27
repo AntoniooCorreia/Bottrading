@@ -1125,3 +1125,19 @@ o melhor perfil de consistencia em baixa (cumpre win >= 50%, pior mes > -5%, pio
 Leitura: o limite de abertas funciona no swing (alvo 2R, trades de dias, perdas juntas) e nao no day trade com alvo 1R. A #229 da mais trades mas
 os anos maus sao fundos. Proximo: #229 com max 2 abertas (mesma licao) e juntar #230 + #226 numa carteira (swing + day trade, ~2.5/semana).
 
+
+## 2026-11-27 cripto - sessao :00 (21h) (3 ideias; ideias cripto testadas antes: ~140 (#100-#230); esta noite (desde 19h de 27-11): 9 de 10 com esta sessao; limite reduzido) - registadas antes de correr
+BTC abaixo da media de 200 dias: ideias para baixa, day trade e swing em carteira de 8 moedas (scalping parado em baixa). journal_lab: sem mudancas propostas.
+Base do best.py: K67 (#158, so opera com BTC em alta: nao serve no regime atual). O que falha nas carteiras de baixa: a #230 (K147) cumpre win 50%,
+pior mes -3.4%, pior ano -0.1%, mas so ~1 trade/semana e +10.4%/ano; a #229 (K146) da ~2.8 trades/semana mas pior ano -11.9% e pior mes -14.2%
+(perdas juntas nas 8 moedas e muitas perdas no alvo 2R). Licao da sessao 20h: o limite de abertas funciona quando as perdas vem juntas (swing).
+Parametros fixos, nada afinado:
+- **#231 carteira-8 #229 com max 2 abertas** (DAY TRADE 1h, max 24h): l-dc24-1h-bear-vol20-s3-tp2-mh24 nas 8 moedas, --max-open 2 (antes 4).
+  Hipotese: como na #230, com no maximo 2R em risco ao mesmo tempo o pior mes (-14.2%) e o pior ano (-11.9%) devem encolher muito; custo: menos trades.
+- **#232 carteira-8 #230 + #229** (SWING 4h + DAY TRADE 1h, MAIS TRADES): --ideas l-dc20-4h-bear-vol15-s2-tp2-mh12,l-dc24-1h-bear-vol20-s3-tp2-mh24
+  nas 8 moedas, --max-open 3 (2 da licao da #230 + 1 lugar para a 2.a estrategia), 1 posicao por moeda.
+  Hipotese: timeframes diferentes (4h vs 1h) dao entradas em alturas diferentes; juntas devem chegar a ~2 trades/semana com o pior mes da #230 (~-5%).
+- **#233 carteira-8 #229 com alvo 1R** (DAY TRADE 1h, max 24h, WIN RATE): l-dc24-1h-bear-vol20-s3-tp1-mh24 (igual a #229, alvo 1R em vez de 2R), 8 moedas, max 4.
+  Hipotese: na rutura de 4h o alvo 1R (#226 vs #221) subiu o win de 48% para 54% e deixou todos os anos positivos; o mesmo deve acontecer em 1h
+  (a #229 tem win 46%). Risco: com stop de 3 ATR o alvo 1R fica perto e os custos pesam mais por trade.
+O criterio oficial (BTC/ETH/SOL) NAO muda.
