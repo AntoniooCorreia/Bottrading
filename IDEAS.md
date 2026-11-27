@@ -1028,3 +1028,9 @@ classico, fixo). Testada em 3 horizontes (um por estilo) e o espelho em short (a
 Fasquia: criterio oficial (>= 60 trades por moeda, positiva em cada, t >= 3.0, confirmacao >= 3/5); depois pre e holdout uma vez.
 Nota: familia nova para a demo (nao esta em SPECS); se passar, precisa de engine.ts + demo_spec.py + testes, sem deploy.
 Nota de desconfianca: 48 ideias de baixa ja testadas (#165-#212).
+Resultado (dev 2019-2024, perp): as 4 REPROVADAS (K130-K133). #213 1h t +1.60, positiva nas 3 moedas (+0.07R, win 45%), conf. 3/5, ~2 trades/semana,
++7.1%/ano, pior ano -3.2% mas pior mes -14.6% (quase passa). #214 short 1h t +0.47 (SOL negativa). #215 15m t -0.29 (pior ano -52% em 2022; scalping em
+baixa 0 de 5). #216 semanal 4h t +1.85, positiva nas 3 (+0.19R, win 54%), conf. 3/5, pior mes -3.5%, mas so 33-50 trades por moeda.
+Leitura: a rutura de volatilidade confirma o padrao da noite (em baixa ganha o LONG no movimento forte, 4h/1h melhor que 15m, short pior), mas
+nenhuma chega ao t 3.0. #213 e #216 quase passam, mas a familia (abertura do periodo + k x amplitude) NAO existe na demo (sr/demo_spec.py):
+nao entram em SPECS sem mexer no engine.ts (fica como proximo passo para o chat).

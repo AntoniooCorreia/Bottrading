@@ -346,3 +346,9 @@ Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --p
 - [x] #210 l-pb1h-ctx197-rsi2-s3-tp2-mh24 (day trade 1h) -> REPROVADA (t -1.36; BTC -0.078R/94, ETH -0.112R/79, SOL -0.017R/51; win 43%; conf. 4/5; K127 -1.9%/ano, pior ano -12.7%)
 - [x] #211 l-pb4h-ctx197-rsi2-s2-tp2-mh12 (swing 4h) -> REPROVADA (t +0.40; BTC -0.048R/21, ETH +0.118R/23, SOL +0.088R/14; win 48%; conf. 4/5; K126 +0.3%/ano, pior ano -3.8%)
 - [x] #212 l-pb15m-ctx202-rsi2-s3-tp2-mh32 (scalping 15m) -> REPROVADA (t -1.43; BTC -0.038R/358, ETH -0.097R/405, SOL +0.030R/263; win 46%; conf. 2/5; K129 +0.6%/ano, pior ano -10.3%)
+
+## Ideias do agente (2026-11-27, sessao 03h30, noite intensiva): rutura de volatilidade de Williams em baixa (perp)
+- [x] #213 l-vbo05-1h-bear-s3-tp2-mh24 (day trade 1h) -> REPROVADA (t +1.60; BTC +0.093R/238, ETH +0.078R/246, SOL +0.024R/182; win 45%; conf. 3/5; K130 +7.1%/ano, pior ano -3.2%, pior mes -14.6%)
+- [x] #214 s-vbo05-1h-bear-s3-tp2-mh24 (day trade short 1h) -> REPROVADA (t +0.47; BTC +0.041R/239, ETH +0.043R/248, SOL -0.036R/195; win 44%; conf. 3/5; K131 +2.7%/ano, pior ano -7.9%)
+- [x] #215 l-vbo05-15m-bear-s3-tp2-mh32 (scalping 15m) -> REPROVADA (t -0.29; BTC -0.011R/285, ETH +0.026R/299, SOL -0.061R/228; win 43%; conf. 1/5; K133 -3.0%/ano, pior ano -52.1%)
+- [x] #216 l-wvbo05-4h-bear-s2-tp2-mh12 (swing semanal 4h) -> REPROVADA (t +1.85; BTC +0.207R/50, ETH +0.203R/42, SOL +0.130R/33; win 54%; conf. 3/5; K132 +4.0%/ano, pior ano -5.1%, pior mes -3.5%)
