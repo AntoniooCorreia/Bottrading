@@ -1080,3 +1080,89 @@ e no pre; continua a NAO passar o criterio oficial (SOL 54 < 60) e o holdout 202
 
 - **#224 diario da demo** (l-dc24-1h-bear-vol15-s3-tp2-mh24): vai testar Pedir volume 2.0x a media na rutura (era 1.5). Proposta por 1 perda(s) ao vivo. Regra fixa do journal_lab.py: aplica se R/trade sobe >= 0.02R, t >= t atual + 0.3 e trades >= 50%.
   Resultado #224: #224: antes t +1.99, +0.091R/trade, win 47%, 605 trades -> depois t +2.46, +0.125R/trade, win 49%, 506 trades (BTC +0.15R, ETH +0.13R, SOL +0.07R). APLICADA: a demo passa a usar a variante.
+
+- **#225 diario da demo** (s-rsi2-15m-long): vai testar So entrar com RSI(2) abaixo de 3 (era 5): sobrevenda mais extrema. Proposta por 1 perda(s) ao vivo. Regra fixa do journal_lab.py: aplica se R/trade sobe >= 0.02R, t >= t atual + 0.3 e trades >= 50%.
+  Resultado #225: #225: antes t -15.95, -0.119R/trade, win 56%, 7091 trades -> depois t -10.79, -0.113R/trade, win 56%, 3821 trades (BTC -0.16R, ETH -0.12R, SOL -0.05R). REJEITADA (R por trade nao subiu 0.02R): a estrategia fica como esta.
+
+## 2026-11-27 cripto - sessao :00 (19h) (3 ideias com a #225 do diario; ideias cripto testadas antes: ~134 (#100-#225); esta noite (desde 19h de 27-11): 3 de 10 com esta sessao; limite reduzido) - registadas antes de correr
+BTC continua abaixo da media de 200 dias: ideias para baixa. Scalping parado (0 de 6 em baixa). Licao da #221: a vantagem das ruturas de 4h com volume
+aparece em 8 moedas e a carteira de 8 moedas dobra a frequencia SEM mudar a regra. Esta sessao aplica a mesma medicao (carteira de 8 moedas,
+max 4 abertas, parametros iguais aos ja registados, nada afinado) as duas vizinhas que QUASE passaram e eram positivas em todas as moedas de confirmacao.
+- **#226 carteira-8 #204** (DAY TRADE, 4h, max 6 velas = 24h, MAIS TRADES e WIN RATE): l-dc20-4h-bear-vol15-s2-tp1-mh6 (alvo 1R) nas 8 moedas, max 4 abertas.
+  Hipotese: a #204 tem win 54%, confirmacao 5/5 e pior ano -1.2%, mas poucas trades (t 1.86). Em 8 moedas a frequencia ~2.5x e o t sobe se a vantagem e real.
+  Objetivo: win rate >= 50% com pior ano perto de 0 e trades curtas (o Antonio nao quer ficar dias em trade).
+- **#227 carteira-8 #218** (SWING, MAIS TRADES): l-dc10-4h-bear-vol15-s2-tp2-mh12 (canal de 10 velas de 4h) nas 8 moedas, max 4 abertas.
+  Hipotese: a #218 e positiva nas 3 moedas e 5/5 na confirmacao, com SOL 81 trades; em 8 moedas pode chegar a ~2-3 trades/semana com a mesma regra.
+  Risco: pior mes -8.0% na #218 (pode piorar com mais trades abertas ao mesmo tempo).
+O criterio oficial (BTC/ETH/SOL) NAO muda: isto mede so a carteira. Comparar com a #221 (K138: +14.3%/ano, win 48%, pior ano -1.2%, pior mes -6.5%, ~1.5/semana).
+Resultado (dev 2019-2024, perp, 8 moedas, max 4 abertas): #226 (K144) positiva nas 8 moedas (+0.008R LINK a +0.162R ADA), t +2.79, win 54%, +0.077R/trade,
+carteira +10.8%/ano, TODOS os 6 anos positivos (pior 2019 +6.7%), pior mes -8.5%, pior queda -17.9%, 93 trades/ano (~1.8/semana), trades <= 24h.
+#227 (K143) positiva nas 8, t +2.99, win 46%, +0.112R/trade, +9.8%/ano, pior ano -5.7% (2019), pior mes -9.9%, 105 trades/ano.
+Leitura: com alvo 1R e saida em 24h a mesma rutura da o melhor perfil de consistencia visto ate agora (nenhum ano negativo, win > 50%), mas
+menos % ao ano que a #221 e um pior mes de -8.5% (varias trades abertas em simultaneo perdem juntas: moedas muito correlacionadas). Nenhuma passa
+o criterio oficial (t das 3 moedas < 3). Ambas entram em SPECS (positivas em todas). Proximo: atacar o pior mes (correlacao entre moedas: max 2 abertas?).
+
+## 2026-11-27 cripto - sessao :00 (20h) (3 ideias; ideias cripto testadas antes: ~137 (#100-#227); esta noite (desde 19h de 27-11): 6 de 10 com esta sessao; limite reduzido) - registadas antes de correr
+BTC abaixo da media de 200 dias: ideias para baixa. Scalping parado (regra suspensa em baixa): day trade e swing, em carteira de 8 moedas.
+Base do best.py: K67 (#158, so opera com BTC em alta: nao serve no regime atual). O que falha nas carteiras de 8 moedas de baixa (#221 K138, #226 K144):
+o PIOR MES (-6.5% e -8.5%): as 8 moedas sao muito correlacionadas e as ruturas com volume disparam juntas; 4 trades abertas = 4R em risco no mesmo
+movimento. As outras metricas estao boas (#226: todos os anos positivos, win 54%). Duas ideias atacam isso, uma abre MAIS TRADES. Parametros fixos.
+- **#228 carteira-8 #226 com max 2 abertas** (DAY TRADE 4h, max 24h): l-dc20-4h-bear-vol15-s2-tp1-mh6 nas 8 moedas, --max-open 2 (antes 4).
+  Hipotese: o pior mes vem de perdas simultaneas; com no maximo 2R em risco ao mesmo tempo o pior mes deve ficar perto de -5% ou melhor.
+  Custo esperado: menos trades (~1.8 -> ~1.3/semana) e menos % ao ano. Mede-se pior mes, pior ano, win, %/ano, trades/semana.
+- **#229 carteira-8 #202+#224** (DAY TRADE 1h, max 24h, MAIS TRADES): l-dc24-1h-bear-vol20-s3-tp2-mh24 = #202 (rutura de 24 velas de 1h,
+  acima da EMA 200 de 1h, BTC em baixa, stop 3 ATR, alvo 2R, max 24h) com volume > 2x (a mudanca que o diario aplicou na #D3, #224) nas 8 moedas, max 4.
+  Hipotese: a #224 e positiva nas 3 moedas (t 2.46); como na #221/#226, a mesma regra em 8 moedas deve dobrar as trades e subir o t.
+- **#230 carteira-8 #221 com max 2 abertas** (SWING 4h, ate 2 dias): l-dc20-4h-bear-vol15-s2-tp2-mh12 nas 8 moedas, --max-open 2 (antes 4).
+  Hipotese igual a #228 para a carteira da demo Swing (K138: +14.3%/ano, pior mes -6.5%): cortar o risco junto deve levar o pior mes para > -5%.
+Nota tecnica: testes com --max-open diferente de 4 (e de 0) gravam o teste com sufixo -mo<n> (nao pisam #221/#226).
+O criterio oficial (BTC/ETH/SOL) NAO muda.
+Resultado (dev 2019-2024, perp, 8 moedas): #228 (K145) +4.8%/ano (antes +10.8%), todos os anos positivos (pior +3.3%), pior mes -5.2% (antes -8.5%),
+win 53%, 64 trades/ano: o limite 2 corta metade do ganho e quase nao melhora o pior mes -> pior que a #226.
+#229 (K146) t 8 moedas +3.76 (3 moedas 2.46), positiva nas 8, win 46%, +9.8%/ano, mas pior ano -11.9% (2022) e pior mes -14.2%, 144 trades/ano.
+#230 (K147) +10.4%/ano (antes +14.3%), pior ano -0.1% (antes -1.2%), pior mes -3.4% (antes -6.5%), win 50%, pior queda -10%, 51 trades/ano:
+o melhor perfil de consistencia em baixa (cumpre win >= 50%, pior mes > -5%, pior ano ~0), mas so ~1 trade/semana e < 14%/ano.
+Leitura: o limite de abertas funciona no swing (alvo 2R, trades de dias, perdas juntas) e nao no day trade com alvo 1R. A #229 da mais trades mas
+os anos maus sao fundos. Proximo: #229 com max 2 abertas (mesma licao) e juntar #230 + #226 numa carteira (swing + day trade, ~2.5/semana).
+
+
+## 2026-11-27 cripto - sessao :00 (21h) (3 ideias; ideias cripto testadas antes: ~140 (#100-#230); esta noite (desde 19h de 27-11): 9 de 10 com esta sessao; limite reduzido) - registadas antes de correr
+BTC abaixo da media de 200 dias: ideias para baixa, day trade e swing em carteira de 8 moedas (scalping parado em baixa). journal_lab: sem mudancas propostas.
+Base do best.py: K67 (#158, so opera com BTC em alta: nao serve no regime atual). O que falha nas carteiras de baixa: a #230 (K147) cumpre win 50%,
+pior mes -3.4%, pior ano -0.1%, mas so ~1 trade/semana e +10.4%/ano; a #229 (K146) da ~2.8 trades/semana mas pior ano -11.9% e pior mes -14.2%
+(perdas juntas nas 8 moedas e muitas perdas no alvo 2R). Licao da sessao 20h: o limite de abertas funciona quando as perdas vem juntas (swing).
+Parametros fixos, nada afinado:
+- **#231 carteira-8 #229 com max 2 abertas** (DAY TRADE 1h, max 24h): l-dc24-1h-bear-vol20-s3-tp2-mh24 nas 8 moedas, --max-open 2 (antes 4).
+  Hipotese: como na #230, com no maximo 2R em risco ao mesmo tempo o pior mes (-14.2%) e o pior ano (-11.9%) devem encolher muito; custo: menos trades.
+- **#232 carteira-8 #230 + #229** (SWING 4h + DAY TRADE 1h, MAIS TRADES): --ideas l-dc20-4h-bear-vol15-s2-tp2-mh12,l-dc24-1h-bear-vol20-s3-tp2-mh24
+  nas 8 moedas, --max-open 3 (2 da licao da #230 + 1 lugar para a 2.a estrategia), 1 posicao por moeda.
+  Hipotese: timeframes diferentes (4h vs 1h) dao entradas em alturas diferentes; juntas devem chegar a ~2 trades/semana com o pior mes da #230 (~-5%).
+- **#233 carteira-8 #229 com alvo 1R** (DAY TRADE 1h, max 24h, WIN RATE): l-dc24-1h-bear-vol20-s3-tp1-mh24 (igual a #229, alvo 1R em vez de 2R), 8 moedas, max 4.
+  Hipotese: na rutura de 4h o alvo 1R (#226 vs #221) subiu o win de 48% para 54% e deixou todos os anos positivos; o mesmo deve acontecer em 1h
+  (a #229 tem win 46%). Risco: com stop de 3 ATR o alvo 1R fica perto e os custos pesam mais por trade.
+O criterio oficial (BTC/ETH/SOL) NAO muda.
+Resultado (dev 2019-2024, perp, 8 moedas): #231 (K148) +8.7%/ano (antes +9.8%), TODOS os anos positivos (pior 2022 +1.5%, antes -11.9%), pior mes -5.6%
+(antes -14.2%), pior queda -14.6%, win 46%, 91 trades/ano: o limite de 2 abertas tambem funciona no day trade de 1h (alvo 2R). -> SPECS.
+#232 (K149) +8.7%/ano, pior ano -9.3%, pior mes -9.5%, win 45%, 124 trades/ano: juntar as duas ruturas dilui (disparam no mesmo movimento).
+#233 (K150) win 54% (antes 46%) mas +0.062R/trade (antes +0.118R), +8.0%/ano, pior ano -12.0%, pior mes -12.2%: o alvo 1R em 1h perde para os custos.
+Leitura: em baixa, o que segura o pior mes e o limite de risco junto (max 2 abertas), nao o alvo nem juntar estrategias parecidas. Proximo: uma 2.a
+estrategia POUCO correlacionada com as ruturas (ex.: short em baixa ou ressalto de sobrevenda) para subir a frequencia sem somar perdas juntas.
+
+
+## 2026-11-27 cripto - sessao :00 (22h) (1 ideia; ideias cripto testadas antes: ~143 (#100-#233); esta noite (desde 19h de 27-11): 10 de 10 com esta sessao; limite reduzido) - registada antes de correr
+BTC abaixo da media de 200 dias. journal_lab: sem mudancas propostas. Base do best.py: K67 (#158, so opera com BTC em alta: nao serve agora).
+O que falha: a #232 (K149, #230 + #229 com max 3 abertas) ficou pior que cada uma sozinha (pior ano -9.3%, pior mes -9.5%): as duas ruturas
+disparam no mesmo movimento e 3R em risco junto voltam a somar perdas. As licoes #230/#231 dizem que o que segura o pior mes e o limite de risco
+junto (max 2), e ambas tem TODOS os anos >= -0.1% com max 2. Os shorts e os ressaltos em baixa ja reprovaram todos (#165-#188, #205-#208).
+- **#234 carteira-8 #230 + #231 com max 2 abertas** (SWING 4h + DAY TRADE 1h, MAIS TRADES): --ideas l-dc20-4h-bear-vol15-s2-tp2-mh12,l-dc24-1h-bear-vol20-s3-tp2-mh24
+  nas 8 moedas, --max-open 2 (era 3 na #232), 1 posicao por moeda. Parametros das ideias iguais (nada afinado).
+  Hipotese: com no maximo 2R em risco ao mesmo tempo o pior mes volta para perto de -5% (como #230 -3.4% e #231 -5.6%), e as duas estrategias
+  juntas enchem os 2 lugares mais vezes que cada uma sozinha -> mais trades/semana (#230 ~1.0, #231 ~1.75) e mais %/ano que a #230 (+10.4%).
+  Reprova como carteira se o pior mes < -5% ou pior ano < -5% ou %/ano <= +10.4% (nao melhora a #230).
+O criterio oficial (BTC/ETH/SOL) NAO muda.
+Resultado (dev 2019-2024, perp, 8 moedas, max 2 abertas): #234 (K151) +6.2%/ano (#230 sozinha +10.4%), pior ano -0.8% (2022), pior mes -7.4% (#230 -3.4%),
+win 45%, pior queda -14.2%, 93 trades/ano (~1.8/semana), so 24/70 meses positivos. REPROVADA como carteira.
+Leitura: as ruturas de 1h ocupam os 2 lugares antes das de 4h (que tem mais R por trade: +0.16R vs +0.12R) e tiram-lhes as melhores trades;
+e como disparam no mesmo movimento, juntar as duas so troca trades boas por trades piores. Em baixa, a #230 (swing, max 2) sozinha continua a melhor
+carteira consistente. Duas ruturas long nao sao "pouco correlacionadas": a 2.a estrategia tem de vir de outro tipo de sinal (todos os shorts e
+ressaltos em baixa ja reprovaram) ou esperar pelo regime de alta.

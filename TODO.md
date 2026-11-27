@@ -358,3 +358,21 @@ Registadas em IDEAS.md antes de correr. `python crypto_lab.py --ideas <nome> --p
 - [x] #218 l-dc10-4h-bear-vol15-s2-tp2-mh12 (swing 4h, canal 10) -> REPROVADA (t +2.43; BTC +0.186R/143, ETH +0.114R/139, SOL +0.132R/81; win 50%; conf. 5/5; K135 +6.0%/ano, pior ano -3.4%, pior mes -8.0%)
 - [x] #219 l-dc96-15m-ctx197-vol15-s3-tp2-mh32 (scalping 15m) -> REPROVADA (t -0.50; BTC +0.046R/103, ETH -0.034R/107, SOL -0.156R/67; win 40%; conf. 1/5; K137 -1.3%/ano, pior ano -12.9%)
 - [x] #220 l-dc24-1h-ctx197-vol15-s3-tp2-mh24 (day trade 1h) -> REPROVADA (t +0.52; BTC +0.204R/58, ETH -0.010R/62, SOL -0.111R/35; win 41%; conf. 2/5; K136 +0.2%/ano, pior ano -9.7%)
+
+## Ideias do agente (2026-11-27, sessao 19h): carteira de 8 moedas das vizinhas da #197 (perp)
+- [x] #225 diario da demo s-rsi2-15m-long~lo3 (scalping) -> REJEITADA pelo journal_lab (-0.119 -> -0.113R/trade, nao sobe 0.02R)
+- [x] #226 carteira-8 #204 l-dc20-4h-bear-vol15-s2-tp1-mh6 (day trade 4h, 8 moedas, max 4 abertas) -> REPROVADA no criterio (t 8 moedas +2.79; positiva nas 8; win 54%; K144 +10.8%/ano, TODOS os anos positivos (pior +6.7%), pior mes -8.5%, ~1.8/semana) -> SPECS
+- [x] #227 carteira-8 #218 l-dc10-4h-bear-vol15-s2-tp2-mh12 (swing 4h, 8 moedas, max 4 abertas) -> REPROVADA (t 8 moedas +2.99; positiva nas 8; win 46%; K143 +9.8%/ano, pior ano -5.7%, pior mes -9.9%, ~2/semana) -> SPECS
+
+## Ideias do agente (2026-11-27, sessao 20h): pior mes das carteiras de 8 moedas (max 2 abertas) + #224 em 8 moedas (perp)
+- [x] #228 carteira-8 #226 l-dc20-4h-bear-vol15-s2-tp1-mh6 (day trade 4h, 8 moedas, max 2 abertas) -> REPROVADA (positiva nas 8; win 53%; K145 +4.8%/ano (antes +10.8%), pior ano +3.3%, pior mes -5.2% (antes -8.5%), 64 trades/ano)
+- [x] #229 carteira-8 #224 l-dc24-1h-bear-vol20-s3-tp2-mh24 (day trade 1h, 8 moedas, max 4 abertas) -> REPROVADA no criterio (t 3 moedas 2.46; t 8 moedas +3.76, positiva nas 8; win 46%; K146 +9.8%/ano, pior ano -11.9%, pior mes -14.2%, 144 trades/ano) -> SPECS; demo_pick pos na #D3
+- [x] #230 carteira-8 #221 l-dc20-4h-bear-vol15-s2-tp2-mh12 (swing 4h, 8 moedas, max 2 abertas) -> REPROVADA no criterio (SOL 54 < 60; positiva nas 8; win 50%; K147 +10.4%/ano (antes +14.3%), pior ano -0.1%, pior mes -3.4% (antes -6.5%), 51 trades/ano) -> SPECS
+
+## Ideias do agente (2026-11-27, sessao 21h): pior mes/ano da #229 + carteira swing+day trade (8 moedas, perp)
+- [x] #231 carteira-8 #229 l-dc24-1h-bear-vol20-s3-tp2-mh24 (day trade 1h, 8 moedas, max 2 abertas) -> REPROVADA no criterio (t 3 moedas 2.46; t 8 moedas +3.76, positiva nas 8; win 46%; K148 +8.7%/ano, pior ano +1.5% (antes -11.9%), pior mes -5.6% (antes -14.2%), 91 trades/ano) -> SPECS
+- [x] #232 carteira-8 #230 + #229 (swing 4h + day trade 1h, 8 moedas, max 3 abertas) -> REPROVADA (win 45%; K149 +8.7%/ano, pior ano -9.3%, pior mes -9.5%, 124 trades/ano; pior que a #230 sozinha)
+- [x] #233 carteira-8 l-dc24-1h-bear-vol20-s3-tp1-mh24 (#229 com alvo 1R, day trade 1h, 8 moedas, max 4) -> REPROVADA (t 8 moedas +2.82; win 54%; +0.062R/trade; K150 +8.0%/ano, pior ano -12.0%, pior mes -12.2%, 195 trades/ano)
+
+## Ideias do agente (2026-11-27, sessao 22h): carteira swing + day trade com max 2 abertas (8 moedas, perp)
+- [x] #234 carteira-8 #230 + #231 (l-dc20-4h-bear-vol15-s2-tp2-mh12 + l-dc24-1h-bear-vol20-s3-tp2-mh24, 8 moedas, max 2 abertas) -> REPROVADA (win 45%; K151 +6.2%/ano, pior ano -0.8%, pior mes -7.4%, 93 trades/ano; pior que a #230 sozinha)
