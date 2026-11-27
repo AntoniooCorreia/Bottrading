@@ -1077,3 +1077,6 @@ e no pre; continua a NAO passar o criterio oficial (SOL 54 < 60) e o holdout 202
   CORRECAO (Claude no chat, mesmo dia): a regra aplicou a #223 so porque o t subiu com MAIS trades, com o R por trade igual (-0.119R).
   Isso nao e melhoria. A regra passou a exigir tambem R por trade +0.02R acima do atual (journal_lab.py). Com a regra corrigida a #223
   e REJEITADA e a demo Scalping continua com a #124. Nenhuma outra mudanca foi testada com a regra antiga.
+
+- **#224 diario da demo** (l-dc24-1h-bear-vol15-s3-tp2-mh24): vai testar Pedir volume 2.0x a media na rutura (era 1.5). Proposta por 1 perda(s) ao vivo. Regra fixa do journal_lab.py: aplica se R/trade sobe >= 0.02R, t >= t atual + 0.3 e trades >= 50%.
+  Resultado #224: #224: antes t +1.99, +0.091R/trade, win 47%, 605 trades -> depois t +2.46, +0.125R/trade, win 49%, 506 trades (BTC +0.15R, ETH +0.13R, SOL +0.07R). APLICADA: a demo passa a usar a variante.

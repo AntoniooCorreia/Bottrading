@@ -1,0 +1,22 @@
+{
+ "l-dc24-1h-bear-vol15-s3-tp2-mh24~vol_mult2": {
+  "base": "l-dc24-1h-bear-vol15-s3-tp2-mh24~vol_mult2",
+  "btc": "bear",
+  "entry": {
+   "kind": "breakout",
+   "n": 24
+  },
+  "journal": true,
+  "max_hold": 24,
+  "num": "#202+#224",
+  "orig_base": "l-dc24-1h-bear-vol15-s3-tp2-mh24",
+  "replaces": "l-dc24-1h-bear-vol15-s3-tp2-mh24",
+  "side": 1,
+  "signal_exit": false,
+  "stop_atr": 3.0,
+  "tf": "1h",
+  "tp_r": 2.0,
+  "trend_ema": 200,
+  "vol_mult": 2
+ }
+}
