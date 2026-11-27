@@ -1117,3 +1117,11 @@ movimento. As outras metricas estao boas (#226: todos os anos positivos, win 54%
   Hipotese igual a #228 para a carteira da demo Swing (K138: +14.3%/ano, pior mes -6.5%): cortar o risco junto deve levar o pior mes para > -5%.
 Nota tecnica: testes com --max-open diferente de 4 (e de 0) gravam o teste com sufixo -mo<n> (nao pisam #221/#226).
 O criterio oficial (BTC/ETH/SOL) NAO muda.
+Resultado (dev 2019-2024, perp, 8 moedas): #228 (K145) +4.8%/ano (antes +10.8%), todos os anos positivos (pior +3.3%), pior mes -5.2% (antes -8.5%),
+win 53%, 64 trades/ano: o limite 2 corta metade do ganho e quase nao melhora o pior mes -> pior que a #226.
+#229 (K146) t 8 moedas +3.76 (3 moedas 2.46), positiva nas 8, win 46%, +9.8%/ano, mas pior ano -11.9% (2022) e pior mes -14.2%, 144 trades/ano.
+#230 (K147) +10.4%/ano (antes +14.3%), pior ano -0.1% (antes -1.2%), pior mes -3.4% (antes -6.5%), win 50%, pior queda -10%, 51 trades/ano:
+o melhor perfil de consistencia em baixa (cumpre win >= 50%, pior mes > -5%, pior ano ~0), mas so ~1 trade/semana e < 14%/ano.
+Leitura: o limite de abertas funciona no swing (alvo 2R, trades de dias, perdas juntas) e nao no day trade com alvo 1R. A #229 da mais trades mas
+os anos maus sao fundos. Proximo: #229 com max 2 abertas (mesma licao) e juntar #230 + #226 numa carteira (swing + day trade, ~2.5/semana).
+

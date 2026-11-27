@@ -63,6 +63,7 @@
 | #201-#204 | 2026-11-27 | MERCADO EM BAIXA, o volume da #197 noutros horizontes (perp): scalping 15m rutura 24h, day trade 1h (#192 + volume), short 4h (#199 + volume), alvo 1R em 24h (#189 + volume); K117-K121 | -1.62 a +1.99 | 41-54% | -0.05 a +0.09 | -16% a +6.0%/ano | REPROVADAS; #202 e #204 positivas nas 3 moedas (quase passam) -> SPECS da demo; #202 corre na conta Day trade |
 | #213-#216 | 2026-11-27 | MERCADO EM BAIXA, rutura de volatilidade de Williams (abertura do dia/semana + 0.5x amplitude anterior, perp): long 1h, short 1h, long 15m, long semanal 4h; K130-K133 | -0.29 a +1.85 | 43-54% | -0.01 a +0.19 | -3.0% a +7.1%/ano | REPROVADAS; #213 (1h) e #216 (semanal) positivas nas 3 moedas e conf. 3/5 (quase passam), mas familia nao existe na demo |
 | #217-#220 | 2026-11-27 | MERCADO EM BAIXA, vizinhas e contexto da #197 (perp): #197 com 4 dias, #197 com canal 10, rutura 15m e 1h so no contexto da #197; K134-K137 | -0.50 a +3.27 | 40-50% | -0.03 a +0.28 | -1.3% a +8.5%/ano | REPROVADAS; #217 t 3.27 conf. 4/5 sem ano < -3.1% mas SOL 54 < 60; #218 t 2.43 conf. 5/5, SOL 81 (entram em SPECS) |
+| #228-#230 | 2026-11-27 | MERCADO EM BAIXA, carteiras de 8 moedas: #226 com max 2 abertas, #224 (rutura 1h, volume 2x) em 8 moedas, #221 com max 2 abertas; K145-K147 | +2.46 a +3.76 (8 moedas) | 46-53% | +0.08 a +0.16 | +4.8% a +10.4%/ano | REPROVADAS no criterio; **#230: win 50%, pior ano -0.1%, pior mes -3.4%, +10.4%/ano, ~1/semana**; #229 pior ano -11.9% |
 | carteiras 8 moedas | 2026-11-22 | demo (#139+#144+#138) e curta (#139+#163+#164) em 8 moedas com --max-open | - | 52-58% | - | curta max 4: 179 trades/ano, +17%/ano, pior ano -1.0%, pior mes -10.4%, queda -22% | so diagnostico |
 
 Scalping (2026-11-21): ANTES de custos ha uma vantagem pequena (RSI(2) 15m long: win rate 69%, +0.05R; Bollinger 5m BTC +0.08R),
@@ -75,8 +76,8 @@ Perpetuos (#133-#137): mesmo com custos 4x mais baixos nada passa. Os shorts int
 
 #138 (2026-11-21, 19h): a #118 em 4h abre 2x mais trades (1.2/semana, SOL 173) com win rate 59%, mas so +0.09R/trade: t 2.47, REPROVADA.
 
-Leitura honesta cripto (2026-11-27, sessao das 19h):
-1. Ideias cripto testadas no total: 141 (#100-#227, K1, scalping, intraday, perpetuos, diario da demo). Mais testes = mais desconfianca num resultado isolado.
+Leitura honesta cripto (2026-11-27, sessao das 20h):
+1. Ideias cripto testadas no total: 144 (#100-#230, K1, scalping, intraday, perpetuos, diario da demo). Mais testes = mais desconfianca num resultado isolado.
 2. Melhor win rate com resultado positivo: 68% (#118 +0.33R, reprovada SOL < 60; #148 +0.14R). Na familia atual: 65% (#156, +0.24R no dev).
 3. A familia "moeda acima da media + BTC em alta + alvo 1R" tem t 4-5 em 2019-2024 mas ~0R em 2017-18 e no holdout (#155, #157): o dev explica quase tudo.
 4. Holdout ja gasto em cripto: K1, #100, #116, #155, #157. Nenhuma estrategia cripto esta aprovada.
@@ -88,7 +89,9 @@ Leitura honesta cripto (2026-11-27, sessao das 19h):
 8. #221 (2026-11-27, chat): a #197 em carteira de 8 moedas (max 4 abertas) da +14.3%/ano no dev, positiva nas 8 moedas, pior ano -1.2%,
    ~1.5 trades/semana, e +18%/ano no pre 2017-18 (2018 +31%). Primeira de baixa que confirma fora das 3 moedas; corre na demo Swing.
 9. #226 (19h): a #204 (alvo 1R, max 24h) em 8 moedas: positiva nas 8, win 54%, +10.8%/ano e NENHUM ano negativo (pior +6.7%), mas pior mes
-   -8.5% (moedas correlacionadas perdem juntas). Melhor consistencia anual ate agora; nao passa o criterio oficial. Entrou na demo Day trade.
+   -8.5% (moedas correlacionadas perdem juntas). Melhor consistencia anual ate agora; nao passa o criterio oficial.
+10. #230 (20h): a #221 com no maximo 2 abertas cumpre win 50%, pior mes -3.4%, pior ano -0.1% (+10.4%/ano, ~1 trade/semana); no day trade
+   (#228) o mesmo limite so corta ganho. #229 (rutura 1h, volume 2x, 8 moedas) tem t 3.76 nas 8 mas pior ano -11.9%; o demo_pick pos-na no Day trade.
 
 # Resumo indices (ARQUIVO, custos CFD incluidos)
 
