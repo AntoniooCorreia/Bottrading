@@ -19,7 +19,8 @@ def _ref_entries(name, b):
     """Entradas da ideia original: vela onde o sinal (estado ou pulso) esta ligado e a anterior nao (para estados)
     ou simplesmente ligado (comparamos a condicao de entrada, por isso usamos o valor do sinal)."""
     from sr.demo_spec import SPECS as _S
-    fn = IDEAS[_S.get(name, {}).get("base", name)][0]
+    from sr.journal import journal_ideas
+    fn = {**IDEAS, **journal_ideas()[0]}[_S.get(name, {}).get("base", name)][0]
     return pd.Series(np.sign(fn(b)), index=b.index)
 
 

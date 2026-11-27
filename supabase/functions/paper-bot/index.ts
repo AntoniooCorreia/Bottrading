@@ -64,6 +64,96 @@ function exitSignal(s: Strat, b: Bar[]) {
   const prev = b.slice(-s.b! - 1, -1);
   return last.c < Math.min(...prev.map((x) => x.l));
 }
+// ===================== DIARIO DO BOT (pedido do Antonio, 2026-11-27) =====================
+// Cada trade fechada e analisada: quanto andou a favor (MFE) e contra (MAE) em R, quanto custaram as comissoes, quanto tempo durou.
+// Numa perda, a causa decide a MUDANCA proposta (so parametros que o backtest consegue testar). O agente testa a mudanca no
+// backtest 2019-2024 (journal_lab.py) e so a aplica se melhorar (regra fixa). Nunca se muda a estrategia ao vivo so por 1 perda.
+const f2 = (x: number) => `${x >= 0 ? "+" : ""}${x.toFixed(2)}`;
+async function analyze(p: any, exitPx: number, reason: string, pnl: number, fee: number) {
+  const spec: any = p.spec ?? {}, side = Number(p.side ?? 1), entry = Number(p.entry_price), stop = Number(p.stop);
+  const risk = Math.abs(entry - stop) || 1e-9, qty = Number(p.qty), riskEur = Number(p.risk_eur) || 1;
+  const t0 = new Date(p.entry_time).getTime(), t1 = p.exit_time ? new Date(p.exit_time).getTime() : Date.now(), horas = (t1 - t0) / 3600000;
+  const iv = horas < 55 ? 5 : 60;
+  let mfe = 0, mae = 0;
+  try {
+    const bars = (await ohlc(ALL_COINS[p.coin] ?? COINS[p.coin], iv)).filter((x) => x.t + iv * 60000 > t0 && x.t < t1);
+    for (const x of bars) { mfe = Math.max(mfe, side === 1 ? x.h - entry : entry - x.l); mae = Math.max(mae, side === 1 ? entry - x.l : x.h - entry); }
+  } catch (_) { /* sem velas: segue so com o resultado */ }
+  mfe = Math.max(mfe, side * (exitPx - entry)); mae = Math.max(mae, -side * (exitPx - entry));
+  const mfeR = mfe / risk, maeR = mae / risk, r = pnl / riskEur, brutoR = side * qty * (exitPx - entry) / riskEur, custoR = fee / riskEur;
+  const maxH = spec.max_hold && spec.tf ? spec.max_hold * TF_MIN[spec.tf] / 60 : null;
+  const e = spec.entry ?? {}, base = { tp_r: spec.tp_r, stop_atr: spec.stop_atr, max_hold: spec.max_hold, vol_mult: spec.vol_mult, lo: e.lo, hi: e.hi };
+  const metricas = { mfe_r: +mfeR.toFixed(2), mae_r: +maeR.toFixed(2), bruto_r: +brutoR.toFixed(2), custo_r: +custoR.toFixed(2), horas: +horas.toFixed(1), max_horas: maxH };
+  const mk = (param: string, para: number, texto: string) => spec.tf ? { param, de: (base as any)[param] ?? null, para, texto,
+    variante: `${p.strategy}~${param}${String(para).replace(".", "_")}` } : null;
+  let causa = "ganho", porque = "", licao = "", mudanca: any = null;
+  if (r >= 0) {
+    porque = `Ganhou ${f2(r)}R (${reason}). Chegou a ${f2(mfeR)}R a favor e a ${f2(-maeR)}R contra, em ${horas.toFixed(1)}h.`;
+    licao = "A estrategia fez o que o backtest espera.";
+  } else if (brutoR > 0 && custoR > 0) {
+    causa = "custos";
+    porque = `O preco ate andou a favor (${f2(brutoR)}R antes de custos), mas comissoes, slippage e funding custaram ${custoR.toFixed(2)}R e a trade fechou em ${f2(r)}R.`;
+    licao = "Ganhos pequenos nao pagam os custos: a saida tem de esperar por um movimento maior.";
+    mudanca = e.kind === "rsi2" && spec.signal_exit ? mk("hi", Math.min(90, (e.hi ?? 65) + 10), `So sair quando o RSI(2) passar ${Math.min(90, (e.hi ?? 65) + 10)} (era ${e.hi}), para o ganho cobrir os custos.`)
+      : spec.tp_r > 0 ? mk("tp_r", spec.tp_r + 1, `Alvo de ${spec.tp_r + 1}R em vez de ${spec.tp_r}R.`) : null;
+  } else if (reason === "stop" && mfeR < 0.3) {
+    causa = "falsa_partida";
+    porque = `Bateu no stop em ${horas.toFixed(1)}h sem nunca ir a favor (no maximo ${f2(mfeR)}R). O sinal de entrada foi falso.`;
+    licao = "Entrar so quando o sinal tem mais forca.";
+    mudanca = e.kind === "breakout" ? mk("vol_mult", +((spec.vol_mult || 1) + 0.5).toFixed(1), `Pedir volume ${((spec.vol_mult || 1) + 0.5).toFixed(1)}x a media na rutura (era ${spec.vol_mult || "sem filtro"}).`)
+      : e.kind === "rsi2" ? mk("lo", Math.max(2, Math.round((e.lo ?? 10) / 2)), `So entrar com RSI(2) abaixo de ${Math.max(2, Math.round((e.lo ?? 10) / 2))} (era ${e.lo}): sobrevenda mais extrema.`)
+      : spec.stop_atr ? mk("stop_atr", spec.stop_atr + 1, `Stop de ${spec.stop_atr + 1} ATR em vez de ${spec.stop_atr} (menos ruido).`) : null;
+  } else if (mfeR >= 1) {
+    causa = "devolveu_lucro";
+    porque = `Chegou a ${f2(mfeR)}R a favor e acabou em ${f2(r)}R (${reason}): devolveu o lucro todo.`;
+    licao = "Quando a trade ja vai bem, convem fechar mais cedo.";
+    const para = spec.tp_r > 1 || !spec.tp_r ? 1 : Math.max(0.75, spec.tp_r - 0.25);
+    mudanca = mk("tp_r", para, `Alvo de ${para}R (era ${spec.tp_r || "sem alvo"}).`);
+  } else if (reason.startsWith("tempo")) {
+    causa = "sem_forca";
+    porque = `Ficou ${horas.toFixed(1)}h sem chegar ao alvo nem ao stop (maximo a favor ${f2(mfeR)}R) e fechou no tempo maximo em ${f2(r)}R.`;
+    licao = "Se o movimento nao vem depressa, normalmente nao vem: sair mais cedo.";
+    mudanca = spec.max_hold > 2 ? mk("max_hold", Math.max(2, Math.round(spec.max_hold / 2)), `Tempo maximo de ${Math.max(2, Math.round(spec.max_hold / 2))} velas (era ${spec.max_hold}).`) : null;
+  } else {
+    causa = "perda_normal";
+    porque = `Foi a favor ate ${f2(mfeR)}R, o mercado virou e fechou em ${f2(r)}R (${reason}). Perda normal: com o win rate do backtest, perdas destas sao esperadas.`;
+    licao = "Nada a corrigir nesta trade; so muda se as perdas passarem o normal do backtest.";
+  }
+  return { causa, porque, licao, mudanca, metricas, r };
+}
+async function journal(p: any, exitPx: number, reason: string, pnl: number, fee: number, notify: boolean) {
+  const a = await analyze(p, exitPx, reason, pnl, fee);
+  const acc = Number(p.account ?? 1);
+  const estado = a.mudanca ? (acc === 1 ? "precisa do OK do Antonio" : "proposta") : "sem mudanca";
+  await sb.from("paper_journal").upsert({ account: acc, position_id: p.id, coin: p.coin, strategy: p.strategy, side: Number(p.side ?? 1),
+    r: a.r, pnl, causa: a.causa, porque: a.porque, licao: a.licao, mudanca: a.mudanca, estado, metricas: a.metricas }, { onConflict: "position_id" });
+  // pausa automatica: perdas acima do normal nesta conta/estrategia (6 seguidas ou -5R no total ao vivo)
+  let pausa = "";
+  if (acc >= 2 && a.r < 0) {
+    const { data: hist } = await sb.from("paper_positions").select("r").eq("account", acc).eq("strategy", p.strategy).eq("status", "closed")
+      .order("exit_time", { ascending: false }).limit(200);
+    const rs = (hist ?? []).map((x: any) => Number(x.r));
+    let seg = 0; for (const x of rs) { if (x < 0) seg++; else break; }
+    const tot = rs.reduce((s, x) => s + x, 0);
+    if (seg >= 6 || tot <= -5) {
+      pausa = `${seg} perdas seguidas, ${f2(tot)}R no total ao vivo`;
+      await sb.from("paper_pause").upsert({ account: acc, strategy: p.strategy, motivo: pausa, at: new Date().toISOString(),
+        ate: new Date(Date.now() + 7 * 86400000).toISOString() });
+    }
+  }
+  const txt = `\n\n📓 <b>Diario do bot</b>\n• Porque: ${a.porque}\n• Licao: ${a.licao}` +
+    (a.mudanca ? `\n• Vai testar: ${a.mudanca.texto} ${acc === 1 ? "(K1 so muda com o teu OK)" : "(testa no backtest 2019-2024; so aplica se melhorar)"}` : "") +
+    (pausa ? `\n• ⏸ Estrategia PAUSADA 7 dias nesta conta: ${pausa} (acima do normal)` : "");
+  return notify ? txt : "";
+}
+async function journalMissing() {   // trades fechadas sem entrada no diario (ex.: antes de o diario existir)
+  const { data: done } = await sb.from("paper_journal").select("position_id");
+  const have = new Set((done ?? []).map((x: any) => Number(x.position_id)));
+  const { data: cl } = await sb.from("paper_positions").select("*").eq("status", "closed").gte("exit_time", new Date(Date.now() - 7 * 86400000).toISOString());
+  for (const p of cl ?? []) if (!have.has(Number(p.id))) {
+    try { await journal({ ...p, account: p.account ?? 1 }, Number(p.exit_price), p.exit_reason ?? "", Number(p.pnl_eur), Number(p.fee_eur), false); } catch (_) { /* segue */ }
+  }
+}
 const eur = (x: number) => `${x >= 0 ? "+" : ""}${x.toFixed(2)} $`;
 async function tg(text: string) { await sb.rpc("paper_notify", { p_text: text }); }
 
@@ -76,7 +166,8 @@ async function closePos(open: any, exitPx: number, reason: string, balance: numb
   const { data: upd } = await sb.from("paper_positions").update({ status: "closed", exit_time: new Date().toISOString(),
     exit_price: exitPx, exit_reason: reason, pnl_eur: pnl, r, fee_eur: fee }).eq("id", open.id).eq("status", "open").select("id");
   if (!upd?.length) return null; // outra corrida ja fechou esta posicao
-  await tg(`${pnl >= 0 ? "✅" : "❌"} <b>Demo: fechou ${NAMES[open.coin]}</b> (${open.strategy})\n• Motivo: ${reason}\n• Entrada ${entry.toFixed(2)} → saida ${exitPx.toFixed(2)} $\n• Resultado: <b>${eur(pnl)}</b> (${r >= 0 ? "+" : ""}${r.toFixed(2)}R)\n• Saldo: ${balance.toFixed(2)} $`);
+  const jt = await journal({ ...open, account: 1 }, exitPx, reason, pnl, fee, true).catch(() => "");
+  await tg(`${pnl >= 0 ? "✅" : "❌"} <b>Demo: fechou ${NAMES[open.coin]}</b> (${open.strategy})\n• Motivo: ${reason}\n• Entrada ${entry.toFixed(2)} → saida ${exitPx.toFixed(2)} $\n• Resultado: <b>${eur(pnl)}</b> (${r >= 0 ? "+" : ""}${r.toFixed(2)}R)\n• Saldo: ${balance.toFixed(2)} $${jt}`);
   return { balance, pnl };
 }
 
@@ -181,7 +272,8 @@ async function closeExp(p: any, exitPx: number, reason: string, balance: number,
     exit_price: exitPx, exit_reason: reason, pnl_eur: pnl, r, fee_eur: fee }).eq("id", p.id).eq("status", "open").select("id");
   if (!upd?.length) return null;
   balance += pnl;
-  await tg(`🧪 ${pnl >= 0 ? "✅" : "❌"} <b>${nome}: fechou ${DIR(side)} ${NAMES[p.coin]}</b> (${p.strategy})\n• Motivo: ${reason}\n• Entrada ${entry.toFixed(2)} → saida ${exitPx.toFixed(2)} $\n• Resultado: <b>${eur(pnl)}</b> (${r >= 0 ? "+" : ""}${r.toFixed(2)}R)\n• Saldo: ${balance.toFixed(2)} $`);
+  const jt = await journal(p, exitPx, reason, pnl, fee, true).catch(() => "");
+  await tg(`🧪 ${pnl >= 0 ? "✅" : "❌"} <b>${nome}: fechou ${DIR(side)} ${NAMES[p.coin]}</b> (${p.strategy})\n• Motivo: ${reason}\n• Entrada ${entry.toFixed(2)} → saida ${exitPx.toFixed(2)} $\n• Resultado: <b>${eur(pnl)}</b> (${r >= 0 ? "+" : ""}${r.toFixed(2)}R)\n• Saldo: ${balance.toFixed(2)} $${jt}`);
   return { balance, pnl };
 }
 async function runStopsExp() {
@@ -219,6 +311,9 @@ async function runExp(fast: boolean) {
     return cache[coin][tf];
   };
   const { data: accs } = await sb.from("paper_account").select("*").gte("id", 2).order("id");
+  const { data: pz } = await sb.from("paper_pause").select("account,strategy").gt("ate", new Date().toISOString());
+  const paused = new Set((pz ?? []).map((x: any) => `${x.account}|${x.strategy}`));
+  if (!fast) await journalMissing().catch(() => null);
   for (const a of accs ?? []) {
     const nome = a.name ?? `Conta ${a.id}`, log: string[] = [];
     let balance = Number(a.balance), unreal = 0;
@@ -258,6 +353,7 @@ async function runExp(fast: boolean) {
       const busy = new Set((stillOpen ?? []).map((x: any) => `${x.coin}|${x.strategy}`));
       for (const s of conta.estrategias) {
         if (FAST.has(s.tf) !== fast) continue;
+        if (paused.has(`${a.id}|${s.ideia}`)) continue;   // pausa automatica do diario (perdas acima do normal)
         const tfm = TF_MIN[s.tf];
         const coins: string[] = (s as any).coins ?? Object.keys(COINS), maxOpen = Number((s as any).max_open ?? 0);
         for (const coin of coins) {
@@ -295,7 +391,7 @@ async function runHourlyExp() { return await runExp(false); }
 Deno.serve(async (req) => {
   const mode = new URL(req.url).searchParams.get("mode");
   try {
-    const out = mode === "stops" ? await runStops() : mode === "fast" ? { ok: true, mode: "fast", exp: await runExp(true) } : await runHourly();
+    const out = mode === "journal" ? (await journalMissing(), { ok: true, mode: "journal" }) : mode === "stops" ? await runStops() : mode === "fast" ? { ok: true, mode: "fast", exp: await runExp(true) } : await runHourly();
     return new Response(JSON.stringify(out), { headers: { "Content-Type": "application/json" } });
   } catch (e) {
     if (mode !== "stops") await tg(`⚠️ <b>Demo: erro</b>\n${String(e).slice(0, 300)}`); // falhas do modo rapido nao enchem o Telegram

@@ -1071,3 +1071,9 @@ Resultado (dev 2019-2024, perp, 8 moedas, max 4 abertas): #221 positiva nas 8 mo
 Pre 2017-18 (so BTC/ETH/XRP/ADA tem dados): +18.1%/ano, 2018 (ano de baixa) +31%, win 58%, pior mes -2.3%. #222 (4 dias): +12.4%/ano,
 pior ano -3.4%, DOGE e LINK negativas, K139: pior que a #221. Leitura: e a primeira estrategia de mercado em baixa que se aguenta em 8 moedas
 e no pre; continua a NAO passar o criterio oficial (SOL 54 < 60) e o holdout 2025-26 nao foi aberto. Entra na demo Swing (substitui a #191).
+
+- **#223 diario da demo** (s-rsi2-15m-long): vai testar So sair quando o RSI(2) passar 70 (era 60), para o ganho cobrir os custos. Proposta por 2 perda(s) ao vivo. Regra fixa do journal_lab.py: aplica se t >= t atual + 0.3, R/trade nao piora e trades >= 50%.
+  Resultado #223: #223: antes t -15.95, -0.119R/trade, win 56%, 7091 trades -> depois t -14.33, -0.119R/trade, win 57%, 7403 trades (BTC -0.15R, ETH -0.14R, SOL -0.05R). APLICADA: a demo passa a usar a variante. Atencao: continua negativa em alguma moeda (so para ver ao vivo).
+  CORRECAO (Claude no chat, mesmo dia): a regra aplicou a #223 so porque o t subiu com MAIS trades, com o R por trade igual (-0.119R).
+  Isso nao e melhoria. A regra passou a exigir tambem R por trade +0.02R acima do atual (journal_lab.py). Com a regra corrigida a #223
+  e REJEITADA e a demo Scalping continua com a #124. Nenhuma outra mudanca foi testada com a regra antiga.

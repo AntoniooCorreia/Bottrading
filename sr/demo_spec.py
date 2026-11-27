@@ -84,6 +84,20 @@ SPECS: dict[str, dict] = {
 }
 
 
+# mudancas aplicadas pelo diario do bot (journal_lab.py): a variante entra nas SPECS e a original deixa de ser escolhida
+def _load_journal():
+    import json as _json
+    import os as _os
+    f = _os.path.join(_os.path.dirname(__file__), "journal_specs.json")
+    return _json.load(open(f)) if _os.path.exists(f) else {}
+
+
+JOURNAL = _load_journal()
+for _n, _s in JOURNAL.items():
+    SPECS[_n] = {k: v for k, v in _s.items() if k not in ("orig_base",)}
+REPLACED = {s["replaces"] for s in JOURNAL.values() if s.get("replaces")}
+
+
 def ema(c: pd.Series, n: int) -> pd.Series:
     return c.ewm(span=n, adjust=False).mean()
 

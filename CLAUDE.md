@@ -50,6 +50,16 @@ opere, marcada "nao passa no backtest (so para ver ao vivo)". O Antonio quer VER
   swing (diario/4h, dias). Sempre --venue perp, --num, carteira no painel. Scalping em spot continua proibido (custos matam).
 - Cron paper-bot-5min (?mode=fast) trata das estrategias de 5m/15m; nao e preciso deploy para specs novas nas familias existentes.
 
+## DIARIO DO BOT + MUDANCAS AUTOMATICAS (pedido do Antonio, 2026-11-27: "quero que a cada loss perceba porque e aplique melhorias")
+- A Edge Function analisa CADA trade fechada da demo (paper_journal: porque, licao, metricas MFE/MAE/custos) e, numa perda com causa
+  corrigivel, propoe UMA mudanca de parametro (estado "proposta"). Perdas normais nao mudam nada. Pausa automatica de 7 dias por
+  conta/estrategia com 6 perdas seguidas ou -5R ao vivo (paper_pause). Tudo aparece no painel (Conta demo > Diario do bot) e no Telegram.
+- OBRIGATORIO no INICIO de cada sessao do agente (antes das ideias novas): `python journal_lab.py` (precisa dos dados de 5m para o
+  scalping: `TF=5m python crypto_download.py BTCUSDT ETHUSDT SOLUSDT` se faltarem). Testa ate 3 mudancas propostas no backtest dev
+  com custos de perpetuos e APLICA sozinho as que passam a regra fixa (R/trade +0.02R, t +0.3, trades >= 50%); as outras ficam
+  rejeitadas com os numeros. Cada teste conta como 1 ideia do limite da noite. Depois: pytest, `python demo_pick.py --push`, commit.
+- NUNCA mexer na regra do journal_lab.py para fazer passar uma mudanca. A K1 (#D1) nunca muda sem o OK do Antonio.
+
 ## NOMES #BK / #D E SO 30 TESTES NO PAINEL (pedido do Antonio, 2026-11-27)
 - Testes de backtesting = #BK<n> (a carteira K138 aparece como #BK138); contas demo = #D1 (K1), #D2 Swing, #D3 Day trade, #D4 Scalping.
   No diario, Telegram, SUMMARY e commits escreve SEMPRE #BK<n> para carteiras de backtesting e #D<n> para a demo (internamente o

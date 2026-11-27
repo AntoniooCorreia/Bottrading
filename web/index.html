@@ -670,10 +670,11 @@ function vDemo(){
       <p style="margin:0 0 6px"><b>Agora:</b> ${open.length?`${open.length} trade(s) aberta(s), vê em "Posições abertas".`:`sem trades abertas, à espera que todas as condições de uma estratégia fiquem ✅ (vê "O que falta para abrir trade").`} ${cfg&&cfg.escolhida?`Estratégias escolhidas a ${esc(cfg.escolhida)}.`:""}</p>
       ${conta&&(conta.estrategias||[]).length?`<ul style="margin:0 0 8px;padding-left:18px">${conta.estrategias.map(e=>`<li><b>${esc(e.num||"")} ${esc(e.ideia)}</b> · velas de ${esc(e.tf)} · ${e.side===1?"long":"short"} · stop ${e.stop_atr} ATR${e.tp_r?` · alvo ${e.tp_r}R`:""}${e.max_hold?` · máx. ${e.max_hold} velas`:""}<br><span class="muted">backtest 2019–24: ${e.trades_semana!=null?nf(+e.trades_semana,1)+" trades/semana, ":""}${e.win!=null?"win rate "+nf(+e.win,0)+"%, ":""}${e.r_trade!=null?rr(+e.r_trade,3)+" por trade":""}</span> ${String(e.estado||"").startsWith("passa")?`<span class="badge ok">passa as regras da demo</span>`:`<span class="badge bad">não passa no backtest · só para ver ao vivo</span>`}</li>`).join("")}</ul>`:`<p style="margin-bottom:0">O agente ainda não escolheu estratégias para esta conta.</p>`}
       ${conta&&conta.aviso?`<p style="margin:8px 0 0"><span class="badge mid" style="white-space:normal">⚠ ${esc(conta.aviso)}</span></p>`:""}</div></div>`:"";
+  const jcard=journalCard(D0,AC);
   return tabs+`<div class="kpis">${kpi("Saldo (com trades abertas)",nf(eq,2)+" $",`começou com ${nf(+a.start_balance,0)} $`, cls(eq-(+a.start_balance)))}
     ${kpi("Rentabilidade",pc(ret,2),"desde o início da demo",cls(ret))}
     ${kpi("Trades fechadas",closed.length,closed.length?`${wins} ganhas (${Math.round(wins/closed.length*100)}%)`:"ainda nenhuma")}
-    ${kpi("Abertas agora",open.length,`${X?"1 por moeda e estratégia":"máximo 1 por moeda"} · última verificação ${last}`)}</div>${how}
+    ${kpi("Abertas agora",open.length,`${X?"1 por moeda e estratégia":"máximo 1 por moeda"} · última verificação ${last}`)}</div>${how}${jcard}
     <div class="card"><h2>Preços ao vivo</h2><p class="hint">Kraken, em dólares. Atualiza de 5 em 5 segundos${D.pxAt?" · "+D.pxAt.toLocaleTimeString("pt-PT"):""}. Variação desde a abertura do dia.</p>
       <div class="kpis sm" style="margin:0">${(()=>{const L=X?[...new Set(((conta&&conta.estrategias)||[]).flatMap(e=>e.coins||["btc","eth","sol"]))]:[]; return L.length?L:["btc","eth","sol"];})().map(c=>{const o=open.find(p=>p.coin===c); return `<div class="kpi"><div class="k">${CN[c]}</div><div class="v">${px[c]?nf(px[c],2)+" $":"—"}</div><div class="s"><span class="${cls((D.chg||{})[c])}">${pc((D.chg||{})[c],2)}</span>${o?` · em posição, stop ${nf(+o.stop,2)} $`:" · sem posição"}</div></div>`;}).join("")}</div></div>
     ${X?expSigCard(D,open,AC):sigCard(D,open)}
@@ -683,6 +684,25 @@ function vDemo(){
     ${chart?`<div class="card"><h2>Evolução do saldo</h2>${chart}</div>`:""}
     <div class="card"><h2>Posições abertas</h2>${open.length?`<div class="scroll"><p class="hint">A trade fecha no que acontecer primeiro: <b>alvo (TP)</b> = ganho, <b>stop</b> = perda de 1R (1% da conta), ou o <b>tempo máximo</b> (fecha ao preço do momento). A barra mostra onde o preço está entre o stop e o alvo.</p><table class="t"><thead><tr><th>Moeda</th><th>Estratégia</th><th class="num">Entrada</th><th class="num">Stop (SL)</th><th class="num">Alvo (TP)</th><th class="num">Agora</th><th class="num">Resultado</th><th>Fecha no máximo</th></tr></thead><tbody>${open.map(orow).join("")}</tbody></table></div>`:`<div class="empty">Sem posições abertas. ${X?"À espera dos sinais das estratégias escolhidas pelo agente.":"O bot está à espera de uma tendência de subida em BTC, ETH ou SOL."}</div>`}</div>
     <div class="card"><h2>Trades fechadas</h2>${closed.length?`<div class="scroll"><table class="t"><thead><tr><th>Moeda</th><th>Estratégia</th><th>Entrada</th><th class="num">Preço entrada</th><th class="num">Stop</th><th class="num">Saída</th><th class="num">Resultado</th><th>Motivo</th></tr></thead><tbody>${closed.slice().reverse().map(row).join("")}</tbody></table></div>`:`<div class="empty">Ainda nenhuma trade fechada.</div>`}</div>`;
+}
+/* diario do bot: porque ganhou/perdeu cada trade, o que propoe mudar e o que o teste no backtest decidiu */
+function journalCard(D0,AC){
+  const J=(D0.jr||[]).filter(j=>+j.account===AC), PZ=(D0.pz||[]).filter(p=>+p.account===AC&&new Date(p.ate)>new Date());
+  const CAU={custos:["Custos comeram o ganho","mid"],falsa_partida:["Entrada falsa","bad"],devolveu_lucro:["Devolveu o lucro","mid"],sem_forca:["Sem força (tempo)","mid"],perda_normal:["Perda normal","neu"],ganho:["Ganho","ok"]};
+  const EST={"proposta":["🧪 vai ser testada no backtest","neu"],"em teste":["⏳ a testar","mid"],"aplicada":["✅ aplicada na demo","ok"],"rejeitada":["❌ não melhorou: fica como está","bad"],"precisa do OK do Antonio":["✋ precisa do teu OK (K1)","mid"],"sem mudanca":["nada a mudar","neu"]};
+  const n=J.length, perdas=J.filter(j=>+j.r<0), cnt={}; perdas.forEach(j=>cnt[j.causa]=(cnt[j.causa]||0)+1);
+  const ap=J.filter(j=>j.estado==="aplicada").length, rj=J.filter(j=>j.estado==="rejeitada").length, pr=J.filter(j=>j.estado==="proposta"||j.estado==="em teste").length;
+  const resumo=n?`<div class="kpis sm" style="margin:0 0 10px">${kpi("Trades analisadas",n,`${perdas.length} perdas · ${n-perdas.length} ganhos`)}${kpi("Porque perdeu",perdas.length?Object.entries(cnt).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`${v}× ${(CAU[k]||[k])[0].toLowerCase()}`).join(" · "):"—","")}${kpi("Mudanças",`${ap} aplicadas`,`${rj} rejeitadas · ${pr} à espera de teste`)}</div>`:"";
+  const pz=PZ.length?`<div class="small" style="margin:0 0 10px">${PZ.map(p=>`<span class="badge bad" style="white-space:normal">⏸ ${esc(p.strategy)} pausada até ${new Date(p.ate).toLocaleString("pt-PT",{dateStyle:"short",timeStyle:"short"})}: ${esc(p.motivo||"")}</span>`).join(" ")}</div>`:"";
+  const row=j=>{const m=j.metricas||{}, c=CAU[j.causa]||[j.causa,"neu"], e=EST[j.estado]||[j.estado,"neu"], mu=j.mudanca;
+    return `<div class="pfc ${+j.r>=0?"ok":c[1]==="bad"?"bad":"mid"}" style="margin-top:10px"><div class="hd"><b>${CN[j.coin]||esc(j.coin)}</b><span class="badge ${+j.side===1?"ok":"bad"}">${+j.side===1?"LONG":"SHORT"}</span><code class="small">${esc(j.strategy)}</code><b class="${cls(+j.r)}">${rr(+j.r)}</b><span class="badge ${c[1]}">${c[0]}</span><span class="small muted" style="margin-left:auto">${new Date(j.at).toLocaleString("pt-PT",{dateStyle:"short",timeStyle:"short"})}</span></div>
+      <div class="small" style="margin-top:4px"><b>Porquê:</b> ${esc(j.porque||"")}</div>
+      <div class="small muted">máx. a favor ${rr(m.mfe_r)} · máx. contra ${m.mae_r!=null?rr(-m.mae_r):"—"} · custos ${m.custo_r!=null?nf(m.custo_r,2)+"R":"—"} · durou ${m.horas!=null?nf(m.horas,1)+"h":"—"}${m.max_horas?" de "+nf(m.max_horas,0)+"h máx.":""}</div>
+      <div class="small" style="margin-top:4px"><b>Lição:</b> ${esc(j.licao||"")}</div>
+      ${mu?`<div class="small" style="margin-top:4px"><b>O que vai mudar:</b> ${esc(mu.texto)} <span class="badge ${e[1]}">${e[0]}</span></div>`:""}
+      ${j.resultado?`<div class="small" style="margin-top:4px;color:var(--text-2)"><b>Resultado do teste:</b> ${esc(j.resultado)}</div>`:""}</div>`;};
+  return `<div class="card"><h2>📓 Diário do bot</h2><p class="hint">Cada trade que fecha é analisada sozinha: quanto andou a favor e contra, quanto custou e porque ganhou ou perdeu. Quando a causa tem correção, o bot propõe <b>uma</b> mudança. O agente testa-a no backtest 2019–2024 e <b>só a aplica se melhorar</b> (R por trade +0,02R, t +0,3, sem perder metade das trades). Perder faz parte: uma perda normal não muda nada. Se as perdas passarem o normal (6 seguidas ou −5R), a estratégia fica pausada 7 dias nesta conta.</p>
+    ${pz}${resumo}${n?J.slice(0,40).map(row).join(""):`<div class="empty">Ainda nenhuma trade fechada nesta conta.</div>`}</div>`;
 }
 /* o que falta para LONG (as 4 estrategias da K1) e para SHORT (espelho, so informativo: spot na Kraken nao permite short) */
 function sigCard(D,open){
@@ -766,8 +786,9 @@ async function loadSig(){
 }
 async function loadDemo(){
   try{
-    const [acc,pos,eqs]=await Promise.all([q("paper_account?select=*&order=id.asc"),q("paper_positions?select=*&order=id.asc"),q("paper_equity?select=at,equity,account&order=at.asc&limit=10000")]);
-    S.demo={...(S.demo||{}),accs:acc,acc:acc[0],pos,eq:eqs}; if(S.route==="demo") render();
+    const [acc,pos,eqs,jr,pz]=await Promise.all([q("paper_account?select=*&order=id.asc"),q("paper_positions?select=*&order=id.asc"),q("paper_equity?select=at,equity,account&order=at.asc&limit=10000"),
+      q("paper_journal?select=*&order=id.desc&limit=300").catch(()=>[]),q("paper_pause?select=*").catch(()=>[])]);
+    S.demo={...(S.demo||{}),accs:acc,acc:acc[0],pos,eq:eqs,jr,pz}; if(S.route==="demo") render();
   }catch(e){console.error(e);}
 }
 /* precos ao vivo da Kraken de 5 em 5 segundos (so no browser; o bot vigia os stops de minuto a minuto) */

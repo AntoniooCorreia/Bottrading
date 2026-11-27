@@ -18,6 +18,11 @@ from sr import supa
 from sr.stats import summarize
 from sr.swing import CONFIRM_COINS, KRAKEN_FEE, MAIN_COINS, load_tf, run_positions
 from sr.swing_ideas import EXITS, IDEAS, NO_MIN_RISK
+from sr.journal import journal_ideas
+
+# mudancas aplicadas pelo diario do bot (sr/journal_specs.json): copias locais, nao mexem no dicionario do swing_ideas
+_ji, _je, _jn = journal_ideas()
+IDEAS, EXITS, NO_MIN_RISK = {**IDEAS, **_ji}, {**EXITS, **_je}, set(NO_MIN_RISK) | _jn
 
 COST_PCT = 2 * KRAKEN_FEE + 0.0005
 # Perpetuos da Kraken (decisao do Antonio, 2026-11-21): taker 0.05% por lado (tier 1, tabela da Kraken de jul-2026)

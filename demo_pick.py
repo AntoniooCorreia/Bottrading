@@ -26,7 +26,7 @@ import urllib.request
 import pandas as pd
 
 from sr import supa
-from sr.demo_spec import SPECS, style
+from sr.demo_spec import REPLACED, SPECS, style
 
 WEEKS_DEV = (pd.Timestamp("2024-12-31") - pd.Timestamp("2019-01-01")).days / 7
 
@@ -115,7 +115,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--push", action="store_true")
     a = ap.parse_args()
-    res = [evaluate(n) for n in SPECS]
+    res = [evaluate(n) for n in SPECS if n not in REPLACED]   # o diario substituiu estas por variantes melhores
     res.sort(key=lambda r: (not r["ok"], -r["t"]))
     print("estilo ideia                              ok   t      R/trade  win%  trades/sem  motivos")
     for r in res:
