@@ -1141,3 +1141,9 @@ Parametros fixos, nada afinado:
   Hipotese: na rutura de 4h o alvo 1R (#226 vs #221) subiu o win de 48% para 54% e deixou todos os anos positivos; o mesmo deve acontecer em 1h
   (a #229 tem win 46%). Risco: com stop de 3 ATR o alvo 1R fica perto e os custos pesam mais por trade.
 O criterio oficial (BTC/ETH/SOL) NAO muda.
+Resultado (dev 2019-2024, perp, 8 moedas): #231 (K148) +8.7%/ano (antes +9.8%), TODOS os anos positivos (pior 2022 +1.5%, antes -11.9%), pior mes -5.6%
+(antes -14.2%), pior queda -14.6%, win 46%, 91 trades/ano: o limite de 2 abertas tambem funciona no day trade de 1h (alvo 2R). -> SPECS.
+#232 (K149) +8.7%/ano, pior ano -9.3%, pior mes -9.5%, win 45%, 124 trades/ano: juntar as duas ruturas dilui (disparam no mesmo movimento).
+#233 (K150) win 54% (antes 46%) mas +0.062R/trade (antes +0.118R), +8.0%/ano, pior ano -12.0%, pior mes -12.2%: o alvo 1R em 1h perde para os custos.
+Leitura: em baixa, o que segura o pior mes e o limite de risco junto (max 2 abertas), nao o alvo nem juntar estrategias parecidas. Proximo: uma 2.a
+estrategia POUCO correlacionada com as ruturas (ex.: short em baixa ou ressalto de sobrevenda) para subir a frequencia sem somar perdas juntas.

@@ -89,6 +89,10 @@ SPECS: dict[str, dict] = {
                                                 "entry": {"kind": "breakout", "n": 20}, "vol_mult": 1.5, "trend_ema": 0, "btc": "bear",
                                                 "stop_atr": 2.0, "tp_r": 2.0, "max_hold": 12, "signal_exit": False,
                                                 "coins": ["btc", "eth", "sol", "xrp", "ada", "doge", "link", "avax"], "max_open": 2},
+    "l-dc24-1h-bear-vol20-s3-tp2-mh24-8m-mo2": {"num": "#231", "base": "l-dc24-1h-bear-vol20-s3-tp2-mh24", "tf": "1h", "side": 1,
+                                                "entry": {"kind": "breakout", "n": 24}, "vol_mult": 2.0, "trend_ema": 200, "btc": "bear",
+                                                "stop_atr": 3.0, "tp_r": 2.0, "max_hold": 24, "signal_exit": False,
+                                                "coins": ["btc", "eth", "sol", "xrp", "ada", "doge", "link", "avax"], "max_open": 2},
     "h-rsi2-1h-short": {"num": "#136", "tf": "1h", "side": -1, "entry": {"kind": "rsi2", "lo": 10, "hi": 70}, "trend_ema": 200,
                         "btc": "bear", "stop_atr": 3.0, "tp_r": 0.0, "max_hold": 24, "signal_exit": True},
     # ---- scalping (15m) ----
