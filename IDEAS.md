@@ -981,3 +981,24 @@ t -2.93 (-0.11R, pior ano -31%); #207 4h t +0.09 (so o BTC positivo, +0.17R; ETH
 Leitura: em baixa, comprar o minimo novo com volume e apanhar a faca a cair em todos os horizontes (pior quanto mais curto); o maximo novo com
 volume tambem nao e armadilha (o short perde). Ou seja, o volume em cripto confirma a DIRECAO da vela que rompe: a #197 (comprar a rutura para
 cima com volume) e o lado certo; nao ha "absorcao" mecanica a explorar. Nada entra em SPECS. Scalping 15m em baixa: 0 de 2 tentativas com volume.
+
+## 2026-11-27 cripto - sessao :00 (03h, noite intensiva) (4 ideias; ideias cripto testadas antes: ~122 (#100-#208); esta noite (desde 19h de 26-11): 12 de 20 com esta sessao) - registadas antes de correr
+PRIORIDADE: BTC abaixo da media de 200 dias. `python best.py`: base geral K67 (#158, so opera com BTC em alta); a melhor de BAIXA continua a #197
+(K111, rutura de 20 velas de 4h com volume > 1.5x, BTC em baixa, stop 2 ATR, alvo 2R, max 2 dias: t +3.34, win 53%, nenhum ano negativo, SOL 54 < 60).
+O que falha: a #197 e o unico sinal de baixa com vantagem, mas so da ~0.6 trades/semana; levar o sinal para velas mais curtas (#201 15m, #202 1h)
+cria ruturas novas, quase todas ruido (o volume de 15m/1h nao separa). As sessoes 02h/02h30 mostraram que o volume confirma a DIRECAO.
+Ideia nova (nao testada): usar a rutura de 4h com volume da #197 so como CONTEXTO (24h depois do sinal ha momento verdadeiro) e entrar em
+velas curtas num RECUO dentro desse momento (RSI(2) < 10, o recuo classico de Connors), em vez de comprar a propria rutura. Assim o sinal
+de 4h (que tem vantagem) gera varias entradas curtas com stop curto -> MAIS TRADES e estilo scalping/day trade. O sinal de 4h e calculado
+sobre velas de 4h feitas a partir das velas curtas e so fica disponivel DEPOIS de a vela de 4h fechar (sem lookahead).
+Parametros fixos: RSI(2) < 10, contexto = sinal nas ultimas 6 velas de 4h (24h), volume 1.5x e rutura 20 como na #197. Todas --venue perp.
+- **#209 l-pb15m-ctx197-rsi2-s3-tp2-mh32** (SCALPING): sinal da #197 nas ultimas 24h + RSI(2) de 15m < 10 -> long. Stop 3 ATR(14) de 15m,
+  alvo 2R, max 32 velas (8h). Hipotese: comprar o recuo de 15m dentro de um ressalto confirmado tem mais win rate e mais trades que a #201.
+- **#210 l-pb1h-ctx197-rsi2-s3-tp2-mh24** (DAY TRADE): o mesmo em 1h (RSI(2) de 1h < 10), stop 3 ATR de 1h, alvo 2R, max 24 velas (24h).
+- **#211 l-pb4h-ctx197-rsi2-s2-tp2-mh12** (SWING): o mesmo em 4h (RSI(2) de 4h < 10 com o sinal da #197 nas 6 velas de 4h anteriores),
+  stop 2 ATR, alvo 2R, max 12 velas (2 dias). Hipotese: o recuo depois da rutura e a 2.a entrada da mesma tendencia (pouco sobreposta a #197).
+- **#212 l-pb15m-ctx202-rsi2-s3-tp2-mh32** (SCALPING, contexto mais frequente): contexto = sinal da #202 (rutura de 24 velas de 1h com volume
+  > 1.5x, acima da EMA 200 de 1h, BTC em baixa) nas ultimas 12 velas de 1h + RSI(2) de 15m < 10 -> long. Stop 3 ATR de 15m, alvo 2R, max 32 velas.
+  Hipotese: a #202 e positiva nas 3 moedas (t 1.99) e dispara ~81/ano: mais contextos -> mais trades de scalping.
+Fasquia: criterio oficial (>= 60 trades por moeda, positiva em cada, t >= 3.0, confirmacao >= 3/5); depois pre e holdout uma vez.
+Nota de desconfianca: 44 ideias de baixa ja testadas (#165-#208).
