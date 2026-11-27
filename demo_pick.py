@@ -32,16 +32,22 @@ WEEKS_DEV = (pd.Timestamp("2024-12-31") - pd.Timestamp("2019-01-01")).days / 7
 
 
 def evaluate(name: str) -> dict:
-    f = f"results/runs/{name}-perp__dev.json"
+    sp = SPECS[name]
+    base, coins = sp.get("base", name), sp.get("coins") or ["btc", "eth", "sol"]
+    suf = f"-{len(coins)}m" if sorted(coins) != ["btc", "eth", "sol"] else ""
+    f = f"results/runs/{base}-perp{suf}__dev.json"
     if not os.path.exists(f):
-        subprocess.run([sys.executable, "crypto_lab.py", "--ideas", name, "--period", "dev", "--venue", "perp",
-                        "--confirm", "", "--num", SPECS[name]["num"]], check=True, capture_output=True)
+        cmd = [sys.executable, "crypto_lab.py", "--ideas", base, "--period", "dev", "--venue", "perp",
+               "--confirm", "", "--num", sp["num"], "--coins", ",".join(coins)]
+        if sp.get("max_open"):
+            cmd += ["--max-open", str(sp["max_open"])]
+        subprocess.run(cmd, check=True, capture_output=True)
     d = json.load(open(f))
     m = d["markets"]
-    n = sum(m[k]["n"] for k in ("btc", "eth", "sol") if k in m)
+    n = sum(m[k]["n"] for k in coins if k in m)
     tpw = n / WEEKS_DEV
-    pos_all = all(k in m and m[k]["meanR"] > 0 for k in ("btc", "eth", "sol"))
-    motivos = [f"{k.upper()} {m[k]['meanR']:+.3f}R" for k in ("btc", "eth", "sol") if k in m and m[k]["meanR"] <= 0]
+    pos_all = all(k in m and m[k]["meanR"] > 0 for k in coins)
+    motivos = [f"{k.upper()} {m[k]['meanR']:+.3f}R" for k in coins if k in m and m[k]["meanR"] <= 0]
     if tpw < 1:
         motivos.append(f"so {tpw:.1f} trades/semana")
     return {"ideia": name, "num": SPECS[name]["num"], "t": d["pooled"]["t"], "r_trade": d["pooled"]["meanR"],

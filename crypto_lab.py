@@ -190,6 +190,8 @@ def save_run(a, name: str, o: dict, rr: dict | None, conf: dict) -> None:
         return
     fn, tf, st, tp, mh = IDEAS[name]
     variant = name + ("-perp" if a.venue == "perp" else "")
+    if sorted(a.coins.split(",")) != sorted(MAIN_COINS):
+        variant += f"-{len(a.coins.split(','))}m"  # carteira com outras moedas: nao pisa o teste original
     per, yearly, curves, periods, allt = {}, {}, {}, {}, []
     for k, tr in rr["tr"].items():
         b = rr["b"][k]

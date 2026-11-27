@@ -18,7 +18,8 @@ HAVE_DATA = os.path.exists("data/crypto/BTCUSDT_1h.csv.gz")
 def _ref_entries(name, b):
     """Entradas da ideia original: vela onde o sinal (estado ou pulso) esta ligado e a anterior nao (para estados)
     ou simplesmente ligado (comparamos a condicao de entrada, por isso usamos o valor do sinal)."""
-    fn = IDEAS[name][0]
+    from sr.demo_spec import SPECS as _S
+    fn = IDEAS[_S.get(name, {}).get("base", name)][0]
     return pd.Series(np.sign(fn(b)), index=b.index)
 
 

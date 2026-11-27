@@ -1066,3 +1066,8 @@ na mesma familia (canal 10) diluem o t. #217 e #218 entram em SPECS (familia bre
   4/5 moedas de confirmacao; em 8 moedas a carteira passa de ~0.6 para ~1.5 trades/semana sem mudar a regra. O criterio oficial NAO muda
   (BTC/ETH/SOL >= 60 continua a falhar por SOL 54): isto mede so a carteira para a demo.
 - **#222 carteira-8 #217** (igual, com a #217 = #197 com maximo 4 dias).
+Resultado (dev 2019-2024, perp, 8 moedas, max 4 abertas): #221 positiva nas 8 moedas (+0.03R DOGE a +0.30R SOL), t +3.60, win 48%,
++0.16R/trade, carteira +14.3%/ano (4/6 anos >= 14%), pior ano -1.2% (2021), pior mes -6.5%, pior queda -17.1%, 79 trades/ano (~1.5/semana), K138.
+Pre 2017-18 (so BTC/ETH/XRP/ADA tem dados): +18.1%/ano, 2018 (ano de baixa) +31%, win 58%, pior mes -2.3%. #222 (4 dias): +12.4%/ano,
+pior ano -3.4%, DOGE e LINK negativas, K139: pior que a #221. Leitura: e a primeira estrategia de mercado em baixa que se aguenta em 8 moedas
+e no pre; continua a NAO passar o criterio oficial (SOL 54 < 60) e o holdout 2025-26 nao foi aberto. Entra na demo Swing (substitui a #191).

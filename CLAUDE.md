@@ -50,6 +50,14 @@ opere, marcada "nao passa no backtest (so para ver ao vivo)". O Antonio quer VER
   swing (diario/4h, dias). Sempre --venue perp, --num, carteira no painel. Scalping em spot continua proibido (custos matam).
 - Cron paper-bot-5min (?mode=fast) trata das estrategias de 5m/15m; nao e preciso deploy para specs novas nas familias existentes.
 
+## DEPOIS DA NOITE INTENSIVA (2026-11-27, chat com o Antonio: "faz os proximos passos")
+- #221 = #197 em carteira de 8 moedas (spec "l-dc20-4h-bear-vol15-s2-tp2-mh12-8m" com coins + max_open 4) corre na demo Swing; a Edge Function
+  ja trata 8 moedas (spec.coins) e max_open. Testes de carteira em 8 moedas: `crypto_lab.py --coins btc,eth,sol,xrp,ada,doge,link,avax
+  --confirm "" --max-open 4` (o teste fica com sufixo -8m e nao pisa o original). O criterio oficial (BTC/ETH/SOL >= 60) NAO muda.
+- Scalping (5m/15m) em mercado de baixa: 0 de 6 -> PARADO. A regra "1 ideia de scalping por noite" fica suspensa enquanto o BTC
+  estiver abaixo da media de 200 dias; as ideias vao para day trade e swing (de preferencia em carteira de 8 moedas).
+- Rutura de volatilidade (#213/#216) e familia nova: so entra na demo se alguem mexer no engine.ts (nao prioritario: t < 2).
+
 ## PRIORIDADE DA NOITE (pedido do Antonio, 2026-11-23): ESTRATEGIAS PARA MERCADO EM BAIXA -> DEMO EXPERIMENTAL A OPERAR JA
 O BTC esta ~17-19% abaixo da media de 200 dias e TODAS as estrategias aprovadas para a demo precisam de BTC acima dela: a demo esta
 parada. O Antonio quer ver trades. Enquanto o BTC estiver abaixo da media de 200 dias, TODAS as ideias da noite sao para esse regime

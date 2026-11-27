@@ -11,6 +11,7 @@ acrescentar aqui + correr pytest. Familias de entrada:
   above_sma fecho acima da media de n velas (long) / abaixo da media (short, side -1)
 Filtro de volume opcional: vol_mult (volume da vela > vol_mult x media das n velas anteriores; n = entry.n).
 Estilo (para as contas demo): scalping = velas de 5m/15m; day trade = 1h/4h com tempo maximo <= 24h; swing = o resto.
+Moedas: por defeito BTC/ETH/SOL; "coins" muda a lista (carteira de 8) e "max_open" limita as trades abertas da estrategia.
 Filtros: trend_ema (fecho acima/abaixo da EMA de n velas, conforme o lado), btc ("bull"/"bear": BTC fechou o dia anterior
 acima/abaixo da media de 200 dias).
 """
@@ -64,6 +65,12 @@ SPECS: dict[str, dict] = {
     "l-dc20-4h-bear-vol15-s2-tp1-mh6": {"num": "#204", "tf": "4h", "side": 1, "entry": {"kind": "breakout", "n": 20},
                                         "vol_mult": 1.5, "trend_ema": 0, "btc": "bear", "stop_atr": 2.0, "tp_r": 1.0,
                                         "max_hold": 6, "signal_exit": False},
+    # carteira de 8 moedas (#221, 2026-11-27): a MESMA regra da #197; "base" = ideia em sr/swing_ideas.py; max_open = trades
+    # abertas ao mesmo tempo desta estrategia (igual ao --max-open do backtest)
+    "l-dc20-4h-bear-vol15-s2-tp2-mh12-8m": {"num": "#221", "base": "l-dc20-4h-bear-vol15-s2-tp2-mh12", "tf": "4h", "side": 1,
+                                            "entry": {"kind": "breakout", "n": 20}, "vol_mult": 1.5, "trend_ema": 0, "btc": "bear",
+                                            "stop_atr": 2.0, "tp_r": 2.0, "max_hold": 12, "signal_exit": False,
+                                            "coins": ["btc", "eth", "sol", "xrp", "ada", "doge", "link", "avax"], "max_open": 4},
     "h-rsi2-1h-short": {"num": "#136", "tf": "1h", "side": -1, "entry": {"kind": "rsi2", "lo": 10, "hi": 70}, "trend_ema": 200,
                         "btc": "bear", "stop_atr": 3.0, "tp_r": 0.0, "max_hold": 24, "signal_exit": True},
     # ---- scalping (15m) ----

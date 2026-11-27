@@ -85,6 +85,8 @@ Leitura honesta cripto (2026-11-27, sessao das 04h, ultima da noite intensiva 26
 6. #197 (t 3.34) e #217 (= #197 com 4 dias, t 3.27, pior ano -3.1%) passam o t mas falham por SOL 54 < 60 trades; a #218 (canal 10) da
    SOL 81 e conf. 5/5 mas t cai para 2.43: mais trades diluem a vantagem. Vizinhas da #197 a passar seriam afinacao: desconfianca alta.
 7. Em 15m (#201, #205, #209, #212, #215, #219) os custos e o ruido matam tudo: scalping em baixa 0 de 6. Demo: ver demo_pick.py.
+8. #221 (2026-11-27, chat): a #197 em carteira de 8 moedas (max 4 abertas) da +14.3%/ano no dev, positiva nas 8 moedas, pior ano -1.2%,
+   ~1.5 trades/semana, e +18%/ano no pre 2017-18 (2018 +31%). Primeira de baixa que confirma fora das 3 moedas; corre na demo Swing.
 
 # Resumo indices (ARQUIVO, custos CFD incluidos)
 

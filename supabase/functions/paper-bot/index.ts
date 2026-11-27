@@ -10,7 +10,10 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 import { atr as atrN, entryAt, exitAt, TF_MIN, type Spec } from "./engine.ts";
 
 const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
-const COINS: Record<string, string> = { btc: "XBTUSD", eth: "ETHUSD", sol: "SOLUSD" };
+const COINS: Record<string, string> = { btc: "XBTUSD", eth: "ETHUSD", sol: "SOLUSD" };   // K1 (conta 1)
+// contas experimentais: uma estrategia pode correr em mais moedas (spec.coins; carteira de 8, #221)
+const ALL_COINS: Record<string, string> = { ...COINS, xrp: "XRPUSD", ada: "ADAUSD", doge: "XDGUSD", link: "LINKUSD", avax: "AVAXUSD" };
+const TICKER_KEY: [string, string][] = [["XBT", "btc"], ["ETH", "eth"], ["SOL", "sol"], ["XRP", "xrp"], ["ADA", "ada"], ["XDG", "doge"], ["LINK", "link"], ["AVAX", "avax"]];
 const FEE = 0.0026;
 type Bar = { t: number; o: number; h: number; l: number; c: number; v?: number };
 type Strat = { name: string; tf: 1440 | 240; kind: "donchian" | "sma"; a: number; b?: number };
@@ -20,7 +23,7 @@ const STRATS: Strat[] = [
   { name: "k-donchian55-4h", tf: 240, kind: "donchian", a: 55, b: 20 },
   { name: "k-sma200-4h", tf: 240, kind: "sma", a: 200 },
 ];
-const NAMES: Record<string, string> = { btc: "BTC", eth: "ETH", sol: "SOL" };
+const NAMES: Record<string, string> = { btc: "BTC", eth: "ETH", sol: "SOL", xrp: "XRP", ada: "ADA", doge: "DOGE", link: "LINK", avax: "AVAX" };
 
 async function ohlc(pair: string, interval: number): Promise<Bar[]> {
   const r = await fetch(`https://api.kraken.com/0/public/OHLC?pair=${pair}&interval=${interval}`);
@@ -31,13 +34,13 @@ async function ohlc(pair: string, interval: number): Promise<Bar[]> {
   return bars.slice(0, -1); // a ultima vela ainda nao fechou
 }
 async function ticker(): Promise<Record<string, number>> {
-  const r = await fetch(`https://api.kraken.com/0/public/Ticker?pair=${Object.values(COINS).join(",")}`);
+  const r = await fetch(`https://api.kraken.com/0/public/Ticker?pair=${Object.values(ALL_COINS).join(",")}`);
   const j = await r.json();
   if (j.error?.length) throw new Error(`Kraken ticker: ${j.error.join(",")}`);
   const out: Record<string, number> = {};
   for (const [k, v] of Object.entries<any>(j.result)) {
-    const coin = k.includes("XBT") ? "btc" : k.includes("ETH") ? "eth" : k.includes("SOL") ? "sol" : null;
-    if (coin) out[coin] = +v.c[0];
+    const hit = TICKER_KEY.find(([s]) => k.includes(s));
+    if (hit) out[hit[1]] = +v.c[0];
   }
   return out;
 }
@@ -212,7 +215,7 @@ async function runExp(fast: boolean) {
   const cache: Record<string, Record<number, Bar[]>> = {};
   const bars = async (coin: string, tf: number) => {
     cache[coin] ??= {};
-    if (!cache[coin][tf]) cache[coin][tf] = coin === "btc" && tf === 1440 ? btcD : await ohlc(COINS[coin], tf);
+    if (!cache[coin][tf]) cache[coin][tf] = coin === "btc" && tf === 1440 ? btcD : await ohlc(ALL_COINS[coin], tf);
     return cache[coin][tf];
   };
   const { data: accs } = await sb.from("paper_account").select("*").gte("id", 2).order("id");
@@ -256,8 +259,10 @@ async function runExp(fast: boolean) {
       for (const s of conta.estrategias) {
         if (FAST.has(s.tf) !== fast) continue;
         const tfm = TF_MIN[s.tf];
-        for (const coin of Object.keys(COINS)) {
+        const coins: string[] = (s as any).coins ?? Object.keys(COINS), maxOpen = Number((s as any).max_open ?? 0);
+        for (const coin of coins) {
           if (busy.has(`${coin}|${s.ideia}`)) continue;
+          if (maxOpen && [...busy].filter((k) => k.endsWith(`|${s.ideia}`)).length >= maxOpen) break;   // como o --max-open do backtest
           const b = await bars(coin, tfm), last = b[b.length - 1];
           const candleClose = last.t + tfm * 60000;
           if (Date.now() - candleClose > Math.min(2 * 3600000, tfm * 60000)) continue;   // so logo a seguir ao fecho da vela

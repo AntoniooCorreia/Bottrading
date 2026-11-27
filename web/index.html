@@ -594,7 +594,7 @@ function vPlano(){
 
 
 /* ---------- conta demo (paper trading crypto) ---------- */
-const CN={btc:"Bitcoin (BTC)",eth:"Ethereum (ETH)",sol:"Solana (SOL)"};
+const CN={btc:"Bitcoin (BTC)",eth:"Ethereum (ETH)",sol:"Solana (SOL)",xrp:"XRP",ada:"Cardano (ADA)",doge:"Dogecoin (DOGE)",link:"Chainlink (LINK)",avax:"Avalanche (AVAX)"};
 function vDemo(){
   const D0=S.demo; if(!D0||!D0.accs) return `<div class="card"><div class="empty">A carregar a conta demo…</div></div>`;
   const AC=S.demoAcc||1, X=AC>=2;
@@ -643,7 +643,7 @@ function vDemo(){
     ${kpi("Trades fechadas",closed.length,closed.length?`${wins} ganhas (${Math.round(wins/closed.length*100)}%)`:"ainda nenhuma")}
     ${kpi("Abertas agora",open.length,`${X?"1 por moeda e estratégia":"máximo 1 por moeda"} · última verificação ${last}`)}</div>${how}
     <div class="card"><h2>Preços ao vivo</h2><p class="hint">Kraken, em dólares. Atualiza de 5 em 5 segundos${D.pxAt?" · "+D.pxAt.toLocaleTimeString("pt-PT"):""}. Variação desde a abertura do dia.</p>
-      <div class="kpis sm" style="margin:0">${["btc","eth","sol"].map(c=>{const o=open.find(p=>p.coin===c); return `<div class="kpi"><div class="k">${CN[c]}</div><div class="v">${px[c]?nf(px[c],2)+" $":"—"}</div><div class="s"><span class="${cls((D.chg||{})[c])}">${pc((D.chg||{})[c],2)}</span>${o?` · em posição, stop ${nf(+o.stop,2)} $`:" · sem posição"}</div></div>`;}).join("")}</div></div>
+      <div class="kpis sm" style="margin:0">${(()=>{const L=X?[...new Set(((conta&&conta.estrategias)||[]).flatMap(e=>e.coins||["btc","eth","sol"]))]:[]; return L.length?L:["btc","eth","sol"];})().map(c=>{const o=open.find(p=>p.coin===c); return `<div class="kpi"><div class="k">${CN[c]}</div><div class="v">${px[c]?nf(px[c],2)+" $":"—"}</div><div class="s"><span class="${cls((D.chg||{})[c])}">${pc((D.chg||{})[c],2)}</span>${o?` · em posição, stop ${nf(+o.stop,2)} $`:" · sem posição"}</div></div>`;}).join("")}</div></div>
     ${X?expSigCard(D,open,AC):sigCard(D,open)}
     ${X?"":`<div class="card"><h2>Como funciona</h2><div class="small" style="color:var(--text-2)">
       <p style="margin-top:0">De hora a hora (quando fecha cada vela) o bot lê os <b>preços reais da Kraken</b> (BTC, ETH, SOL em dólares) e aplica as estratégias de tendência <b>K1</b>: compra quando o preço rompe máximos ou fica acima da média, e vende quando a tendência acaba ou o stop é tocado (o stop é vigiado a cada minuto). <b>Nenhuma ordem real é enviada</b>: as trades são simuladas aqui, com a comissão da Kraken (0,26% por lado).</p>
@@ -678,7 +678,7 @@ function sigCard(D,open){
 async function loadExpSig(){
   const cfg=(S.stc&&S.stc.demo_exp&&S.stc.demo_exp.value)||null; if(!cfg) return;
   const contas=cfg.contas||(cfg.estrategias?[{id:2,estrategias:cfg.estrategias}]:[]);
-  const pairs={btc:"XBTUSD",eth:"ETHUSD",sol:"SOLUSD"}, TFM={"5m":5,"15m":15,"1h":60,"4h":240,"1d":1440}, cache={};
+  const pairs={btc:"XBTUSD",eth:"ETHUSD",sol:"SOLUSD",xrp:"XRPUSD",ada:"ADAUSD",doge:"XDGUSD",link:"LINKUSD",avax:"AVAXUSD"}, TFM={"5m":5,"15m":15,"1h":60,"4h":240,"1d":1440}, cache={};
   const get=async(p,i)=>{const k=p+i; if(!cache[k]){const j=await fetch(`https://api.kraken.com/0/public/OHLC?pair=${p}&interval=${i}`,{cache:"no-store"}).then(r=>r.json());
     const key=Object.keys(j.result).find(x=>x!=="last"); cache[k]=j.result[key].slice(0,-1).map(r=>({t:r[0]*1000,h:+r[2],l:+r[3],c:+r[4],v:+r[6]}));} return cache[k];};
   try{
@@ -687,7 +687,7 @@ async function loadExpSig(){
     const rows=[];
     for(const conta of contas) for(const e of (conta.estrategias||[])){
       const tfm=TFM[e.tf];
-      for(const [coin,pair] of Object.entries(pairs)){
+      for(const coin of (e.coins||["btc","eth","sol"])){ const pair=pairs[coin];
         const b=await get(pair,tfm), c=b.map(x=>x.c), last=b[b.length-1], conds=[];
         const E=e.entry, side=e.side||1;
         if(E.kind==="above_sma"){const m=c.slice(-E.n).reduce((a,x)=>a+x,0)/E.n; conds.push({txt:`${coin.toUpperCase()} fechar acima da média de ${E.n} velas de ${e.tf}`,lvl:m,cur:last.c,ok:last.c>m,up:true});}
@@ -696,7 +696,7 @@ async function loadExpSig(){
         else if(E.kind==="lowclose"){const m=Math.min(...c.slice(-E.n)); conds.push({txt:`${coin.toUpperCase()} fechar no mínimo das últimas ${E.n} velas`,lvl:m,cur:last.c,ok:last.c<=m,up:false});}
         else if(E.kind==="rsi2"){let up=0,dn=0; for(let i=1;i<c.length;i++){const d=c[i]-c[i-1],u=Math.max(d,0),w=Math.max(-d,0); if(i===1){up=u;dn=w;}else{up=.5*u+.5*up;dn=.5*w+.5*dn;}}
           const r=dn?100-100/(1+up/dn):100; conds.push({txt:`RSI(2) de ${e.tf} ${side===1?"abaixo de "+E.lo:"acima de "+(100-E.lo)} (agora ${nf(r,0)})`,lvl:null,cur:null,ok:side===1?r<E.lo:r>100-E.lo});}
-        if(e.vol_mult){const n=20, m=b.slice(-n-1,-1).reduce((q,x)=>q+x.v,0)/n; conds.push({txt:`volume da vela > ${e.vol_mult}x a média de 20 (agora ${m?nf(last.v/m,1):"—"}x)`,lvl:null,cur:null,ok:m>0&&last.v>e.vol_mult*m});}
+        if(e.vol_mult){const n=E.n||20, m=b.slice(-n-1,-1).reduce((q,x)=>q+x.v,0)/n; conds.push({txt:`volume da vela > ${e.vol_mult}x a média de ${E.n||20} (agora ${m?nf(last.v/m,1):"—"}x)`,lvl:null,cur:null,ok:m>0&&last.v>e.vol_mult*m});}
         if(e.trend_ema){const a=2/(e.trend_ema+1); let m=c[0]; c.forEach(x=>m=a*x+(1-a)*m); conds.push({txt:`${coin.toUpperCase()} ${side===1?"acima":"abaixo"} da EMA ${e.trend_ema} de ${e.tf}`,lvl:m,cur:last.c,ok:side===1?last.c>m:last.c<m,up:side===1});}
         if(e.btc) conds.push({txt:`BTC fechar o dia ${e.btc==="bull"?"acima":"abaixo"} da média de 200 dias`,lvl:regime.lvl,cur:regime.close,ok:e.btc==="bull"?regime.bull:!regime.bull,up:e.btc==="bull"});
         rows.push({acc:+conta.id,e,coin,conds,next:last.t+2*tfm*60000});
@@ -741,9 +741,9 @@ async function loadDemo(){
 /* precos ao vivo da Kraken de 5 em 5 segundos (so no browser; o bot vigia os stops de minuto a minuto) */
 async function livePx(){
   if(document.hidden) return;
-  try{const r=await fetch("https://api.kraken.com/0/public/Ticker?pair=XBTUSD,ETHUSD,SOLUSD",{cache:"no-store"}).then(r=>r.json());
+  try{const r=await fetch("https://api.kraken.com/0/public/Ticker?pair=XBTUSD,ETHUSD,SOLUSD,XRPUSD,ADAUSD,XDGUSD,LINKUSD,AVAXUSD",{cache:"no-store"}).then(r=>r.json());
     const px={},chg={};
-    for(const [k,v] of Object.entries(r.result||{})){const c=k.includes("XBT")?"btc":k.includes("ETH")?"eth":k.includes("SOL")?"sol":null; if(c){px[c]=+v.c[0]; chg[c]=(+v.c[0]/(+v.o)-1)*100;}}
+    for(const [k,v] of Object.entries(r.result||{})){const h=[["XBT","btc"],["ETH","eth"],["SOL","sol"],["XRP","xrp"],["ADA","ada"],["XDG","doge"],["LINK","link"],["AVAX","avax"]].find(([q])=>k.includes(q)), c=h&&h[1]; if(c){px[c]=+v.c[0]; chg[c]=(+v.c[0]/(+v.o)-1)*100;}}
     S.demo={...(S.demo||{}),px,chg,pxAt:new Date()}; if(S.route==="demo"&&S.demo.acc) render();
   }catch(e){}
 }
